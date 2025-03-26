@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "intelligence.apps.IntelligenceConfig",
     "projects.apps.ProjectsConfig",
     "tasks.apps.TasksConfig",
-    "settings.apps.SettingsConfig",
+    "admin_panel.apps.AdminPanelConfig",
     "correspondence.apps.CorrespondenceConfig",
     "workspace.apps.WorkspaceConfig",
 ]

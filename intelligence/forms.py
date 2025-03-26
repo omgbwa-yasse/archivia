@@ -37,33 +37,31 @@ class AIPromptForm(forms.ModelForm):
 class AIChatForm(forms.ModelForm):
     class Meta:
         model = AIChat
-        fields = ['title', 'description', 'ai_agent']
+        fields = ['title', 'description', 'ai_agent', 'chat_settings', 'status']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
+            'chat_settings': forms.Textarea(attrs={'rows': 4}),
         }
 
 class AIToolForm(forms.ModelForm):
     class Meta:
         model = AITool
-        fields = ['name', 'description', 'type', 'version', 'status', 'configuration']
+        fields = ['name', 'description', 'type', 'capabilities', 'configuration', 'api_endpoint', 'version', 'status']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
+            'capabilities': forms.Textarea(attrs={'rows': 4}),
             'configuration': forms.Textarea(attrs={'rows': 4}),
         }
 
 class AITaskForm(forms.ModelForm):
     class Meta:
         model = AITask
-        fields = ['name', 'description', 'agent', 'model', 'priority', 'status', 'configuration']
+        fields = ['name', 'description', 'agent', 'model', 'priority', 'status']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
-            'configuration': forms.Textarea(attrs={'rows': 4}),
         }
 
 class AIReferenceDataForm(forms.ModelForm):
     class Meta:
         model = AIReferenceData
-        fields = ['reference_list', 'ai_agent', 'usage', 'configuration']
-        widgets = {
-            'configuration': forms.Textarea(attrs={'rows': 4}),
-        } 
+        fields = ['ai_agent', 'usage'] 

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Supprimer la donnée de référence</h1>
+        <a href="{% url 'intelligence:reference_detail' reference.pk %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au détail
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="lead">
+                Êtes-vous sûr de vouloir supprimer la donnée de référence pour l'agent "{{ reference.ai_agent.name }}" 
+                avec l'usage "{{ reference.get_usage_display }}" ?
+            </p>
+
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                Cette action est irréversible.
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Confirmer la suppression
+                </button>
+                <a href="{% url 'intelligence:reference_detail' reference.pk %}" class="btn btn-light">
+                    Annuler
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

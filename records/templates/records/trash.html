@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Corbeille{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Corbeille</h2>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Dossiers supprimés -->
+    {% if deleted_folders %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Dossiers supprimés</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date de suppression</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for folder in deleted_folders %}
+                        <tr>
+                            <td>{{ folder.name }}</td>
+                            <td>{{ folder.deleted_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="restore">
+                                    <input type="hidden" name="type" value="folder">
+                                    <input type="hidden" name="id" value="{{ folder.id }}">
+                                    <button type="submit" class="btn btn-sm btn-success">Restaurer</button>
+                                </form>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="type" value="folder">
+                                    <input type="hidden" name="id" value="{{ folder.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement ce dossier ?')">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Documents supprimés -->
+    {% if deleted_documents %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Documents supprimés</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date de suppression</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for document in deleted_documents %}
+                        <tr>
+                            <td>{{ document.name }}</td>
+                            <td>{{ document.deleted_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="restore">
+                                    <input type="hidden" name="type" value="document">
+                                    <input type="hidden" name="id" value="{{ document.id }}">
+                                    <button type="submit" class="btn btn-sm btn-success">Restaurer</button>
+                                </form>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="type" value="document">
+                                    <input type="hidden" name="id" value="{{ document.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement ce document ?')">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Métadonnées supprimées -->
+    {% if deleted_metadata %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Métadonnées supprimées</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date de suppression</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for metadata in deleted_metadata %}
+                        <tr>
+                            <td>{{ metadata.name }}</td>
+                            <td>{{ metadata.deleted_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="restore">
+                                    <input type="hidden" name="type" value="metadata">
+                                    <input type="hidden" name="id" value="{{ metadata.id }}">
+                                    <button type="submit" class="btn btn-sm btn-success">Restaurer</button>
+                                </form>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="type" value="metadata">
+                                    <input type="hidden" name="id" value="{{ metadata.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement cette métadonnée ?')">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Listes de référence supprimées -->
+    {% if deleted_reference_lists %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Listes de référence supprimées</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Date de suppression</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ref_list in deleted_reference_lists %}
+                        <tr>
+                            <td>{{ ref_list.name }}</td>
+                            <td>{{ ref_list.deleted_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="restore">
+                                    <input type="hidden" name="type" value="reference_list">
+                                    <input type="hidden" name="id" value="{{ ref_list.id }}">
+                                    <button type="submit" class="btn btn-sm btn-success">Restaurer</button>
+                                </form>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="type" value="reference_list">
+                                    <input type="hidden" name="id" value="{{ ref_list.id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer définitivement cette liste de référence ?')">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not deleted_folders and not deleted_documents and not deleted_metadata and not deleted_reference_lists %}
+    <div class="alert alert-info">
+        La corbeille est vide.
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

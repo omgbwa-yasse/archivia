@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -18,6 +19,32 @@ from .forms import (
     AIAgentForm, AIModelForm, AIPromptForm, AIChatForm,
     AIToolForm, AITaskForm, AIReferenceDataForm
 )
+
+@login_required
+def dashboard(request):
+    context = {
+        'agents_count': AIAgent.objects.count(),
+        'models_count': AIModel.objects.count(),
+        'tasks_count': AITask.objects.filter(created_by=request.user).count(),
+        'chats_count': AIChat.objects.filter(created_by=request.user).count(),
+    }
+    return render(request, 'intelligence/dashboard.html', context)
+
+@login_required
+def analysis(request):
+    return render(request, 'intelligence/analysis.html')
+
+@login_required
+def predictions(request):
+    return render(request, 'intelligence/predictions.html')
+
+@login_required
+def training(request):
+    return render(request, 'intelligence/training.html')
+
+@login_required
+def evaluation(request):
+    return render(request, 'intelligence/evaluation.html')
 
 # AI Agent Views
 class AIAgentListView(LoginRequiredMixin, ListView):
@@ -142,7 +169,7 @@ class AIChatListView(LoginRequiredMixin, ListView):
     context_object_name = 'chats'
 
     def get_queryset(self):
-        return AIChat.objects.filter(user=self.request.user)
+        return AIChat.objects.filter(created_by=self.request.user)
 
 class AIChatCreateView(LoginRequiredMixin, CreateView):
     model = AIChat
@@ -151,7 +178,7 @@ class AIChatCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('intelligence:chat_list')
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        form.instance.created_by = self.request.user
         return super().form_valid(form)
 
 class AIChatDetailView(LoginRequiredMixin, DetailView):
@@ -165,6 +192,10 @@ class AIChatUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'intelligence/chat_form.html'
     success_url = reverse_lazy('intelligence:chat_list')
 
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
 class AIChatDeleteView(LoginRequiredMixin, DeleteView):
     model = AIChat
     template_name = 'intelligence/chat_confirm_delete.html'
@@ -172,7 +203,7 @@ class AIChatDeleteView(LoginRequiredMixin, DeleteView):
 
 @require_POST
 def chat_archive(request, pk):
-    chat = get_object_or_404(AIChat, pk=pk, user=request.user)
+    chat = get_object_or_404(AIChat, pk=pk, created_by=request.user)
     chat.is_archived = True
     chat.save()
     messages.success(request, "Le chat a été archivé avec succès.")
@@ -240,7 +271,7 @@ class AITaskListView(LoginRequiredMixin, ListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return AITask.objects.filter(user=self.request.user)
+        return AITask.objects.filter(created_by=self.request.user)
 
 class AITaskCreateView(LoginRequiredMixin, CreateView):
     model = AITask
@@ -249,7 +280,7 @@ class AITaskCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('intelligence:task_list')
 
     def form_valid(self, form):
-        form.instance.user = self.request.user
+        form.instance.created_by = self.request.user
         return super().form_valid(form)
 
 class AITaskDetailView(LoginRequiredMixin, DetailView):
@@ -270,33 +301,26 @@ class AITaskDeleteView(LoginRequiredMixin, DeleteView):
 
 @require_POST
 def task_start(request, pk):
-    task = get_object_or_404(AITask, pk=pk, user=request.user)
-    task.status = 'RUNNING'
-    task.save()
+    task = get_object_or_404(AITask, pk=pk, created_by=request.user)
+    task.start()
     return JsonResponse({'status': 'success'})
 
 @require_POST
 def task_complete(request, pk):
-    task = get_object_or_404(AITask, pk=pk, user=request.user)
-    task.status = 'COMPLETED'
-    task.completed_at = timezone.now()
-    task.save()
+    task = get_object_or_404(AITask, pk=pk, created_by=request.user)
+    task.complete()
     return JsonResponse({'status': 'success'})
 
 @require_POST
 def task_fail(request, pk):
-    task = get_object_or_404(AITask, pk=pk, user=request.user)
-    task.status = 'FAILED'
-    task.failed_at = timezone.now()
-    task.save()
+    task = get_object_or_404(AITask, pk=pk, created_by=request.user)
+    task.fail()
     return JsonResponse({'status': 'success'})
 
 @require_POST
 def task_cancel(request, pk):
-    task = get_object_or_404(AITask, pk=pk, user=request.user)
-    task.status = 'CANCELLED'
-    task.cancelled_at = timezone.now()
-    task.save()
+    task = get_object_or_404(AITask, pk=pk, created_by=request.user)
+    task.cancel()
     return JsonResponse({'status': 'success'})
 
 class AITaskFeedbackCreateView(LoginRequiredMixin, CreateView):
@@ -329,13 +353,13 @@ def usage_stats_export(request):
 # AI Reference Data Views
 class AIReferenceDataListView(LoginRequiredMixin, ListView):
     model = AIReferenceData
-    template_name = 'intelligence/reference_data_list.html'
+    template_name = 'intelligence/reference/reference_list.html'
     context_object_name = 'references'
 
 class AIReferenceDataCreateView(LoginRequiredMixin, CreateView):
     model = AIReferenceData
     form_class = AIReferenceDataForm
-    template_name = 'intelligence/reference_data_form.html'
+    template_name = 'intelligence/reference/reference_form.html'
     success_url = reverse_lazy('intelligence:reference_list')
 
     def form_valid(self, form):
@@ -344,13 +368,13 @@ class AIReferenceDataCreateView(LoginRequiredMixin, CreateView):
 
 class AIReferenceDataDetailView(LoginRequiredMixin, DetailView):
     model = AIReferenceData
-    template_name = 'intelligence/reference_data_detail.html'
+    template_name = 'intelligence/reference/reference_detail.html'
     context_object_name = 'reference'
 
 class AIReferenceDataUpdateView(LoginRequiredMixin, UpdateView):
     model = AIReferenceData
     form_class = AIReferenceDataForm
-    template_name = 'intelligence/reference_data_form.html'
+    template_name = 'intelligence/reference/reference_form.html'
     success_url = reverse_lazy('intelligence:reference_list')
 
     def form_valid(self, form):
@@ -359,5 +383,5 @@ class AIReferenceDataUpdateView(LoginRequiredMixin, UpdateView):
 
 class AIReferenceDataDeleteView(LoginRequiredMixin, DeleteView):
     model = AIReferenceData
-    template_name = 'intelligence/reference_data_confirm_delete.html'
+    template_name = 'intelligence/reference/reference_confirm_delete.html'
     success_url = reverse_lazy('intelligence:reference_list') 

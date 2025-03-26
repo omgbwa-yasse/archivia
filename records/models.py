@@ -139,3 +139,96 @@ class ReferenceValue(models.Model):
 
     def __str__(self):
         return f"{self.list.name} - {self.value}"
+
+class Category(models.Model):
+    name = models.CharField(_('Name'), max_length=100, unique=True)
+    description = models.TextField(_('Description'), blank=True, null=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_categories')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_categories')
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='deleted_categories')
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('Category')
+        verbose_name_plural = _('Categories')
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def soft_delete(self, user):
+        self.deleted_by = user
+        self.deleted_at = timezone.now()
+        self.save()
+
+    def restore(self):
+        self.deleted_by = None
+        self.deleted_at = None
+        self.save()
+
+class Archive(models.Model):
+    name = models.CharField(_('Name'), max_length=190)
+    description = models.TextField(_('Description'), blank=True, null=True)
+    location = models.CharField(_('Location'), max_length=255)
+    capacity = models.IntegerField(_('Capacity'), help_text=_('Capacity in cubic meters'))
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_archives')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_archives')
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='deleted_archives')
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('Archive')
+        verbose_name_plural = _('Archives')
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def soft_delete(self, user):
+        self.deleted_by = user
+        self.deleted_at = timezone.now()
+        self.save()
+
+    def restore(self):
+        self.deleted_by = None
+        self.deleted_at = None
+        self.save()
+
+class Retention(models.Model):
+    name = models.CharField(_('Name'), max_length=190)
+    description = models.TextField(_('Description'), blank=True, null=True)
+    retention_period = models.IntegerField(_('Retention Period'), help_text=_('Retention period in years'))
+    retention_type = models.CharField(_('Retention Type'), max_length=20, choices=[
+        ('permanent', _('Permanent')),
+        ('temporary', _('Temporary')),
+        ('confidential', _('Confidential')),
+    ])
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_retentions')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_retentions')
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='deleted_retentions')
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('Retention')
+        verbose_name_plural = _('Retentions')
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def soft_delete(self, user):
+        self.deleted_by = user
+        self.deleted_at = timezone.now()
+        self.save()
+
+    def restore(self):
+        self.deleted_by = None
+        self.deleted_at = None
+        self.save()

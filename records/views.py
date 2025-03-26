@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import (
     Folder, Document, MetadataDefinition,
     DocumentMetadata, FolderMetadata, ReferenceList,
-    ReferenceValue
+    ReferenceValue, Category, Archive, Retention
 )
 from .serializers import (
     FolderSerializer, FolderDetailSerializer, MetadataDefinitionSerializer,
@@ -17,6 +17,7 @@ from .serializers import (
     ReferenceValueSerializer, DocumentSerializer
 )
 from django.http import FileResponse
+from django.contrib import messages
 
 # Create your views here.
 
@@ -74,6 +75,34 @@ class DocumentListView(LoginRequiredMixin, ListView):
     model = Document
     template_name = 'records/document_list.html'
     context_object_name = 'documents'
+
+class DocumentImportView(LoginRequiredMixin, View):
+    template_name = 'records/document_import.html'
+
+    def get(self, request):
+        folders = Folder.objects.filter(deleted_at__isnull=True)
+        return render(request, self.template_name, {'folders': folders})
+
+    def post(self, request):
+        try:
+            files = request.FILES.getlist('files')
+            folder_id = request.POST.get('folder')
+            folder = get_object_or_404(Folder, id=folder_id) if folder_id else None
+
+            for file in files:
+                Document.objects.create(
+                    name=file.name,
+                    file=file,
+                    folder=folder,
+                    created_by=request.user
+                )
+
+            messages.success(request, f'{len(files)} document(s) importé(s) avec succès')
+            return redirect('records:document_list')
+        except Exception as e:
+            messages.error(request, f'Erreur lors de l\'import: {str(e)}')
+            folders = Folder.objects.filter(deleted_at__isnull=True)
+            return render(request, self.template_name, {'folders': folders})
 
 class DocumentDetailView(LoginRequiredMixin, DetailView):
     model = Document
@@ -333,3 +362,179 @@ class FolderTreeView(generics.RetrieveAPIView):
         if children.exists():
             data['children'] = [self._build_tree(child) for child in children]
         return data
+
+class TrashView(LoginRequiredMixin, View):
+    template_name = 'records/trash.html'
+
+    def get(self, request):
+        deleted_folders = Folder.objects.filter(deleted_at__isnull=False)
+        deleted_documents = Document.objects.filter(deleted_at__isnull=False)
+        deleted_metadata = MetadataDefinition.objects.filter(deleted_at__isnull=False)
+        deleted_reference_lists = ReferenceList.objects.filter(deleted_at__isnull=False)
+        
+        context = {
+            'deleted_folders': deleted_folders,
+            'deleted_documents': deleted_documents,
+            'deleted_metadata': deleted_metadata,
+            'deleted_reference_lists': deleted_reference_lists,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        action = request.POST.get('action')
+        item_type = request.POST.get('type')
+        item_id = request.POST.get('id')
+
+        if action == 'restore':
+            if item_type == 'folder':
+                item = get_object_or_404(Folder, id=item_id)
+                item.restore()
+            elif item_type == 'document':
+                item = get_object_or_404(Document, id=item_id)
+                item.restore()
+            elif item_type == 'metadata':
+                item = get_object_or_404(MetadataDefinition, id=item_id)
+                item.restore()
+            elif item_type == 'reference_list':
+                item = get_object_or_404(ReferenceList, id=item_id)
+                item.restore()
+            messages.success(request, f'{item_type.title()} restauré avec succès')
+        elif action == 'delete':
+            if item_type == 'folder':
+                item = get_object_or_404(Folder, id=item_id)
+                item.hard_delete()
+            elif item_type == 'document':
+                item = get_object_or_404(Document, id=item_id)
+                item.hard_delete()
+            elif item_type == 'metadata':
+                item = get_object_or_404(MetadataDefinition, id=item_id)
+                item.hard_delete()
+            elif item_type == 'reference_list':
+                item = get_object_or_404(ReferenceList, id=item_id)
+                item.hard_delete()
+            messages.success(request, f'{item_type.title()} supprimé définitivement')
+
+        return redirect('records:trash')
+
+class CategoryCreateView(LoginRequiredMixin, CreateView):
+    model = Category
+    template_name = 'records/category_form.html'
+    fields = ['name', 'description', 'parent']
+    success_url = reverse_lazy('records:category_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+class CategoryListView(LoginRequiredMixin, ListView):
+    model = Category
+    template_name = 'records/category_list.html'
+    context_object_name = 'categories'
+    
+    def get_queryset(self):
+        return Category.objects.filter(parent=None)
+
+class CategoryDetailView(LoginRequiredMixin, DetailView):
+    model = Category
+    template_name = 'records/category_detail.html'
+    context_object_name = 'category'
+
+class CategoryUpdateView(LoginRequiredMixin, UpdateView):
+    model = Category
+    template_name = 'records/category_form.html'
+    fields = ['name', 'description', 'parent']
+    success_url = reverse_lazy('records:category_list')
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+class CategoryDeleteView(LoginRequiredMixin, DeleteView):
+    model = Category
+    template_name = 'records/category_confirm_delete.html'
+    success_url = reverse_lazy('records:category_list')
+
+    def delete(self, request, *args, **kwargs):
+        category = self.get_object()
+        category.soft_delete(request.user)
+        return super().delete(request, *args, **kwargs)
+
+class ArchiveListView(LoginRequiredMixin, ListView):
+    model = Archive
+    template_name = 'records/archive_list.html'
+    context_object_name = 'archives'
+
+class ArchiveCreateView(LoginRequiredMixin, CreateView):
+    model = Archive
+    template_name = 'records/archive_form.html'
+    fields = ['name', 'description', 'location', 'capacity']
+    success_url = reverse_lazy('records:archive_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+class ArchiveDetailView(LoginRequiredMixin, DetailView):
+    model = Archive
+    template_name = 'records/archive_detail.html'
+    context_object_name = 'archive'
+
+class ArchiveUpdateView(LoginRequiredMixin, UpdateView):
+    model = Archive
+    template_name = 'records/archive_form.html'
+    fields = ['name', 'description', 'location', 'capacity']
+    success_url = reverse_lazy('records:archive_list')
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+class ArchiveDeleteView(LoginRequiredMixin, DeleteView):
+    model = Archive
+    template_name = 'records/archive_confirm_delete.html'
+    success_url = reverse_lazy('records:archive_list')
+
+    def delete(self, request, *args, **kwargs):
+        archive = self.get_object()
+        archive.soft_delete(request.user)
+        return super().delete(request, *args, **kwargs)
+
+class RetentionListView(LoginRequiredMixin, ListView):
+    model = Retention
+    template_name = 'records/retention_list.html'
+    context_object_name = 'retentions'
+
+class RetentionCreateView(LoginRequiredMixin, CreateView):
+    model = Retention
+    template_name = 'records/retention_form.html'
+    fields = ['name', 'description', 'retention_period', 'retention_type']
+    success_url = reverse_lazy('records:retention_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+class RetentionDetailView(LoginRequiredMixin, DetailView):
+    model = Retention
+    template_name = 'records/retention_detail.html'
+    context_object_name = 'retention'
+
+class RetentionUpdateView(LoginRequiredMixin, UpdateView):
+    model = Retention
+    template_name = 'records/retention_form.html'
+    fields = ['name', 'description', 'retention_period', 'retention_type']
+    success_url = reverse_lazy('records:retention_list')
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+class RetentionDeleteView(LoginRequiredMixin, DeleteView):
+    model = Retention
+    template_name = 'records/retention_confirm_delete.html'
+    success_url = reverse_lazy('records:retention_list')
+
+    def delete(self, request, *args, **kwargs):
+        retention = self.get_object()
+        retention.soft_delete(request.user)
+        return super().delete(request, *args, **kwargs)

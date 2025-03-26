@@ -12,16 +12,11 @@ router.register(r'metadata-definitions', views.MetadataDefinitionViewSet, basena
 router.register(r'reference-lists', views.ReferenceListViewSet, basename='reference-list')
 router.register(r'reference-values', views.ReferenceValueViewSet, basename='reference-value')
 
-api_urlpatterns = [
-    path('', include(router.urls)),
-    path('folders/<int:pk>/metadata/', views.FolderMetadataViewSet.as_view({'get': 'list', 'post': 'create'}), name='folder-metadata'),
-    path('folders/<int:pk>/metadata/<int:metadata_id>/', views.FolderMetadataViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='folder-metadata-detail'),
-    path('folders/<int:pk>/children/', views.FolderChildrenView.as_view(), name='folder-children'),
-    path('folders/<int:pk>/tree/', views.FolderTreeView.as_view(), name='folder-tree'),
-]
-
 # URLs pour les vues templates
 urlpatterns = [
+    # Trash URL
+    path('trash/', views.TrashView.as_view(), name='trash'),
+    
     # Folder URLs
     path('folders/', views.FolderListView.as_view(), name='folder_list'),
     path('folders/create/', views.FolderCreateView.as_view(), name='folder_create'),
@@ -32,6 +27,7 @@ urlpatterns = [
     
     # Document URLs
     path('documents/', views.DocumentListView.as_view(), name='document_list'),
+    path('documents/import/', views.DocumentImportView.as_view(), name='document_import'),
     path('documents/create/', views.DocumentCreateView.as_view(), name='document_create'),
     path('documents/<int:pk>/', views.DocumentDetailView.as_view(), name='document_detail'),
     path('documents/<int:pk>/update/', views.DocumentUpdateView.as_view(), name='document_update'),
@@ -57,6 +53,31 @@ urlpatterns = [
     path('reference-values/<int:pk>/update/', views.ReferenceValueUpdateView.as_view(), name='reference_value_update'),
     path('reference-values/<int:pk>/delete/', views.ReferenceValueDeleteView.as_view(), name='reference_value_delete'),
     
-    # URLs de l'API
-    path('api/', include(api_urlpatterns)),
+    # Category URLs
+    path('categories/', views.CategoryListView.as_view(), name='category_list'),
+    path('categories/create/', views.CategoryCreateView.as_view(), name='category_create'),
+    path('categories/<int:pk>/', views.CategoryDetailView.as_view(), name='category_detail'),
+    path('categories/<int:pk>/update/', views.CategoryUpdateView.as_view(), name='category_update'),
+    path('categories/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category_delete'),
+    
+    # Archive URLs
+    path('archives/', views.ArchiveListView.as_view(), name='archive_list'),
+    path('archives/create/', views.ArchiveCreateView.as_view(), name='archive_create'),
+    path('archives/<int:pk>/', views.ArchiveDetailView.as_view(), name='archive_detail'),
+    path('archives/<int:pk>/update/', views.ArchiveUpdateView.as_view(), name='archive_update'),
+    path('archives/<int:pk>/delete/', views.ArchiveDeleteView.as_view(), name='archive_delete'),
+    
+    # Retention URLs
+    path('retentions/', views.RetentionListView.as_view(), name='retention_list'),
+    path('retentions/create/', views.RetentionCreateView.as_view(), name='retention_create'),
+    path('retentions/<int:pk>/', views.RetentionDetailView.as_view(), name='retention_detail'),
+    path('retentions/<int:pk>/update/', views.RetentionUpdateView.as_view(), name='retention_update'),
+    path('retentions/<int:pk>/delete/', views.RetentionDeleteView.as_view(), name='retention_delete'),
+    
+    # API URLs
+    path('api/folders/<int:pk>/metadata/', views.FolderMetadataViewSet.as_view({'get': 'list', 'post': 'create'}), name='folder-metadata'),
+    path('api/folders/<int:pk>/metadata/<int:metadata_id>/', views.FolderMetadataViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='folder-metadata-detail'),
+    path('api/folders/<int:pk>/children/', views.FolderChildrenView.as_view(), name='folder-children'),
+    path('api/folders/<int:pk>/tree/', views.FolderTreeView.as_view(), name='folder-tree'),
+    path('api/', include(router.urls)),
 ] 

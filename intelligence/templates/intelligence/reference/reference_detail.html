@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Donnée de référence - {{ reference.ai_agent.name }}</h1>
+        <div>
+            <a href="{% url 'intelligence:reference_list' %}" class="btn btn-secondary me-2">
+                <i class="fas fa-arrow-left"></i> Retour à la liste
+            </a>
+            <div class="btn-group" role="group">
+                <a href="{% url 'intelligence:reference_update' reference.pk %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+                <a href="{% url 'intelligence:reference_delete' reference.pk %}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Supprimer
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Agent</dt>
+                        <dd class="col-sm-8">
+                            <a href="{% url 'intelligence:agent_detail' reference.ai_agent.pk %}">
+                                {{ reference.ai_agent.name }}
+                            </a>
+                        </dd>
+
+                        <dt class="col-sm-4">Usage</dt>
+                        <dd class="col-sm-8">{{ reference.get_usage_display }}</dd>
+
+                        <dt class="col-sm-4">Créé par</dt>
+                        <dd class="col-sm-8">{{ reference.created_by.username }}</dd>
+
+                        <dt class="col-sm-4">Date de création</dt>
+                        <dd class="col-sm-8">{{ reference.created_at|date:"d/m/Y H:i" }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Agent associé</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Type</dt>
+                        <dd class="col-sm-8">{{ reference.ai_agent.get_type_display }}</dd>
+
+                        <dt class="col-sm-4">Statut</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge {% if reference.ai_agent.status == 'ACTIVE' %}bg-success{% elif reference.ai_agent.status == 'MAINTENANCE' %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ reference.ai_agent.get_status_display }}
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-4">Version</dt>
+                        <dd class="col-sm-8">{{ reference.ai_agent.version }}</dd>
+
+                        <dt class="col-sm-4">Description</dt>
+                        <dd class="col-sm-8">{{ reference.ai_agent.description|default:"Aucune description" }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if reference.ai_agent.capabilities %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Capacités de l'agent</h5>
+        </div>
+        <div class="card-body">
+            <pre><code>{{ reference.ai_agent.capabilities|pprint }}</code></pre>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if reference.ai_agent.system_prompt %}
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Prompt système</h5>
+        </div>
+        <div class="card-body">
+            <pre><code>{{ reference.ai_agent.system_prompt }}</code></pre>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

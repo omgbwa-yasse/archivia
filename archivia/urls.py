@@ -33,7 +33,7 @@ urlpatterns = [
     path('intelligence/', include('intelligence.urls')),  # URLs pour le module intelligence
     path('projects/', include('projects.urls')),  # URLs pour le module projects
     path('tasks/', include('tasks.urls')),  # URLs pour le module tasks
-    path('settings/', include('settings.urls')),  # URLs pour le module settings
+    path('settings/', include('admin_panel.urls')),  # URLs pour le module settings
     path('correspondence/', include('correspondence.urls')),  # URLs pour le module correspondence
     path('examples/', lambda request: render(request, 'examples.html'), name='examples'),
 ]

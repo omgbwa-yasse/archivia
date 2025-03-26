@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}{{ archive.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">{{ archive.name }}</h2>
+                    <div>
+                        <a href="{% url 'records:archive_update' archive.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{% url 'records:archive_delete' archive.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if archive.description %}
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p>{{ archive.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-4">
+                        <h5>Emplacement</h5>
+                        <p>{{ archive.location }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Capacité</h5>
+                        <p>{{ archive.capacity }} m³</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Informations</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Créé par</dt>
+                        <dd class="col-sm-8">{{ archive.created_by.get_full_name|default:archive.created_by.username }}</dd>
+                        
+                        <dt class="col-sm-4">Date de création</dt>
+                        <dd class="col-sm-8">{{ archive.created_at|date:"d/m/Y H:i" }}</dd>
+                        
+                        {% if archive.updated_by %}
+                        <dt class="col-sm-4">Dernière modification</dt>
+                        <dd class="col-sm-8">{{ archive.updated_at|date:"d/m/Y H:i" }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

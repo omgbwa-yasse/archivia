@@ -73,6 +73,19 @@ def welcome(request):
     return render(request, 'users/welcome.html')
 
 @login_required
+def profile(request):
+    if request.method == 'POST':
+        # Handle profile update
+        user = request.user
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.save()
+        messages.success(request, 'Profil mis à jour avec succès')
+        return redirect('users:profile')
+    
+    return render(request, 'users/profile.html')
+
+@login_required
 def logout_view(request):
     logout(request)
     messages.success(request, 'Vous avez été déconnecté avec succès')

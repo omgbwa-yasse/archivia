@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Données de référence</h1>
+        <a href="{% url 'intelligence:reference_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouvelle donnée de référence
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Agent</th>
+                            <th>Usage</th>
+                            <th>Créé par</th>
+                            <th>Date de création</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reference in references %}
+                        <tr>
+                            <td>{{ reference.ai_agent.name }}</td>
+                            <td>{{ reference.get_usage_display }}</td>
+                            <td>{{ reference.created_by.username }}</td>
+                            <td>{{ reference.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'intelligence:reference_detail' reference.pk %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'intelligence:reference_update' reference.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'intelligence:reference_delete' reference.pk %}" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune donnée de référence trouvée</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if references.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if references.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">&laquo; Premier</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ references.previous_page_number }}">Précédent</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in references.paginator.page_range %}
+                    {% if references.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > references.number|add:'-3' and num < references.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if references.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ references.next_page_number }}">Suivant</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ references.paginator.num_pages }}">Dernier &raquo;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.login_view, name='login'),  # Page par défaut
     path('register/', views.register, name='register'),
     path('welcome/', views.welcome, name='welcome'),
+    path('profile/', views.profile, name='profile'),
     path('logout/', views.logout_view, name='logout'),
 ]
 

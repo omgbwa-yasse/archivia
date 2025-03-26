@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">{{ category.name }}</h2>
+                    <div>
+                        <a href="{% url 'records:category_update' category.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{% url 'records:category_delete' category.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if category.description %}
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p>{{ category.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if category.parent %}
+                    <div class="mb-4">
+                        <h5>Catégorie parente</h5>
+                        <p>
+                            <a href="{% url 'records:category_detail' category.parent.pk %}">
+                                {{ category.parent.name }}
+                            </a>
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    {% if category.children.exists %}
+                    <div class="mb-4">
+                        <h5>Sous-catégories</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for child in category.children.all %}
+                                    <tr>
+                                        <td>{{ child.name }}</td>
+                                        <td>{{ child.description|truncatewords:30 }}</td>
+                                        <td>
+                                            <a href="{% url 'records:category_detail' child.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'records:category_update' child.pk %}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'records:category_delete' child.pk %}" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Informations</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Créé par</dt>
+                        <dd class="col-sm-8">{{ category.created_by.get_full_name|default:category.created_by.username }}</dd>
+                        
+                        <dt class="col-sm-4">Date de création</dt>
+                        <dd class="col-sm-8">{{ category.created_at|date:"d/m/Y H:i" }}</dd>
+                        
+                        {% if category.updated_by %}
+                        <dt class="col-sm-4">Dernière modification</dt>
+                        <dd class="col-sm-8">{{ category.updated_at|date:"d/m/Y H:i" }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
