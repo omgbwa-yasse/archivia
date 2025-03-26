@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Documents</span>
+                    </h6>
+                    <button class="btn btn-sm btn-primary" id="uploadDocumentBtn">
+                        <i class="fas fa-upload"></i> Nouveau
+                    </button>
+                </div>
+                <div class="px-3">
+                    <div class="mb-3">
+                        <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Rechercher...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-muted">Filtres</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterRecent">
+                            <label class="form-check-label" for="filterRecent">
+                                Documents récents
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterShared">
+                            <label class="form-check-label" for="filterShared">
+                                Documents partagés
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2" id="currentViewTitle">Documents</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="viewModeBtn">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="listModeBtn">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="documentContent">
+                <!-- Le contenu des documents sera chargé dynamiquement -->
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal pour uploader un document -->
+<div class="modal fade" id="documentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModalTitle">Nouveau document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="documentForm">
+                    <div class="mb-3">
+                        <label for="documentName" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="documentName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="documentDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="documentDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="documentFile" class="form-label">Fichier</label>
+                        <input type="file" class="form-control" id="documentFile" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="documentFolder" class="form-label">Dossier</label>
+                        <select class="form-select" id="documentFolder">
+                            <!-- Les options seront chargées dynamiquement -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="saveDocumentBtn">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Configuration globale
+    const API_BASE_URL = '/documents/';
+    let currentViewMode = 'grid'; // 'grid' ou 'list'
+
+    // Fonctions utilitaires
+    function showError(message) {
+        // Implémenter l'affichage des erreurs
+    }
+
+    function showSuccess(message) {
+        // Implémenter l'affichage des messages de succès
+    }
+
+    // Gestion des documents
+    function loadDocuments(filters = {}) {
+        // Implémenter le chargement des documents
+    }
+
+    function uploadDocument() {
+        // Implémenter l'upload de documents
+    }
+
+    function editDocument(documentId) {
+        // Implémenter l'édition d'un document
+    }
+
+    function deleteDocument(documentId) {
+        // Implémenter la suppression d'un document
+    }
+
+    function shareDocument(documentId) {
+        // Implémenter le partage de documents
+    }
+
+    // Gestion de l'interface
+    function toggleViewMode(mode) {
+        // Implémenter le changement de mode d'affichage
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDocuments();
+        
+        // Gestionnaires d'événements
+        document.getElementById('uploadDocumentBtn').addEventListener('click', uploadDocument);
+        document.getElementById('viewModeBtn').addEventListener('click', () => toggleViewMode('grid'));
+        document.getElementById('listModeBtn').addEventListener('click', () => toggleViewMode('list'));
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            loadDocuments({ search: e.target.value });
+        });
+        document.getElementById('filterRecent').addEventListener('change', (e) => {
+            loadDocuments({ recent: e.target.checked });
+        });
+        document.getElementById('filterShared').addEventListener('change', (e) => {
+            loadDocuments({ shared: e.target.checked });
+        });
+        document.getElementById('saveDocumentBtn').addEventListener('click', () => {
+            // Implémenter la sauvegarde du formulaire
+        });
+    });
+</script>
+{% endblock %} 

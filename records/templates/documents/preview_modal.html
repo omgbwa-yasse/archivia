@@ -1,0 +1,87 @@
+<!-- Modal de prévisualisation -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Prévisualisation du document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <!-- Barre latérale -->
+                    <div class="col-md-3 bg-light border-end">
+                        <div class="p-3">
+                            <h6 class="mb-3">Informations</h6>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Type de fichier</small>
+                                <span class="badge bg-primary">{{ document.file_type }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Taille</small>
+                                <span>{{ document.file_size|filesizeformat }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Dernière modification</small>
+                                <span>{{ document.updated_at|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Version</small>
+                                <span>{{ document.version }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Zone de prévisualisation -->
+                    <div class="col-md-9">
+                        <div class="preview-container" style="height: 70vh;">
+                            {% if document.file_type == 'pdf' %}
+                            <iframe src="{{ document.file.url }}" class="w-100 h-100"></iframe>
+                            {% elif document.file_type in 'doc,docx,xls,xlsx' %}
+                            <div class="d-flex align-items-center justify-content-center h-100">
+                                <div class="text-center">
+                                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">La prévisualisation n'est pas disponible pour ce type de fichier</p>
+                                    <a href="{{ document.file.url }}" class="btn btn-primary" target="_blank">
+                                        <i class="fas fa-download"></i> Télécharger
+                                    </a>
+                                </div>
+                            </div>
+                            {% elif document.file_type == 'txt' %}
+                            <pre class="p-3 h-100 overflow-auto">{{ document.content }}</pre>
+                            {% else %}
+                            <div class="d-flex align-items-center justify-content-center h-100">
+                                <div class="text-center">
+                                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Type de fichier non supporté pour la prévisualisation</p>
+                                    <a href="{{ document.file.url }}" class="btn btn-primary" target="_blank">
+                                        <i class="fas fa-download"></i> Télécharger
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ document.file.url }}" class="btn btn-primary" target="_blank">
+                    <i class="fas fa-download"></i> Télécharger
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .preview-container {
+        background-color: #f8f9fa;
+    }
+    .preview-container iframe {
+        border: none;
+    }
+    .preview-container pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+</style> 

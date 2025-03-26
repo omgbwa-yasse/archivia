@@ -1,0 +1,205 @@
+{% extends "settings/base.html" %}
+
+{% block settings_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ backup_config.name }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'settings:backup_config_update' backup_config.pk %}" class="btn btn-warning me-2">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <form method="post" action="{% url 'settings:start_backup' backup_config.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-play"></i> Start Backup
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Configuration Details</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">{{ backup_config.description|default:"-" }}</dd>
+
+                    <dt class="col-sm-4">Storage Type</dt>
+                    <dd class="col-sm-8">{{ backup_config.get_storage_type_display }}</dd>
+
+                    <dt class="col-sm-4">Storage Path</dt>
+                    <dd class="col-sm-8">{{ backup_config.storage_path }}</dd>
+
+                    <dt class="col-sm-4">Retention</dt>
+                    <dd class="col-sm-8">{{ backup_config.retention_days }} days</dd>
+
+                    <dt class="col-sm-4">Max Backups</dt>
+                    <dd class="col-sm-8">{{ backup_config.max_backups|default:"No limit" }}</dd>
+
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        {% if backup_config.enabled %}
+                        <span class="badge bg-success">Enabled</span>
+                        {% else %}
+                        <span class="badge bg-danger">Disabled</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Backup Options</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Include Files</dt>
+                    <dd class="col-sm-8">
+                        {% if backup_config.include_files %}
+                        <span class="badge bg-success">Yes</span>
+                        {% else %}
+                        <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Include Database</dt>
+                    <dd class="col-sm-8">
+                        {% if backup_config.include_database %}
+                        <span class="badge bg-success">Yes</span>
+                        {% else %}
+                        <span class="badge bg-danger">No</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Compression</dt>
+                    <dd class="col-sm-8">{{ backup_config.get_compression_type_display }}</dd>
+
+                    <dt class="col-sm-4">Encryption</dt>
+                    <dd class="col-sm-8">
+                        {% if backup_config.encryption_enabled %}
+                        <span class="badge bg-success">Enabled</span>
+                        {% else %}
+                        <span class="badge bg-danger">Disabled</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-sm-4">Schedule</dt>
+                    <dd class="col-sm-8">
+                        {% if backup_config.schedule_type == 'MANUAL' %}
+                        Manual
+                        {% else %}
+                        {{ backup_config.get_schedule_type_display }} at {{ backup_config.schedule_time|time:"H:i" }}
+                        {% if backup_config.schedule_day %}
+                        ({{ backup_config.schedule_day }})
+                        {% endif %}
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Backup History</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Size</th>
+                        <th>Duration</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in backup_logs %}
+                    <tr>
+                        <td>{{ log.start_time|date:"Y-m-d H:i" }}</td>
+                        <td>{{ log.get_type_display }}</td>
+                        <td>
+                            {% if log.status == 'COMPLETED' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% elif log.status == 'RUNNING' %}
+                            <span class="badge bg-warning">Running</span>
+                            {% else %}
+                            <span class="badge bg-danger">Failed</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ log.file_size|filesizeformat|default:"-" }}</td>
+                        <td>
+                            {% if log.end_time %}
+                            {{ log.end_time|timeuntil:log.start_time }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-sm btn-info" title="Download">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <form method="post" 
+                                      action="{% url 'settings:restore_backup' log.id %}" 
+                                      class="d-inline"
+                                      onsubmit="return confirm('Are you sure you want to restore this backup? This will overwrite current data.');">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-warning" 
+                                            title="Restore">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No backup logs found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update backup status for running backups
+    function updateBackupStatus() {
+        const runningBackups = document.querySelectorAll('tr:has(.bg-warning)');
+        runningBackups.forEach(function(row) {
+            const backupId = row.dataset.backupId;
+            if (backupId) {
+                fetch(`/settings/api/backup/${backupId}/status/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'COMPLETED') {
+                            location.reload();
+                        } else if (data.status === 'FAILED') {
+                            location.reload();
+                        }
+                    });
+            }
+        });
+    }
+
+    // Check status every 5 seconds if there are running backups
+    if (document.querySelector('.bg-warning')) {
+        setInterval(updateBackupStatus, 5000);
+    }
+</script>
+{% endblock %} 

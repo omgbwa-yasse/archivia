@@ -1,0 +1,39 @@
+{% extends 'tools/base.html' %}
+
+{% block page_title %}Supprimer l'Organisation{% endblock %}
+
+{% block page_content %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Êtes-vous sûr de vouloir supprimer cette organisation ?</h5>
+        <p class="card-text">
+            Vous êtes sur le point de supprimer l'organisation suivante :
+            <strong>{{ organisation.code }} - {{ organisation.name }}</strong>
+        </p>
+
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            Cette action est irréversible.
+        </div>
+
+        {% if organisation.children.exists %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-circle"></i>
+            Cette organisation contient {{ organisation.children.count }} organisation(s) enfant(s) qui seront également supprimée(s).
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mt-4">
+                <a href="{% url 'tools:organisation_detail' organisation.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Confirmer la suppression
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

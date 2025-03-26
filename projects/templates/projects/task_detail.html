@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ task.title }} - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ task.title }}</h1>
+        <div class="btn-group">
+            <a href="{% url 'projects:task_edit' project.pk task.pk %}" class="btn btn-outline-primary">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+            <a href="{% url 'projects:task_delete' project.pk task.pk %}" class="btn btn-outline-danger">
+                <i class="fas fa-trash"></i> Supprimer
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Informations de la tâche -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations de la tâche</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Description :</strong></p>
+                            <p>{{ task.description|default:"Aucune description" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Statut :</strong> <span class="badge bg-{{ task.status|lower }}">{{ task.get_status_display }}</span></p>
+                            <p><strong>Priorité :</strong> <span class="badge bg-{{ task.priority|lower }}">{{ task.get_priority_display }}</span></p>
+                            <p><strong>Assigné à :</strong> {{ task.assigned_to.get_full_name|default:task.assigned_to.username|default:"Non assigné" }}</p>
+                            {% if task.estimated_hours %}
+                            <p><strong>Heures estimées :</strong> {{ task.estimated_hours }}</p>
+                            {% endif %}
+                            {% if task.start_date %}
+                            <p><strong>Date de début :</strong> {{ task.start_date|date:"d/m/Y" }}</p>
+                            {% endif %}
+                            {% if task.due_date %}
+                            <p><strong>Date d'échéance :</strong> {{ task.due_date|date:"d/m/Y" }}</p>
+                            {% endif %}
+                            {% if task.completed_at %}
+                            <p><strong>Date de complétion :</strong> {{ task.completed_at|date:"d/m/Y" }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commentaires -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Commentaires</h5>
+                    <a href="{% url 'projects:task_comment_add' project.pk task.pk %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Ajouter un commentaire
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for comment in comments %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ comment.created_by.get_full_name|default:comment.created_by.username }}</h6>
+                                <small class="text-muted">{{ comment.created_at|date:"d/m/Y H:i" }}</small>
+                            </div>
+                            <p class="mb-0 mt-2">{{ comment.comment }}</p>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center">Aucun commentaire</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entrées de temps -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Temps passé</h5>
+                    <a href="{% url 'projects:task_time_entry_add' project.pk task.pk %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Ajouter une entrée
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Utilisateur</th>
+                                    <th>Heures</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in time_entries %}
+                                <tr>
+                                    <td>{{ entry.work_date|date:"d/m/Y" }}</td>
+                                    <td>{{ entry.user.get_full_name|default:entry.user.username }}</td>
+                                    <td>{{ entry.hours_spent }}</td>
+                                    <td>{{ entry.description|default:"-" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Aucune entrée de temps</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dépendances -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Dépendances</h5>
+                    <a href="{% url 'projects:task_dependency_add' project.pk task.pk %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for dependency in dependencies %}
+                        <div class="list-group-item">
+                            <h6 class="mb-0">{{ dependency.depends_on_task.title }}</h6>
+                            <small class="text-muted">{{ dependency.get_dependency_type_display }}</small>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center">Aucune dépendance</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

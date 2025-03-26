@@ -1,0 +1,37 @@
+{% extends "records/base.html" %}
+{% load i18n %}
+
+{% block records_content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">{% if form.instance.pk %}{% trans "Edit Folder" %}{% else %}{% trans "New Folder" %}{% endif %}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    {% if form.instance.pk %}{% trans "Update" %}{% else %}{% trans "Create" %}{% endif %}
+                </button>
+                <a href="{% url 'records:folder_list' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Supprimer la tâche {{ task.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Confirmation de suppression</h5>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer la tâche <strong>{{ task.name }}</strong> ?</p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Cette action est irréversible. Toutes les données associées à cette tâche seront définitivement supprimées.
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">Informations de la tâche</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3">Agent</dt>
+                                <dd class="col-sm-9">{{ task.agent.name }}</dd>
+
+                                <dt class="col-sm-3">Type</dt>
+                                <dd class="col-sm-9">{{ task.get_type_display }}</dd>
+
+                                <dt class="col-sm-3">Statut</dt>
+                                <dd class="col-sm-9">
+                                    <span class="badge {% if task.status == 'PENDING' %}bg-warning{% elif task.status == 'RUNNING' %}bg-info{% elif task.status == 'COMPLETED' %}bg-success{% elif task.status == 'FAILED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                        {{ task.get_status_display }}
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-3">Priorité</dt>
+                                <dd class="col-sm-9">
+                                    <span class="badge {% if task.priority == 'HIGH' %}bg-danger{% elif task.priority == 'MEDIUM' %}bg-warning{% else %}bg-info{% endif %}">
+                                        {{ task.get_priority_display }}
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-3">Progression</dt>
+                                <dd class="col-sm-9">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ task.progress }}%">
+                                            {{ task.progress }}%
+                                        </div>
+                                    </div>
+                                </dd>
+
+                                <dt class="col-sm-3">Description</dt>
+                                <dd class="col-sm-9">{{ task.description|default:"Aucune description" }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Attention :</strong> La suppression de cette tâche supprimera également tous les logs d'exécution associés.
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'intelligence:task_detail' task.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

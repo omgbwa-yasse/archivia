@@ -1,0 +1,150 @@
+{% extends "documents/base.html" %}
+
+{% block content %}
+{{ block.super }}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        {% if document %}
+                            Modifier le document
+                        {% else %}
+                            Nouveau document
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="documentForm">
+                        {% csrf_token %}
+                        
+                        <!-- Informations de base -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Informations de base</h6>
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ document.name|default:'' }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3">{{ document.description|default:'' }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="folder" class="form-label">Dossier</label>
+                                <select class="form-select" id="folder" name="folder" required>
+                                    <option value="">Sélectionner un dossier</option>
+                                    {% for folder in folders %}
+                                    <option value="{{ folder.id }}" {% if document.folder.id == folder.id %}selected{% endif %}>
+                                        {{ folder.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Fichier -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Fichier</h6>
+                            {% if document %}
+                            <div class="mb-3">
+                                <label class="form-label">Fichier actuel</label>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-file-alt text-muted me-2"></i>
+                                    <span>{{ document.file.name }}</span>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="mb-3">
+                                <label for="file" class="form-label">
+                                    {% if document %}
+                                        Nouveau fichier (optionnel)
+                                    {% else %}
+                                        Fichier
+                                    {% endif %}
+                                </label>
+                                <input type="file" class="form-control" id="file" name="file" {% if not document %}required{% endif %}>
+                                <div class="form-text">
+                                    Formats acceptés : PDF, DOC, DOCX, XLS, XLSX, TXT, etc.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Métadonnées -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Métadonnées</h6>
+                            {% for metadata in metadata_definitions %}
+                            <div class="mb-3">
+                                <label for="metadata_{{ metadata.id }}" class="form-label">{{ metadata.name }}</label>
+                                {% if metadata.type == 'text' %}
+                                <input type="text" class="form-control" id="metadata_{{ metadata.id }}" name="metadata_{{ metadata.id }}" 
+                                       value="{{ document.metadata|get_metadata_value:metadata.id|default:'' }}">
+                                {% elif metadata.type == 'textarea' %}
+                                <textarea class="form-control" id="metadata_{{ metadata.id }}" name="metadata_{{ metadata.id }}" rows="2">{{ document.metadata|get_metadata_value:metadata.id|default:'' }}</textarea>
+                                {% elif metadata.type == 'select' %}
+                                <select class="form-select" id="metadata_{{ metadata.id }}" name="metadata_{{ metadata.id }}">
+                                    <option value="">Sélectionner une valeur</option>
+                                    {% for value in metadata.values.all %}
+                                    <option value="{{ value.id }}" {% if document.metadata|get_metadata_value:metadata.id == value.id %}selected{% endif %}>
+                                        {{ value.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                {% endif %}
+                                {% if metadata.description %}
+                                <div class="form-text">{{ metadata.description }}</div>
+                                {% endif %}
+                            </div>
+                            {% empty %}
+                            <div class="text-center text-muted py-3">
+                                Aucune métadonnée définie
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Boutons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'documents:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    document.getElementById('documentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: this.method,
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirect_url;
+            } else {
+                showError(data.error || 'Une erreur est survenue');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de l\'enregistrement');
+        });
+    });
+</script>
+{% endblock %} 

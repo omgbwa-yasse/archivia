@@ -1,0 +1,55 @@
+{% extends "records/base.html" %}
+{% load i18n %}
+
+{% block records_content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{% trans "Folders" %}</h5>
+        <a href="{% url 'records:folder_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> {% trans "New Folder" %}
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{% trans "Name" %}</th>
+                        <th>{% trans "Description" %}</th>
+                        <th>{% trans "Created By" %}</th>
+                        <th>{% trans "Created At" %}</th>
+                        <th>{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for folder in folders %}
+                    <tr>
+                        <td>{{ folder.name }}</td>
+                        <td>{{ folder.description|truncatewords:30 }}</td>
+                        <td>{{ folder.created_by }}</td>
+                        <td>{{ folder.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{% url 'records:folder_detail' folder.pk %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'records:folder_update' folder.pk %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'records:folder_delete' folder.pk %}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">{% trans "No folders found." %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

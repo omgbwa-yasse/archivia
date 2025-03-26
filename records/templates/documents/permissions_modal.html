@@ -1,0 +1,171 @@
+<!-- Modal de gestion des permissions -->
+<div class="modal fade" id="permissionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gérer les permissions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Liste des permissions -->
+                <div class="mb-4">
+                    <h6 class="mb-3">Permissions actuelles</h6>
+                    <div class="list-group" id="permissionsList">
+                        {% for permission in document.permissions.all %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ permission.user.get_full_name }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-envelope"></i> {{ permission.user.email }}
+                                    </small>
+                                </div>
+                                <div class="btn-group">
+                                    <select class="form-select form-select-sm" onchange="updatePermission('{{ permission.id }}', this.value)">
+                                        <option value="read" {% if permission.permission == 'read' %}selected{% endif %}>Lecture</option>
+                                        <option value="write" {% if permission.permission == 'write' %}selected{% endif %}>Modification</option>
+                                        <option value="admin" {% if permission.permission == 'admin' %}selected{% endif %}>Administration</option>
+                                    </select>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePermission('{{ permission.id }}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-users fa-3x mb-3"></i>
+                            <p>Aucune permission définie</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Ajouter une permission -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Ajouter une permission</h6>
+                    </div>
+                    <div class="card-body">
+                        <form id="addPermissionForm">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="userSelect" class="form-label">Utilisateur</label>
+                                    <select class="form-select" id="userSelect" name="user" required>
+                                        <option value="">Sélectionner un utilisateur</option>
+                                        {% for user in users %}
+                                        <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="permissionSelect" class="form-label">Permission</label>
+                                    <select class="form-select" id="permissionSelect" name="permission" required>
+                                        <option value="read">Lecture</option>
+                                        <option value="write">Modification</option>
+                                        <option value="admin">Administration</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> Ajouter
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Informations sur les permissions -->
+                <div class="mt-4">
+                    <h6 class="mb-3">Informations sur les permissions</h6>
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">Niveaux de permission</h6>
+                        <ul class="mb-0">
+                            <li><strong>Lecture :</strong> Permet de consulter et télécharger le document</li>
+                            <li><strong>Modification :</strong> Permet de modifier le document et ses métadonnées</li>
+                            <li><strong>Administration :</strong> Permet de gérer les permissions et de supprimer le document</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gestionnaire de soumission du formulaire d'ajout de permission
+    document.getElementById('addPermissionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch(`/api/documents/{{ document.id }}/permissions/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showError(data.error || 'Une erreur est survenue lors de l\'ajout de la permission');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de l\'ajout de la permission');
+        });
+    });
+
+    // Mettre à jour une permission
+    function updatePermission(permissionId, newPermission) {
+        fetch(`/api/documents/{{ document.id }}/permissions/${permissionId}/`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                permission: newPermission
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess('Permission mise à jour avec succès');
+            } else {
+                showError(data.error || 'Une erreur est survenue lors de la mise à jour de la permission');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de la mise à jour de la permission');
+        });
+    }
+
+    // Supprimer une permission
+    function removePermission(permissionId) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cette permission ?')) {
+            fetch(`/api/documents/{{ document.id }}/permissions/${permissionId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    showError(data.error || 'Une erreur est survenue lors de la suppression de la permission');
+                }
+            })
+            .catch(error => {
+                showError('Une erreur est survenue lors de la suppression de la permission');
+            });
+        }
+    }
+</script> 

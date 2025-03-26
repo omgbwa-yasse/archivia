@@ -1,0 +1,62 @@
+<!-- Modal de version -->
+<div class="modal fade" id="versionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nouvelle version</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="versionForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="versionFile" class="form-label">Fichier</label>
+                        <input type="file" class="form-control" id="versionFile" name="file" required>
+                        <div class="form-text">
+                            Formats acceptés : PDF, DOC, DOCX, XLS, XLSX, TXT, etc.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="versionComment" class="form-label">Commentaire</label>
+                        <textarea class="form-control" id="versionComment" name="comment" rows="3" required></textarea>
+                        <div class="form-text">
+                            Décrivez les modifications apportées dans cette version
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="submitVersion()">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitVersion() {
+        const formData = new FormData(document.getElementById('versionForm'));
+        
+        fetch(`/api/documents/{{ document.id }}/versions/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Recharger la page pour afficher la nouvelle version
+                window.location.reload();
+            } else {
+                showError(data.error || 'Une erreur est survenue lors de l\'enregistrement de la version');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de l\'enregistrement de la version');
+        });
+    }
+</script> 

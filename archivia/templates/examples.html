@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Exemples de composants Bootstrap{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Cards -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-file-alt"></i> Documents récents
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Document du jour</h5>
+                <p class="card-text">Ceci est un exemple de carte Bootstrap avec des icônes Font Awesome.</p>
+                <button class="btn btn-primary">
+                    <i class="fas fa-download"></i> Télécharger
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="col-md-4 mb-4">
+        <div class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle"></i> Opération réussie !
+        </div>
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> Attention : action requise
+        </div>
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-times-circle"></i> Erreur : action impossible
+        </div>
+    </div>
+
+    <!-- Progress Bars -->
+    <div class="col-md-4 mb-4">
+        <h5>Progression du projet</h5>
+        <div class="progress mb-3">
+            <div class="progress-bar bg-success" role="progressbar" style="width: 75%">
+                75%
+            </div>
+        </div>
+        <div class="progress mb-3">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: 45%">
+                45%
+            </div>
+        </div>
+        <div class="progress">
+            <div class="progress-bar bg-danger" role="progressbar" style="width: 25%">
+                25%
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Buttons -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h5>Boutons</h5>
+        <button class="btn btn-primary me-2">
+            <i class="fas fa-save"></i> Enregistrer
+        </button>
+        <button class="btn btn-secondary me-2">
+            <i class="fas fa-edit"></i> Modifier
+        </button>
+        <button class="btn btn-success me-2">
+            <i class="fas fa-check"></i> Valider
+        </button>
+        <button class="btn btn-danger me-2">
+            <i class="fas fa-trash"></i> Supprimer
+        </button>
+        <button class="btn btn-warning me-2">
+            <i class="fas fa-exclamation"></i> Attention
+        </button>
+        <button class="btn btn-info me-2">
+            <i class="fas fa-info-circle"></i> Information
+        </button>
+    </div>
+</div>
+
+<!-- Forms -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user-edit"></i> Formulaire d'exemple
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="nom@exemple.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Options</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="option1">
+                            <label class="form-check-label" for="option1">
+                                Option 1
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="option2">
+                            <label class="form-check-label" for="option2">
+                                Option 2
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Choix</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="choice" id="choice1">
+                            <label class="form-check-label" for="choice1">
+                                Choix 1
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="choice" id="choice2">
+                            <label class="form-check-label" for="choice2">
+                                Choix 2
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Envoyer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tables -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-table"></i> Tableau d'exemple
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Document 1</td>
+                            <td><span class="badge bg-success">Actif</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Document 2</td>
+                            <td><span class="badge bg-warning">En attente</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Document 3</td>
+                            <td><span class="badge bg-danger">Inactif</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,199 @@
+{% extends "mails/base.html" %}
+{% load static %}
+
+{% block mail_content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            {% if form.instance.pk %}Modifier l'email{% else %}Nouvel email{% endif %}
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.recipient_email.id_for_label }}" class="form-label">
+                            {{ form.recipient_email.label }}
+                        </label>
+                        {{ form.recipient_email }}
+                        {% if form.recipient_email.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.recipient_email.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.recipient_name.id_for_label }}" class="form-label">
+                            {{ form.recipient_name.label }}
+                        </label>
+                        {{ form.recipient_name }}
+                        {% if form.recipient_name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.recipient_name.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.cc.id_for_label }}" class="form-label">
+                            {{ form.cc.label }}
+                        </label>
+                        {{ form.cc }}
+                        <small class="form-text text-muted">{{ form.cc.help_text }}</small>
+                        {% if form.cc.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.cc.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.bcc.id_for_label }}" class="form-label">
+                            {{ form.bcc.label }}
+                        </label>
+                        {{ form.bcc }}
+                        <small class="form-text text-muted">{{ form.bcc.help_text }}</small>
+                        {% if form.bcc.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.bcc.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.subject.id_for_label }}" class="form-label">
+                    {{ form.subject.label }}
+                </label>
+                {{ form.subject }}
+                {% if form.subject.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.subject.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.body_html.id_for_label }}" class="form-label">
+                    {{ form.body_html.label }}
+                </label>
+                {{ form.body_html }}
+                {% if form.body_html.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.body_html.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.body_text.id_for_label }}" class="form-label">
+                    {{ form.body_text.label }}
+                </label>
+                {{ form.body_text }}
+                {% if form.body_text.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.body_text.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.priority.id_for_label }}" class="form-label">
+                            {{ form.priority.label }}
+                        </label>
+                        {{ form.priority }}
+                        {% if form.priority.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.priority.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.template.id_for_label }}" class="form-label">
+                            {{ form.template.label }}
+                        </label>
+                        {{ form.template }}
+                        {% if form.template.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.template.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Pièces jointes</label>
+                <div id="attachments-container">
+                    {% for attachment in form.instance.attachments.all %}
+                    <div class="attachment-item mb-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="{{ attachment.filename }}" readonly>
+                            <a href="{% url 'mails:download_attachment' form.instance.pk attachment.pk %}" 
+                               class="btn btn-outline-primary">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <button type="button" class="btn btn-outline-danger remove-attachment" 
+                                    data-attachment-id="{{ attachment.pk }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="file" class="form-control mt-2" id="new-attachment" multiple>
+            </div>
+
+            <div class="text-end">
+                <a href="{% url 'mails:email_list' %}" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Gestion des pièces jointes
+        $('.remove-attachment').click(function() {
+            $(this).closest('.attachment-item').remove();
+        });
+
+        // Prévisualisation des pièces jointes
+        $('#new-attachment').change(function() {
+            const files = this.files;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const attachmentItem = `
+                    <div class="attachment-item mb-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="${file.name}" readonly>
+                            <button type="button" class="btn btn-outline-danger remove-attachment">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                $('#attachments-container').append(attachmentItem);
+            }
+        });
+    });
+</script>
+{% endblock %} 

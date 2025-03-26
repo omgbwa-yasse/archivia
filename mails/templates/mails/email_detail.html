@@ -1,0 +1,137 @@
+{% extends "mails/base.html" %}
+
+{% block mail_content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">Détails de l'email</h5>
+        <div class="btn-group">
+            {% if email.status != 'sent' %}
+            <a href="{% url 'mails:email_edit' email.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+            <a href="{% url 'mails:email_send' email.pk %}" class="btn btn-success">
+                <i class="fas fa-paper-plane"></i> Envoyer
+            </a>
+            {% endif %}
+            <a href="{% url 'mails:email_delete' email.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Supprimer
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h6 class="text-muted">Informations générales</h6>
+                <table class="table table-sm">
+                    <tr>
+                        <th style="width: 150px;">Statut</th>
+                        <td>
+                            <span class="badge {% if email.status == 'sent' %}bg-success
+                                             {% elif email.status == 'failed' %}bg-danger
+                                             {% elif email.status == 'pending' %}bg-warning
+                                             {% else %}bg-secondary{% endif %}">
+                                {{ email.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Priorité</th>
+                        <td>
+                            <span class="badge {% if email.priority == 'urgent' %}bg-danger
+                                             {% elif email.priority == 'high' %}bg-warning
+                                             {% elif email.priority == 'low' %}bg-info
+                                             {% else %}bg-secondary{% endif %}">
+                                {{ email.get_priority_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Date de création</th>
+                        <td>{{ email.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Dernière modification</th>
+                        <td>{{ email.updated_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% if email.sent_at %}
+                    <tr>
+                        <th>Date d'envoi</th>
+                        <td>{{ email.sent_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-muted">Destinataires</h6>
+                <table class="table table-sm">
+                    <tr>
+                        <th style="width: 150px;">À</th>
+                        <td>
+                            {% if email.recipient_name %}
+                            {{ email.recipient_name }} &lt;{{ email.recipient_email }}&gt;
+                            {% else %}
+                            {{ email.recipient_email }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if email.cc %}
+                    <tr>
+                        <th>Copie à</th>
+                        <td>{{ email.cc }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if email.bcc %}
+                    <tr>
+                        <th>Copie cachée</th>
+                        <td>{{ email.bcc }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <h6 class="text-muted">Contenu</h6>
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">{{ email.subject }}</h6>
+                </div>
+                <div class="card-body">
+                    {{ email.body_html|safe }}
+                </div>
+            </div>
+        </div>
+
+        {% if email.attachments.exists %}
+        <div class="mb-4">
+            <h6 class="text-muted">Pièces jointes</h6>
+            <div class="list-group">
+                {% for attachment in email.attachments.all %}
+                <a href="{% url 'mails:download_attachment' email.pk attachment.pk %}" 
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-paperclip me-2"></i>
+                        {{ attachment.filename }}
+                        <small class="text-muted ms-2">({{ attachment.file_size|filesizeformat }})</small>
+                    </div>
+                    <i class="fas fa-download"></i>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if email.template %}
+        <div class="mb-4">
+            <h6 class="text-muted">Template utilisé</h6>
+            <div class="card">
+                <div class="card-body">
+                    <h6>{{ email.template.name }}</h6>
+                    <p class="text-muted mb-0">{{ email.template.category|default:"Sans catégorie" }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

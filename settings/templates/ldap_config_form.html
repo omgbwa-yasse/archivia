@@ -1,0 +1,235 @@
+{% extends "settings/base.html" %}
+
+{% block settings_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        {% if form.instance.pk %}
+        Edit LDAP Configuration
+        {% else %}
+        New LDAP Configuration
+        {% endif %}
+    </h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.name.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.enabled.id_for_label }}" class="form-label">Status</label>
+                            <div class="form-check form-switch">
+                                {{ form.enabled }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.description.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="{{ form.server_url.id_for_label }}" class="form-label">Server URL</label>
+                            {{ form.server_url }}
+                            {% if form.server_url.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.server_url.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.port.id_for_label }}" class="form-label">Port</label>
+                            {{ form.port }}
+                            {% if form.port.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.port.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.bind_dn.id_for_label }}" class="form-label">Bind DN</label>
+                            {{ form.bind_dn }}
+                            {% if form.bind_dn.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.bind_dn.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.bind_password.id_for_label }}" class="form-label">Bind Password</label>
+                            {{ form.bind_password }}
+                            {% if form.bind_password.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.bind_password.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.search_base.id_for_label }}" class="form-label">Search Base</label>
+                        {{ form.search_base }}
+                        {% if form.search_base.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.search_base.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.user_search_filter.id_for_label }}" class="form-label">User Search Filter</label>
+                        {{ form.user_search_filter }}
+                        {% if form.user_search_filter.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.user_search_filter.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.group_search_filter.id_for_label }}" class="form-label">Group Search Filter</label>
+                        {{ form.group_search_filter }}
+                        {% if form.group_search_filter.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.group_search_filter.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.user_id_attribute.id_for_label }}" class="form-label">User ID Attribute</label>
+                            {{ form.user_id_attribute }}
+                            {% if form.user_id_attribute.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.user_id_attribute.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.user_email_attribute.id_for_label }}" class="form-label">Email Attribute</label>
+                            {{ form.user_email_attribute }}
+                            {% if form.user_email_attribute.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.user_email_attribute.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.user_display_name_attribute.id_for_label }}" class="form-label">Display Name Attribute</label>
+                            {{ form.user_display_name_attribute }}
+                            {% if form.user_display_name_attribute.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.user_display_name_attribute.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.group_id_attribute.id_for_label }}" class="form-label">Group ID Attribute</label>
+                            {{ form.group_id_attribute }}
+                            {% if form.group_id_attribute.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.group_id_attribute.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.group_member_attribute.id_for_label }}" class="form-label">Group Member Attribute</label>
+                        {{ form.group_member_attribute }}
+                        {% if form.group_member_attribute.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.group_member_attribute.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.use_ssl }}
+                                <label class="form-check-label" for="{{ form.use_ssl.id_for_label }}">Use SSL</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.connection_timeout.id_for_label }}" class="form-label">Connection Timeout (ms)</label>
+                            {{ form.connection_timeout }}
+                            {% if form.connection_timeout.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.connection_timeout.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'settings:ldap_config_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Help</h5>
+            </div>
+            <div class="card-body">
+                <h6>Server Configuration</h6>
+                <p>Enter your LDAP server details including the server URL and port. If using SSL, make sure to enable it and use port 636.</p>
+
+                <h6>Authentication</h6>
+                <p>Provide the Bind DN and password if your LDAP server requires authentication for searches.</p>
+
+                <h6>Search Configuration</h6>
+                <p>The search base and filters determine which users and groups are synchronized. Use standard LDAP filter syntax.</p>
+
+                <h6>Attribute Mapping</h6>
+                <p>Map LDAP attributes to your local user and group fields. Common attributes are:</p>
+                <ul>
+                    <li>uid - User ID</li>
+                    <li>mail - Email address</li>
+                    <li>cn - Common Name</li>
+                    <li>member - Group membership</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

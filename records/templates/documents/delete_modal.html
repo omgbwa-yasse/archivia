@@ -1,0 +1,46 @@
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer le document "{{ document.name }}" ?</p>
+                <p class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Cette action est irréversible. Toutes les versions et métadonnées associées seront également supprimées.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete() {
+        fetch(`/api/documents/{{ document.id }}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = "{% url 'documents:list' %}";
+            } else {
+                showError(data.error || 'Une erreur est survenue lors de la suppression');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de la suppression');
+        });
+    }
+</script> 

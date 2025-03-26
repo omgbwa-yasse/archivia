@@ -1,0 +1,173 @@
+<!-- Modal de partage -->
+<div class="modal fade" id="shareModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Partager le document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Lien de partage -->
+                <div class="mb-4">
+                    <label class="form-label">Lien de partage</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="shareUrl" value="{{ document.share_url }}" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyShareUrl()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ajouter un utilisateur -->
+                <div class="mb-4">
+                    <h6 class="mb-3">Ajouter un accès</h6>
+                    <form id="addShareForm">
+                        <div class="mb-3">
+                            <label for="userSelect" class="form-label">Utilisateur</label>
+                            <select class="form-select" id="userSelect" required>
+                                <option value="">Sélectionner un utilisateur</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="permissionSelect" class="form-label">Permission</label>
+                            <select class="form-select" id="permissionSelect" required>
+                                <option value="read">Lecture</option>
+                                <option value="write">Modification</option>
+                                <option value="admin">Administration</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Ajouter
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Liste des accès -->
+                <div>
+                    <h6 class="mb-3">Accès partagés</h6>
+                    <div class="list-group list-group-flush" id="sharesList">
+                        {% for share in document.shares.all %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-user"></i> {{ share.user.get_full_name }}
+                                <small class="text-muted d-block">{{ share.permission }}</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeShare('{{ share.id }}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        {% empty %}
+                        <div class="text-center text-muted py-3">
+                            Aucun accès partagé
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Copier le lien de partage
+    function copyShareUrl() {
+        const shareUrl = document.getElementById('shareUrl').value;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            showSuccess('Lien de partage copié dans le presse-papiers');
+        }).catch(() => {
+            showError('Erreur lors de la copie du lien');
+        });
+    }
+
+    // Ajouter un accès partagé
+    document.getElementById('addShareForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const userId = document.getElementById('userSelect').value;
+        const permission = document.getElementById('permissionSelect').value;
+        
+        fetch(`/api/documents/{{ document.id }}/shares/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                user: userId,
+                permission: permission
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Recharger la liste des accès
+                loadShares();
+                showSuccess('Accès ajouté avec succès');
+            } else {
+                showError(data.error || 'Une erreur est survenue');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de l\'ajout de l\'accès');
+        });
+    });
+
+    // Supprimer un accès partagé
+    function removeShare(shareId) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cet accès partagé ?')) {
+            fetch(`/api/documents/{{ document.id }}/shares/${shareId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Recharger la liste des accès
+                    loadShares();
+                    showSuccess('Accès supprimé avec succès');
+                } else {
+                    showError(data.error || 'Une erreur est survenue');
+                }
+            })
+            .catch(error => {
+                showError('Une erreur est survenue lors de la suppression de l\'accès');
+            });
+        }
+    }
+
+    // Charger la liste des accès
+    function loadShares() {
+        fetch(`/api/documents/{{ document.id }}/shares/`)
+        .then(response => response.json())
+        .then(data => {
+            const sharesList = document.getElementById('sharesList');
+            if (data.shares.length === 0) {
+                sharesList.innerHTML = `
+                    <div class="text-center text-muted py-3">
+                        Aucun accès partagé
+                    </div>
+                `;
+            } else {
+                sharesList.innerHTML = data.shares.map(share => `
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-user"></i> ${share.user_name}
+                            <small class="text-muted d-block">${share.permission}</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeShare('${share.id}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors du chargement des accès');
+        });
+    }
+</script> 

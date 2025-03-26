@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if member %}Edit Member{% else %}Add Member{% endif %} - {{ workspace.name }}
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">
+                        {% if member %}
+                        Edit Member - {{ member.user.get_full_name }}
+                        {% else %}
+                        Add New Member to {{ workspace.name }}
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages mb-3">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if not member %}
+                        <div class="mb-3">
+                            <label for="user_id" class="form-label">Select User</label>
+                            <select name="user_id" id="user_id" class="form-select" required>
+                                <option value="">Choose a user...</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.get_full_name }} ({{ user.email }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select name="role" id="role" class="form-select" required>
+                                <option value="member" {% if member and member.role == 'member' %}selected{% endif %}>Member</option>
+                                <option value="admin" {% if member and member.role == 'admin' %}selected{% endif %}>Admin</option>
+                            </select>
+                            <div class="form-text">
+                                Admins can manage workspace settings and members.
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'workspace:workspace_member_list' workspace.pk %}" class="btn btn-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if member %}Save Changes{% else %}Add Member{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

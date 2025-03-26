@@ -1,0 +1,85 @@
+{% extends 'workspace/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+    {% if form.instance.pk %}Edit Member{% else %}Add New Member{% endif %} - {{ workspace.name }}
+{% endblock %}
+
+{% block workspace_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}Update Member{% else %}Add Member{% endif %}
+                        </button>
+                        <a href="{% url 'workspace:workspace_member_list' workspace.pk %}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Role Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="text-danger">Administrator</h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-check text-success"></i> Full access to workspace</li>
+                        <li><i class="fas fa-check text-success"></i> Can manage members</li>
+                        <li><i class="fas fa-check text-success"></i> Can manage all documents</li>
+                    </ul>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-primary">Member</h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-check text-success"></i> Can create and edit documents</li>
+                        <li><i class="fas fa-check text-success"></i> Can share documents</li>
+                        <li><i class="fas fa-times text-danger"></i> Cannot manage workspace settings</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h6 class="text-secondary">Viewer</h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-check text-success"></i> Can view documents</li>
+                        <li><i class="fas fa-times text-danger"></i> Cannot edit documents</li>
+                        <li><i class="fas fa-times text-danger"></i> Cannot share documents</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Current Members</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    {% for member in workspace.members.all %}
+                    <li class="mb-2">
+                        <i class="fas fa-user text-primary"></i>
+                        {{ member.user.username }}
+                        <span class="badge bg-{% if member.role == 'admin' %}danger{% elif member.role == 'member' %}primary{% else %}secondary{% endif %}">
+                            {{ member.get_role_display }}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

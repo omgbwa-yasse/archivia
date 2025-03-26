@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ email.subject }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 20px;
+        }
+        .content {
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+            margin-top: 20px;
+        }
+        .attachments {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .attachment-item:last-child {
+            margin-bottom: 0;
+        }
+        .attachment-icon {
+            margin-right: 10px;
+            color: #6c757d;
+        }
+        .attachment-name {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .attachment-size {
+            color: #6c757d;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>{{ email.subject }}</h2>
+            {% if email.recipient_name %}
+            <p>Bonjour {{ email.recipient_name }},</p>
+            {% else %}
+            <p>Bonjour,</p>
+            {% endif %}
+        </div>
+
+        <div class="content">
+            {{ email.body_html|safe }}
+        </div>
+
+        {% if attachments %}
+        <div class="attachments">
+            <h3>Pièces jointes</h3>
+            {% for attachment in attachments %}
+            <div class="attachment-item">
+                <span class="attachment-icon">📎</span>
+                <a href="{{ attachment.get_absolute_url }}" class="attachment-name">
+                    {{ attachment.filename }}
+                </a>
+                <span class="attachment-size">({{ attachment.file_size|filesizeformat }})</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            <p>Cet email a été envoyé depuis {{ settings.SITE_NAME }}</p>
+            <p>© {% now "Y" %} {{ settings.SITE_NAME }}. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html> 

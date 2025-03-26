@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Supprimer le modèle {{ model.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Confirmation de suppression</h5>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer le modèle <strong>{{ model.name }}</strong> ?</p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Cette action est irréversible. Toutes les données associées à ce modèle seront définitivement supprimées.
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">Informations du modèle</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3">Provider</dt>
+                                <dd class="col-sm-9">{{ model.get_provider_display }}</dd>
+
+                                <dt class="col-sm-3">Version</dt>
+                                <dd class="col-sm-9">{{ model.version }}</dd>
+
+                                <dt class="col-sm-3">Statut</dt>
+                                <dd class="col-sm-9">
+                                    <span class="badge {% if model.status == 'ACTIVE' %}bg-success{% elif model.status == 'INACTIVE' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                        {{ model.get_status_display }}
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-3">Description</dt>
+                                <dd class="col-sm-9">{{ model.description|default:"Aucune description" }}</dd>
+
+                                <dt class="col-sm-3">Capacités</dt>
+                                <dd class="col-sm-9">
+                                    {% for capability in model.capabilities %}
+                                    <span class="badge bg-info me-1">{{ capability }}</span>
+                                    {% empty %}
+                                    <span class="text-muted">Aucune capacité définie</span>
+                                    {% endfor %}
+                                </dd>
+
+                                <dt class="col-sm-3">Limites</dt>
+                                <dd class="col-sm-9">
+                                    <ul class="list-unstyled mb-0">
+                                        <li><strong>Tokens max :</strong> {{ model.max_tokens }}</li>
+                                        <li><strong>Contexte max :</strong> {{ model.max_context_length }}</li>
+                                        <li><strong>Coût par token :</strong> {{ model.cost_per_token }}€</li>
+                                    </ul>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Attention :</strong> La suppression de ce modèle affectera tous les agents qui l'utilisent. Assurez-vous de mettre à jour ou de supprimer ces agents avant de procéder.
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Statistiques d'utilisation</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Total des requêtes</h6>
+                                            <h3 class="card-title">{{ model.total_requests }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Tokens utilisés</h6>
+                                            <h3 class="card-title">{{ model.total_tokens }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Coût total</h6>
+                                            <h3 class="card-title">{{ model.total_cost }}€</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Agents utilisant ce modèle</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                {% for agent in model.agents.all %}
+                                <a href="{% url 'intelligence:agent_detail' agent.pk %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ agent.name }}</h6>
+                                        <small>{{ agent.get_type_display }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ agent.description|truncatechars:100 }}</p>
+                                    <small>
+                                        <span class="badge {% if agent.status == 'ACTIVE' %}bg-success{% elif agent.status == 'INACTIVE' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                            {{ agent.get_status_display }}
+                                        </span>
+                                    </small>
+                                </a>
+                                {% empty %}
+                                <div class="text-center text-muted">Aucun agent n'utilise ce modèle</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'intelligence:model_detail' model.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

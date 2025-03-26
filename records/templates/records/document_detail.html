@@ -1,0 +1,75 @@
+{% extends "records/base.html" %}
+{% load i18n %}
+
+{% block records_content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ document.name }}</h5>
+        <div>
+            <a href="{% url 'records:document_download' document.pk %}" class="btn btn-success">
+                <i class="fas fa-download"></i> {% trans "Download" %}
+            </a>
+            <a href="{% url 'records:document_update' document.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> {% trans "Edit" %}
+            </a>
+            <a href="{% url 'records:document_delete' document.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> {% trans "Delete" %}
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>{% trans "Basic Information" %}</h6>
+                <table class="table">
+                    <tr>
+                        <th>{% trans "Name" %}</th>
+                        <td>{{ document.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Description" %}</th>
+                        <td>{{ document.description|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Folder" %}</th>
+                        <td>
+                            <a href="{% url 'records:folder_detail' document.folder.pk %}">{{ document.folder.name }}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "File" %}</th>
+                        <td>{{ document.file.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Created By" %}</th>
+                        <td>{{ document.created_by }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Created At" %}</th>
+                        <td>{{ document.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Last Updated" %}</th>
+                        <td>{{ document.updated_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6>{% trans "Metadata" %}</h6>
+                <table class="table">
+                    {% for metadata in document.metadata.all %}
+                    <tr>
+                        <th>{{ metadata.definition.name }}</th>
+                        <td>{{ metadata.value }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center">{% trans "No metadata defined." %}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

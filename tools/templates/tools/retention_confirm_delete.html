@@ -1,0 +1,41 @@
+{% extends 'tools/base.html' %}
+
+{% block page_title %}Supprimer la Conservation{% endblock %}
+
+{% block page_content %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Êtes-vous sûr de vouloir supprimer cette conservation ?</h5>
+        <p class="card-text">
+            Vous êtes sur le point de supprimer la conservation suivante :
+            <br>
+            <strong>{{ retention.code }} - {{ retention.name }}</strong>
+        </p>
+
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            Cette action est irréversible.
+        </div>
+
+        {% if retention.retentionlawarticle_set.exists %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-circle"></i>
+            Cette conservation est associée à {{ retention.retentionlawarticle_set.count }} article(s) de loi.
+            La suppression de la conservation supprimera également ces associations.
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mt-3">
+                <a href="{% url 'tools:retention_detail' retention.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Confirmer la suppression
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

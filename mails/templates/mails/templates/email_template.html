@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .content {
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            {% if logo_url %}
+            <img src="{{ logo_url }}" alt="Logo" class="logo">
+            {% endif %}
+            <h1>{{ subject }}</h1>
+        </div>
+        
+        <div class="content">
+            {{ content|safe }}
+        </div>
+        
+        <div class="footer">
+            <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+            {% if unsubscribe_url %}
+            <p><a href="{{ unsubscribe_url }}">Se désabonner</a></p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html> 

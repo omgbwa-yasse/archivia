@@ -1,0 +1,48 @@
+{% extends "records/base.html" %}
+{% load i18n %}
+
+{% block records_content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">{% if form.instance.pk %}{% trans "Edit Metadata Definition" %}{% else %}{% trans "New Metadata Definition" %}{% endif %}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% if field.name == 'data_type' %}
+                <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control">
+                    <option value="">{% trans "Select a data type" %}</option>
+                    <option value="text" {% if field.value == 'text' %}selected{% endif %}>{% trans "Text" %}</option>
+                    <option value="number" {% if field.value == 'number' %}selected{% endif %}>{% trans "Number" %}</option>
+                    <option value="date" {% if field.value == 'date' %}selected{% endif %}>{% trans "Date" %}</option>
+                    <option value="boolean" {% if field.value == 'boolean' %}selected{% endif %}>{% trans "Boolean" %}</option>
+                    <option value="reference" {% if field.value == 'reference' %}selected{% endif %}>{% trans "Reference" %}</option>
+                </select>
+                {% else %}
+                {{ field }}
+                {% endif %}
+                {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    {% if form.instance.pk %}{% trans "Update" %}{% else %}{% trans "Create" %}{% endif %}
+                </button>
+                <a href="{% url 'records:metadata_definition_list' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

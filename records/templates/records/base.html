@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{% trans "Records Management" %}</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'records:folder_list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'folder_list' %}active{% endif %}">
+                        {% trans "Folders" %}
+                    </a>
+                    <a href="{% url 'records:document_list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'document_list' %}active{% endif %}">
+                        {% trans "Documents" %}
+                    </a>
+                    <a href="{% url 'records:metadata_definition_list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'metadata_definition_list' %}active{% endif %}">
+                        {% trans "Metadata Definitions" %}
+                    </a>
+                    <a href="{% url 'records:reference_list_list' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'reference_list_list' %}active{% endif %}">
+                        {% trans "Reference Lists" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            {% block records_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Supprimer l'agent {{ agent.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Confirmation de suppression</h5>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer l'agent <strong>{{ agent.name }}</strong> ?</p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Cette action est irréversible. Toutes les données associées à cet agent seront définitivement supprimées.
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">Informations de l'agent</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3">Type</dt>
+                                <dd class="col-sm-9">{{ agent.get_type_display }}</dd>
+
+                                <dt class="col-sm-3">Version</dt>
+                                <dd class="col-sm-9">{{ agent.version }}</dd>
+
+                                <dt class="col-sm-3">Statut</dt>
+                                <dd class="col-sm-9">
+                                    <span class="badge {% if agent.status == 'ACTIVE' %}bg-success{% elif agent.status == 'INACTIVE' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                        {{ agent.get_status_display }}
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-3">Description</dt>
+                                <dd class="col-sm-9">{{ agent.description|default:"Aucune description" }}</dd>
+
+                                <dt class="col-sm-3">Modèle</dt>
+                                <dd class="col-sm-9">{{ agent.model.name }}</dd>
+
+                                <dt class="col-sm-3">Prompts</dt>
+                                <dd class="col-sm-9">
+                                    {% for prompt in agent.prompts.all %}
+                                    <span class="badge bg-info me-1">{{ prompt.name }}</span>
+                                    {% empty %}
+                                    <span class="text-muted">Aucun prompt assigné</span>
+                                    {% endfor %}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Attention :</strong> La suppression de cet agent affectera toutes les tâches qui lui sont associées. Assurez-vous de sauvegarder ou de supprimer ces tâches avant de procéder.
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Statistiques d'utilisation</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Total des tâches</h6>
+                                            <h3 class="card-title">{{ agent.total_tasks }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-subtitle mb-2 text-muted">Taux de succès</h6>
+                                            <h3 class="card-title">{{ agent.success_rate }}%</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'intelligence:agent_detail' agent.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

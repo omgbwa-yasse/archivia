@@ -1,0 +1,53 @@
+/* Custom styles for Archivia */
+
+/* Navbar customization */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.nav-link {
+    padding: 0.5rem 1rem;
+}
+
+.nav-link i {
+    margin-right: 0.5rem;
+}
+
+/* Main content area */
+main {
+    min-height: calc(100vh - 200px);
+}
+
+/* Footer customization */
+.footer {
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Dropdown menu customization */
+.dropdown-menu {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.dropdown-item i {
+    margin-right: 0.5rem;
+    width: 1.2rem;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .navbar-nav {
+        padding: 1rem 0;
+    }
+    
+    .nav-item {
+        padding: 0.5rem 1rem;
+    }
+} 

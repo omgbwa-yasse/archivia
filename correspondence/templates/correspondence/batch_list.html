@@ -1,0 +1,52 @@
+{% extends 'correspondence/base.html' %}
+
+{% block title %}Batches{% endblock %}
+
+{% block correspondence_content %}
+<div class="mb-3">
+    <a href="{% url 'correspondence:batch_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> New Batch
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Organisation Holder</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for batch in batches %}
+            <tr>
+                <td>{{ batch.code }}</td>
+                <td>{{ batch.name }}</td>
+                <td>{{ batch.organisation_holder.name }}</td>
+                <td>{{ batch.created_at|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'correspondence:batch_detail' batch.pk %}" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'correspondence:batch_update' batch.pk %}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'correspondence:batch_delete' batch.pk %}" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No batches found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

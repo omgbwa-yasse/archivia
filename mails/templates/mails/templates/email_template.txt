@@ -1,0 +1,8 @@
+{{ subject }}
+
+{{ content }}
+
+---
+Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+{% if unsubscribe_url %}
+Pour vous désabonner, cliquez ici : {{ unsubscribe_url }} 

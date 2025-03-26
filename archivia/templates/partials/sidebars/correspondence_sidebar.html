@@ -1,0 +1,94 @@
+{% load static %}
+<div class="sidebar bg-light">
+    <div class="sidebar-sticky">
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Correspondance</span>
+                <a class="link-secondary" href="{% url 'correspondence:create' %}" aria-label="Create new correspondence">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'list' %}active{% endif %}" href="{% url 'correspondence:list' %}">
+                        <i class="fas fa-exchange-alt"></i> Toutes les correspondances
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'create' %}active{% endif %}" href="{% url 'correspondence:create' %}">
+                        <i class="fas fa-plus-circle"></i> Nouvelle correspondance
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Gestion</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'incoming' %}active{% endif %}" href="{% url 'correspondence:incoming' %}">
+                        <i class="fas fa-inbox"></i> Courriers entrants
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'outgoing' %}active{% endif %}" href="{% url 'correspondence:outgoing' %}">
+                        <i class="fas fa-paper-plane"></i> Courriers sortants
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'internal' %}active{% endif %}" href="{% url 'correspondence:internal' %}">
+                        <i class="fas fa-building"></i> Notes internes
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Organisation</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'folders' %}active{% endif %}" href="{% url 'correspondence:folders' %}">
+                        <i class="fas fa-folder"></i> Dossiers
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'tags' %}active{% endif %}" href="{% url 'correspondence:tags' %}">
+                        <i class="fas fa-tags"></i> Étiquettes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'templates' %}active{% endif %}" href="{% url 'correspondence:templates' %}">
+                        <i class="fas fa-file-alt"></i> Modèles
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Suivi</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'tracking' %}active{% endif %}" href="{% url 'correspondence:tracking' %}">
+                        <i class="fas fa-truck"></i> Suivi des envois
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'workflow' %}active{% endif %}" href="{% url 'correspondence:workflow' %}">
+                        <i class="fas fa-project-diagram"></i> Workflow
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}" href="{% url 'correspondence:reports' %}">
+                        <i class="fas fa-chart-bar"></i> Rapports
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div> 

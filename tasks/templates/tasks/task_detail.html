@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">{{ task.name }}</h2>
+                    <div>
+                        <a href="{% url 'tasks:task_update' task.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        {% if task.status != 'completed' %}
+                        <a href="{% url 'tasks:task_complete' task.pk %}" class="btn btn-success">
+                            <i class="fas fa-check"></i> Marquer comme terminé
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'tasks:task_delete' task.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Statut</h5>
+                        <span class="badge {% if task.status == 'completed' %}bg-success
+                                          {% elif task.status == 'in_progress' %}bg-primary
+                                          {% elif task.status == 'pending' %}bg-warning
+                                          {% else %}bg-secondary{% endif %}">
+                            {{ task.get_status_display }}
+                        </span>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p>{{ task.description }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Informations</h5>
+                        <ul class="list-unstyled">
+                            <li><strong>Workflow:</strong> {{ task.workflow_instance.workflow_definition.name }}</li>
+                            <li><strong>Assigné à:</strong> {{ task.assigned_to|default:"Non assigné" }}</li>
+                            <li><strong>Date d'échéance:</strong> {{ task.due_date|date:"d/m/Y"|default:"Non définie" }}</li>
+                            <li><strong>Date de création:</strong> {{ task.created_at|date:"d/m/Y H:i" }}</li>
+                            <li><strong>Dernière mise à jour:</strong> {{ task.updated_at|date:"d/m/Y H:i" }}</li>
+                        </ul>
+                    </div>
+
+                    {% if task.attachments.exists %}
+                    <div class="mb-4">
+                        <h5>Pièces jointes</h5>
+                        <div class="list-group">
+                            {% for attachment in task.attachments.all %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="fas fa-paperclip"></i>
+                                        <a href="{{ attachment.file.url }}" target="_blank">{{ attachment.filename }}</a>
+                                    </div>
+                                    <small class="text-muted">{{ attachment.uploaded_at|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'tasks:task_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour à la liste
+                        </a>
+                        <a href="{% url 'tasks:workflow_instance_detail' task.workflow_instance.pk %}" class="btn btn-info">
+                            <i class="fas fa-project-diagram"></i> Voir le Workflow
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

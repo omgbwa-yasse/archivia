@@ -1,0 +1,90 @@
+{% extends 'tools/base.html' %}
+
+{% block page_title %}Détails de l'Association{% endblock %}
+
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+        <a href="{% url 'tools:retention_law_article_update' retention_law_article.pk %}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{% url 'tools:retention_law_article_delete' retention_law_article.pk %}" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Supprimer
+        </a>
+    </div>
+    <a href="{% url 'tools:retention_law_article_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Association Rétention-Article de Loi</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="mb-3">Rétention</h6>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <a href="{% url 'tools:retention_detail' retention_law_article.retention.pk %}">
+                                {{ retention_law_article.retention.code }} - {{ retention_law_article.retention.name }}
+                            </a>
+                        </h6>
+                        <p class="card-text">
+                            <strong>Durée :</strong> {{ retention_law_article.retention.duration }} ans<br>
+                            <strong>Sort :</strong> {{ retention_law_article.retention.sort.code }} - {{ retention_law_article.retention.sort.name }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="mb-3">Article de Loi</h6>
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <a href="{% url 'tools:law_article_detail' retention_law_article.law_article.pk %}">
+                                {{ retention_law_article.law_article.code }} - {{ retention_law_article.law_article.name }}
+                            </a>
+                        </h6>
+                        <p class="card-text">
+                            <strong>Loi :</strong> 
+                            <a href="{% url 'tools:law_detail' retention_law_article.law_article.law.pk %}">
+                                {{ retention_law_article.law_article.law.code }} - {{ retention_law_article.law_article.law.name }}
+                            </a>
+                        </p>
+                        {% if retention_law_article.law_article.description %}
+                        <p class="card-text">{{ retention_law_article.law_article.description|truncatewords:30 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h6 class="mb-3">Métadonnées</h6>
+            <table class="table table-sm">
+                <tr>
+                    <th style="width: 150px;">Créé par</th>
+                    <td>{{ retention_law_article.created_by }}</td>
+                </tr>
+                <tr>
+                    <th>Créé le</th>
+                    <td>{{ retention_law_article.created_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+                <tr>
+                    <th>Modifié par</th>
+                    <td>{{ retention_law_article.updated_by }}</td>
+                </tr>
+                <tr>
+                    <th>Modifié le</th>
+                    <td>{{ retention_law_article.updated_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

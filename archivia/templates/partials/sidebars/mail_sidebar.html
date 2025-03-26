@@ -1,0 +1,77 @@
+{% load static %}
+<div class="sidebar bg-light">
+    <div class="sidebar-sticky">
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Messagerie</span>
+                <a class="link-secondary" href="{% url 'mail:compose' %}" aria-label="Compose new mail">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'inbox' %}active{% endif %}" href="{% url 'mail:inbox' %}">
+                        <i class="fas fa-inbox"></i> Boîte de réception
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'sent' %}active{% endif %}" href="{% url 'mail:sent' %}">
+                        <i class="fas fa-paper-plane"></i> Envoyés
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'drafts' %}active{% endif %}" href="{% url 'mail:drafts' %}">
+                        <i class="fas fa-file-alt"></i> Brouillons
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'trash' %}active{% endif %}" href="{% url 'mail:trash' %}">
+                        <i class="fas fa-trash"></i> Corbeille
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Dossiers</span>
+                <a class="link-secondary" href="{% url 'mail:folder_create' %}" aria-label="Create new folder">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'folder_list' %}active{% endif %}" href="{% url 'mail:folder_list' %}">
+                        <i class="fas fa-folder"></i> Tous les dossiers
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'folder_create' %}active{% endif %}" href="{% url 'mail:folder_create' %}">
+                        <i class="fas fa-plus-circle"></i> Nouveau dossier
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Contacts</span>
+                <a class="link-secondary" href="{% url 'mail:contact_create' %}" aria-label="Add new contact">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'contact_list' %}active{% endif %}" href="{% url 'mail:contact_list' %}">
+                        <i class="fas fa-address-book"></i> Tous les contacts
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'contact_create' %}active{% endif %}" href="{% url 'mail:contact_create' %}">
+                        <i class="fas fa-plus-circle"></i> Nouveau contact
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div> 

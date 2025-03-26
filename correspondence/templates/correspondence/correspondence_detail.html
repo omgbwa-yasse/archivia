@@ -1,0 +1,140 @@
+{% extends 'correspondence/base.html' %}
+
+{% block title %}Correspondence Details{% endblock %}
+
+{% block correspondence_content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">{{ correspondence.code }} - {{ correspondence.name }}</h3>
+        <div class="btn-group">
+            <a href="{% url 'correspondence:update' correspondence.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'correspondence:delete' correspondence.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+            {% if not correspondence.is_archived %}
+            <a href="{% url 'correspondence:archive' correspondence.pk %}" class="btn btn-secondary">
+                <i class="fas fa-archive"></i> Archive
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Basic Information</h5>
+                <table class="table">
+                    <tr>
+                        <th>Status:</th>
+                        <td>
+                            <span class="badge {% if correspondence.status == 'draft' %}bg-secondary
+                                             {% elif correspondence.status == 'in_progress' %}bg-primary
+                                             {% elif correspondence.status == 'transmitted' %}bg-success
+                                             {% else %}bg-danger{% endif %}">
+                                {{ correspondence.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Priority:</th>
+                        <td>{{ correspondence.priority.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date:</th>
+                        <td>{{ correspondence.date|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Document Type:</th>
+                        <td>{{ correspondence.get_document_type_display }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h5>Classification</h5>
+                <table class="table">
+                    <tr>
+                        <th>Typology:</th>
+                        <td>{{ correspondence.typology.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Action:</th>
+                        <td>{{ correspondence.action.name }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h5>Sender Information</h5>
+                <table class="table">
+                    <tr>
+                        <th>User:</th>
+                        <td>{{ correspondence.sender_user.get_full_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Organisation:</th>
+                        <td>{{ correspondence.sender_organisation.name }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h5>Recipient Information</h5>
+                <table class="table">
+                    <tr>
+                        <th>User:</th>
+                        <td>{{ correspondence.recipient_user.get_full_name|default:"Not specified" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Organisation:</th>
+                        <td>{{ correspondence.recipient_organisation.name|default:"Not specified" }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        {% if correspondence.description %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <h5>Description</h5>
+                <p class="card-text">{{ correspondence.description }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if correspondence.attachments.exists %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <h5>Attachments</h5>
+                <ul class="list-group">
+                    {% for attachment in correspondence.attachments.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ attachment.original_name }}
+                        <span class="badge bg-primary rounded-pill">{{ attachment.extension }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if correspondence.related_correspondences.exists %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <h5>Related Correspondences</h5>
+                <ul class="list-group">
+                    {% for related in correspondence.related_correspondences.all %}
+                    <li class="list-group-item">
+                        <a href="{% url 'correspondence:detail' related.related_correspondence.pk %}">
+                            {{ related.related_correspondence.code }} - {{ related.related_correspondence.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

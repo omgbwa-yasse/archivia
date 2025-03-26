@@ -1,0 +1,217 @@
+{% extends 'workspace/base.html' %}
+
+{% block page_title %}{{ workspace.name }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+        <a href="{% url 'workspace:folder_list' workspace.pk %}" class="btn btn-primary">
+            <i class="fas fa-folder"></i> Browse Folders
+        </a>
+        <a href="{% url 'workspace:workspace_member_list' workspace.pk %}" class="btn btn-secondary">
+            <i class="fas fa-users"></i> Manage Members
+        </a>
+        <a href="{% url 'workspace:workspace_edit' workspace.pk %}" class="btn btn-info">
+            <i class="fas fa-edit"></i> Edit Workspace
+        </a>
+    </div>
+    <div class="btn-group">
+        <a href="{% url 'workspace:workspace_delete' workspace.pk %}" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Delete Workspace
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block workspace_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Workspace Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> {{ workspace.name }}</p>
+                        <p><strong>Owner:</strong> {{ workspace.owner.username }}</p>
+                        <p><strong>Created At:</strong> {{ workspace.created_at|date:"M d, Y H:i" }}</p>
+                        <p><strong>Created By:</strong> {{ workspace.created_by.username }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Last Updated:</strong> {{ workspace.updated_at|date:"M d, Y H:i" }}</p>
+                        <p><strong>Last Updated By:</strong> {{ workspace.updated_by.username }}</p>
+                        <p><strong>Total Members:</strong> {{ workspace.members.count }}</p>
+                        <p><strong>Total Folders:</strong> {{ workspace.folders.count }}</p>
+                    </div>
+                </div>
+                
+                {% if workspace.description %}
+                <div class="mt-4">
+                    <h6>Description</h6>
+                    <p>{{ workspace.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% for activity in recent_activities %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-secondary"></div>
+                        <div class="timeline-content">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-1">{{ activity.action }}</h6>
+                                <small class="text-muted">{{ activity.created_at|date:"M d, Y H:i" }}</small>
+                            </div>
+                            <p class="mb-1">By {{ activity.user.username }}</p>
+                            {% if activity.details %}
+                            <p class="mb-0">{{ activity.details }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <div class="alert alert-info mb-0">
+                            No recent activity recorded.
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ total_documents }}</h3>
+                                <small class="text-muted">Documents</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ total_folders }}</h3>
+                                <small class="text-muted">Folders</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ total_members }}</h3>
+                                <small class="text-muted">Members</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ total_storage|filesizeformat }}</h3>
+                                <small class="text-muted">Storage Used</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Members</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    {% for member in recent_members %}
+                    <li class="mb-2">
+                        <i class="fas fa-user text-primary"></i>
+                        {{ member.user.username }}
+                        <span class="badge bg-{% if member.role == 'admin' %}danger{% elif member.role == 'member' %}primary{% else %}secondary{% endif %}">
+                            {{ member.get_role_display }}
+                        </span>
+                        <small class="text-muted">Added {{ member.created_at|timesince }} ago</small>
+                    </li>
+                    {% empty %}
+                    <li class="text-muted">No recent members</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Documents</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    {% for document in recent_documents %}
+                    <li class="mb-2">
+                        <i class="fas fa-file text-primary"></i>
+                        <a href="{% url 'workspace:document_detail' workspace.pk document.folder.pk document.pk %}">
+                            {{ document.name }}
+                        </a>
+                        <small class="text-muted">Updated {{ document.updated_at|timesince }} ago</small>
+                    </li>
+                    {% empty %}
+                    <li class="text-muted">No recent documents</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.timeline-item:not(:last-child):before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 20px;
+    bottom: -30px;
+    width: 2px;
+    background: #dee2e6;
+}
+</style>
+{% endblock %}
+{% endblock %} 

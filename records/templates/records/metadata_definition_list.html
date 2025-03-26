@@ -1,0 +1,65 @@
+{% extends "records/base.html" %}
+{% load i18n %}
+
+{% block records_content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{% trans "Metadata Definitions" %}</h5>
+        <a href="{% url 'records:metadata_definition_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> {% trans "New Definition" %}
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{% trans "Name" %}</th>
+                        <th>{% trans "Description" %}</th>
+                        <th>{% trans "Data Type" %}</th>
+                        <th>{% trans "Mandatory" %}</th>
+                        <th>{% trans "Created By" %}</th>
+                        <th>{% trans "Created At" %}</th>
+                        <th>{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for definition in metadata_definitions %}
+                    <tr>
+                        <td>{{ definition.name }}</td>
+                        <td>{{ definition.description|truncatewords:30 }}</td>
+                        <td>{{ definition.data_type }}</td>
+                        <td>
+                            {% if definition.mandatory %}
+                            <span class="badge badge-danger">{% trans "Yes" %}</span>
+                            {% else %}
+                            <span class="badge badge-secondary">{% trans "No" %}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ definition.created_by }}</td>
+                        <td>{{ definition.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{% url 'records:metadata_definition_detail' definition.pk %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'records:metadata_definition_update' definition.pk %}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'records:metadata_definition_delete' definition.pk %}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">{% trans "No metadata definitions found." %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                        <span>Dossiers</span>
+                    </h6>
+                    <button class="btn btn-sm btn-primary" id="newFolderBtn">
+                        <i class="fas fa-folder-plus"></i> Nouveau
+                    </button>
+                </div>
+                <div id="folderTree">
+                    <!-- Le contenu de l'arborescence sera chargé dynamiquement -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2" id="currentFolderName">Dossiers</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="viewModeBtn">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="listModeBtn">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="folderContent">
+                <!-- Le contenu du dossier sera chargé dynamiquement -->
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal pour créer/éditer un dossier -->
+<div class="modal fade" id="folderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="folderModalTitle">Nouveau dossier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="folderForm">
+                    <div class="mb-3">
+                        <label for="folderName" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="folderName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="folderDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="folderDescription" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="saveFolderBtn">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Configuration globale
+    const API_BASE_URL = '/folders/';
+    let currentFolderId = null;
+    let currentViewMode = 'grid'; // 'grid' ou 'list'
+
+    // Fonctions utilitaires
+    function showError(message) {
+        // Implémenter l'affichage des erreurs
+    }
+
+    function showSuccess(message) {
+        // Implémenter l'affichage des messages de succès
+    }
+
+    // Gestion des dossiers
+    function loadFolderTree() {
+        // Implémenter le chargement de l'arborescence
+    }
+
+    function loadFolderContent(folderId) {
+        // Implémenter le chargement du contenu du dossier
+    }
+
+    function createFolder(parentId = null) {
+        // Implémenter la création d'un dossier
+    }
+
+    function updateFolder(folderId) {
+        // Implémenter la mise à jour d'un dossier
+    }
+
+    function deleteFolder(folderId) {
+        // Implémenter la suppression d'un dossier
+    }
+
+    // Gestion de l'interface
+    function toggleViewMode(mode) {
+        // Implémenter le changement de mode d'affichage
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFolderTree();
+        
+        // Gestionnaires d'événements
+        document.getElementById('newFolderBtn').addEventListener('click', () => createFolder(currentFolderId));
+        document.getElementById('viewModeBtn').addEventListener('click', () => toggleViewMode('grid'));
+        document.getElementById('listModeBtn').addEventListener('click', () => toggleViewMode('list'));
+        document.getElementById('saveFolderBtn').addEventListener('click', () => {
+            // Implémenter la sauvegarde du formulaire
+        });
+    });
+</script>
+{% endblock %} 

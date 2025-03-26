@@ -1,0 +1,71 @@
+{% load static %}
+<div class="sidebar bg-light">
+    <div class="sidebar-sticky">
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Projets</span>
+                <a class="link-secondary" href="{% url 'projects:project_create' %}" aria-label="Create new project">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'project_list' %}active{% endif %}" href="{% url 'projects:project_list' %}">
+                        <i class="fas fa-project-diagram"></i> Tous les projets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'project_create' %}active{% endif %}" href="{% url 'projects:project_create' %}">
+                        <i class="fas fa-plus-circle"></i> Nouveau projet
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Gestion</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'milestone_list' %}active{% endif %}" href="{% url 'projects:milestone_list' %}">
+                        <i class="fas fa-flag"></i> Jalons
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'resource_list' %}active{% endif %}" href="{% url 'projects:resource_list' %}">
+                        <i class="fas fa-users"></i> Ressources
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'budget_list' %}active{% endif %}" href="{% url 'projects:budget_list' %}">
+                        <i class="fas fa-money-bill"></i> Budget
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Rapports</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'progress_report' %}active{% endif %}" href="{% url 'projects:progress_report' %}">
+                        <i class="fas fa-chart-line"></i> Progression
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'risk_report' %}active{% endif %}" href="{% url 'projects:risk_report' %}">
+                        <i class="fas fa-exclamation-triangle"></i> Risques
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'resource_report' %}active{% endif %}" href="{% url 'projects:resource_report' %}">
+                        <i class="fas fa-chart-pie"></i> Utilisation des ressources
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div> 

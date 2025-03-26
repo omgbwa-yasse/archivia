@@ -1,0 +1,130 @@
+<!-- Modal de recherche -->
+<div class="modal fade" id="searchModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Rechercher des documents</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulaire de recherche -->
+                <form id="searchForm" class="mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="searchQuery" class="form-label">Recherche</label>
+                            <input type="text" class="form-control" id="searchQuery" name="q" placeholder="Mots-clés...">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="searchFolder" class="form-label">Dossier</label>
+                            <select class="form-select" id="searchFolder" name="folder">
+                                <option value="">Tous les dossiers</option>
+                                {% for folder in folders %}
+                                <option value="{{ folder.id }}">{{ folder.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchType" class="form-label">Type de fichier</label>
+                            <select class="form-select" id="searchType" name="type">
+                                <option value="">Tous les types</option>
+                                <option value="pdf">PDF</option>
+                                <option value="doc">DOC</option>
+                                <option value="docx">DOCX</option>
+                                <option value="xls">XLS</option>
+                                <option value="xlsx">XLSX</option>
+                                <option value="txt">TXT</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchDateFrom" class="form-label">Date de création</label>
+                            <input type="date" class="form-control" id="searchDateFrom" name="date_from">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchDateTo" class="form-label">à</label>
+                            <input type="date" class="form-control" id="searchDateTo" name="date_to">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Rechercher
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Résultats de recherche -->
+                <div id="searchResults">
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <p>Entrez des critères de recherche pour commencer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gestionnaire de soumission du formulaire
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        performSearch();
+    });
+
+    // Fonction de recherche
+    function performSearch() {
+        const formData = new FormData(document.getElementById('searchForm'));
+        const searchParams = new URLSearchParams(formData);
+        
+        fetch(`/api/documents/search/?${searchParams.toString()}`)
+        .then(response => response.json())
+        .then(data => {
+            displaySearchResults(data);
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de la recherche');
+        });
+    }
+
+    // Affichage des résultats
+    function displaySearchResults(data) {
+        const resultsContainer = document.getElementById('searchResults');
+        
+        if (data.results.length === 0) {
+            resultsContainer.innerHTML = `
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-search fa-3x mb-3"></i>
+                    <p>Aucun résultat trouvé</p>
+                </div>
+            `;
+            return;
+        }
+
+        resultsContainer.innerHTML = `
+            <div class="list-group">
+                ${data.results.map(doc => `
+                    <a href="/documents/${doc.id}/" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${doc.name}</h6>
+                                <p class="mb-1 small text-muted">${doc.description || 'Aucune description'}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-folder"></i> ${doc.folder_name} |
+                                    <i class="fas fa-user"></i> ${doc.created_by_name} |
+                                    <i class="fas fa-calendar"></i> ${doc.created_at}
+                                </small>
+                            </div>
+                            <span class="badge bg-primary">${doc.file_type}</span>
+                        </div>
+                    </a>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    // Recherche en temps réel
+    let searchTimeout;
+    document.getElementById('searchQuery').addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performSearch, 500);
+    });
+</script> 

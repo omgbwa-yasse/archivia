@@ -1,0 +1,41 @@
+{% extends 'tools/base.html' %}
+
+{% block page_title %}Supprimer la Communicabilité{% endblock %}
+
+{% block page_content %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Êtes-vous sûr de vouloir supprimer cette communicabilité ?</h5>
+        <p class="card-text">
+            Vous êtes sur le point de supprimer la communicabilité suivante :
+            <br>
+            <strong>{{ communicability.code }} - {{ communicability.name }}</strong>
+        </p>
+
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            Cette action est irréversible.
+        </div>
+
+        {% if communicability.activity_set.exists %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-circle"></i>
+            Cette communicabilité est associée à {{ communicability.activity_set.count }} activité(s).
+            La suppression de la communicabilité supprimera également ces associations.
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mt-3">
+                <a href="{% url 'tools:communicability_detail' communicability.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Confirmer la suppression
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

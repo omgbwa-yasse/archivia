@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ model.name }} - Détails{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ model.name }}</h1>
+        <div class="btn-group">
+            <a href="{% url 'intelligence:model_update' model.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+            <a href="{% url 'intelligence:model_delete' model.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Supprimer
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Provider</dt>
+                        <dd class="col-sm-9">{{ model.get_provider_display }}</dd>
+
+                        <dt class="col-sm-3">Version</dt>
+                        <dd class="col-sm-9">{{ model.version }}</dd>
+
+                        <dt class="col-sm-3">Statut</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge {% if model.status == 'ACTIVE' %}bg-success{% elif model.status == 'INACTIVE' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                {{ model.get_status_display }}
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9">{{ model.description|default:"Aucune description" }}</dd>
+
+                        <dt class="col-sm-3">Capacités</dt>
+                        <dd class="col-sm-9">
+                            {% for capability in model.capabilities %}
+                            <span class="badge bg-info me-1">{{ capability }}</span>
+                            {% empty %}
+                            <span class="text-muted">Aucune capacité définie</span>
+                            {% endfor %}
+                        </dd>
+
+                        <dt class="col-sm-3">Configuration</dt>
+                        <dd class="col-sm-9">
+                            <pre class="bg-light p-3 rounded"><code>{{ model.configuration|pprint }}</code></pre>
+                        </dd>
+
+                        <dt class="col-sm-3">Limites</dt>
+                        <dd class="col-sm-9">
+                            <ul class="list-unstyled mb-0">
+                                <li><strong>Tokens max :</strong> {{ model.max_tokens }}</li>
+                                <li><strong>Contexte max :</strong> {{ model.max_context_length }}</li>
+                                <li><strong>Coût par token :</strong> {{ model.cost_per_token }}€</li>
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Statistiques d'utilisation</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2 text-muted">Total des requêtes</h6>
+                                    <h3 class="card-title">{{ model.total_requests }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2 text-muted">Tokens utilisés</h6>
+                                    <h3 class="card-title">{{ model.total_tokens }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2 text-muted">Coût total</h6>
+                                    <h3 class="card-title">{{ model.total_cost }}€</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Métadonnées</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Créé par</dt>
+                        <dd class="col-sm-8">{{ model.created_by }}</dd>
+
+                        <dt class="col-sm-4">Crée le</dt>
+                        <dd class="col-sm-8">{{ model.created_at|date:"d/m/Y H:i" }}</dd>
+
+                        <dt class="col-sm-4">Modifié par</dt>
+                        <dd class="col-sm-8">{{ model.updated_by|default:"-" }}</dd>
+
+                        <dt class="col-sm-4">Modifié le</dt>
+                        <dd class="col-sm-8">{{ model.updated_at|date:"d/m/Y H:i" }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Agents utilisant ce modèle</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for agent in model.agents.all %}
+                        <a href="{% url 'intelligence:agent_detail' agent.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ agent.name }}</h6>
+                                <small>{{ agent.get_type_display }}</small>
+                            </div>
+                            <p class="mb-1">{{ agent.description|truncatechars:100 }}</p>
+                            <small>
+                                <span class="badge {% if agent.status == 'ACTIVE' %}bg-success{% elif agent.status == 'INACTIVE' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                    {{ agent.get_status_display }}
+                                </span>
+                            </small>
+                        </a>
+                        {% empty %}
+                        <div class="text-center text-muted">Aucun agent n'utilise ce modèle</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

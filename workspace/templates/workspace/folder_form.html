@@ -1,0 +1,97 @@
+{% extends 'workspace/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+    {% if form.instance.pk %}Edit Folder{% else %}Create New Folder{% endif %} - {{ workspace.name }}
+{% endblock %}
+
+{% block workspace_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}Update Folder{% else %}Create Folder{% endif %}
+                        </button>
+                        <a href="{% url 'workspace:folder_list' workspace.pk %}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Folder Information</h5>
+            </div>
+            <div class="card-body">
+                <p>A folder helps you organize your documents by:</p>
+                <ul>
+                    <li>Creating a hierarchical structure</li>
+                    <li>Grouping related documents</li>
+                    <li>Managing permissions at the folder level</li>
+                    <li>Tracking folder-specific activities</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Current Location</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1">
+                    <strong>Workspace:</strong><br>
+                    <a href="{% url 'workspace:workspace_detail' workspace.pk %}">
+                        {{ workspace.name }}
+                    </a>
+                </p>
+                {% if parent_folder %}
+                <p class="mb-1">
+                    <strong>Parent Folder:</strong><br>
+                    <a href="{% url 'workspace:folder_detail' workspace.pk parent_folder.pk %}">
+                        {{ parent_folder.name }}
+                    </a>
+                </p>
+                {% endif %}
+                {% if form.instance.pk %}
+                <p class="mb-0">
+                    <strong>Current Path:</strong><br>
+                    {{ form.instance.path }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if form.instance.pk %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Folder Statistics</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1">
+                    <strong>Total Documents:</strong><br>
+                    {{ form.instance.documents.count }}
+                </p>
+                <p class="mb-1">
+                    <strong>Total Subfolders:</strong><br>
+                    {{ form.instance.subfolders.count }}
+                </p>
+                <p class="mb-0">
+                    <strong>Created:</strong><br>
+                    {{ form.instance.created_at|date:"M d, Y H:i" }} by {{ form.instance.created_by.username }}
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

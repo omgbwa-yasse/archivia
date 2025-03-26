@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ agent.name }} - Détails{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ agent.name }}</h1>
+        <div class="btn-group">
+            <a href="{% url 'intelligence:agent_update' agent.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+            <a href="{% url 'intelligence:agent_delete' agent.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Supprimer
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Type</dt>
+                        <dd class="col-sm-9">{{ agent.get_type_display }}</dd>
+
+                        <dt class="col-sm-3">Version</dt>
+                        <dd class="col-sm-9">{{ agent.version }}</dd>
+
+                        <dt class="col-sm-3">Statut</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge {% if agent.status == 'ACTIVE' %}bg-success{% elif agent.status == 'INACTIVE' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                {{ agent.get_status_display }}
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9">{{ agent.description|default:"Aucune description" }}</dd>
+
+                        <dt class="col-sm-3">Modèle</dt>
+                        <dd class="col-sm-9">
+                            <a href="{% url 'intelligence:model_detail' agent.model.pk %}">{{ agent.model.name }}</a>
+                            <span class="badge bg-secondary ms-2">{{ agent.model.version }}</span>
+                        </dd>
+
+                        <dt class="col-sm-3">Prompts</dt>
+                        <dd class="col-sm-9">
+                            {% for prompt in agent.prompts.all %}
+                            <a href="{% url 'intelligence:prompt_detail' prompt.pk %}" class="badge bg-info me-1">
+                                {{ prompt.name }}
+                            </a>
+                            {% empty %}
+                            <span class="text-muted">Aucun prompt assigné</span>
+                            {% endfor %}
+                        </dd>
+
+                        <dt class="col-sm-3">Configuration</dt>
+                        <dd class="col-sm-9">
+                            <pre class="bg-light p-3 rounded"><code>{{ agent.configuration|pprint }}</code></pre>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Statistiques d'utilisation</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2 text-muted">Total des tâches</h6>
+                                    <h3 class="card-title">{{ agent.total_tasks }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2 text-muted">Taux de succès</h6>
+                                    <h3 class="card-title">{{ agent.success_rate }}%</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Métadonnées</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Créé par</dt>
+                        <dd class="col-sm-8">{{ agent.created_by }}</dd>
+
+                        <dt class="col-sm-4">Crée le</dt>
+                        <dd class="col-sm-8">{{ agent.created_at|date:"d/m/Y H:i" }}</dd>
+
+                        <dt class="col-sm-4">Modifié par</dt>
+                        <dd class="col-sm-8">{{ agent.updated_by|default:"-" }}</dd>
+
+                        <dt class="col-sm-4">Modifié le</dt>
+                        <dd class="col-sm-8">{{ agent.updated_at|date:"d/m/Y H:i" }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dernières tâches</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for task in agent.recent_tasks %}
+                        <a href="{% url 'intelligence:task_detail' task.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ task.name }}</h6>
+                                <small>{{ task.created_at|date:"d/m/Y H:i" }}</small>
+                            </div>
+                            <p class="mb-1">{{ task.description|truncatechars:100 }}</p>
+                            <small>
+                                <span class="badge {% if task.status == 'COMPLETED' %}bg-success{% elif task.status == 'FAILED' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ task.get_status_display }}
+                                </span>
+                            </small>
+                        </a>
+                        {% empty %}
+                        <div class="text-center text-muted">Aucune tâche récente</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

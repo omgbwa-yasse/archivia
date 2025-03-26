@@ -1,0 +1,163 @@
+<!-- Modal de gestion des métadonnées -->
+<div class="modal fade" id="metadataModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gérer les métadonnées</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="metadataForm">
+                    {% csrf_token %}
+                    
+                    <!-- Métadonnées de base -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Métadonnées de base</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="metadataTitle" class="form-label">Titre</label>
+                                <input type="text" class="form-control" id="metadataTitle" name="title" value="{{ document.name }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="metadataAuthor" class="form-label">Auteur</label>
+                                <input type="text" class="form-control" id="metadataAuthor" name="author" value="{{ document.author|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="metadataDate" class="form-label">Date de création</label>
+                                <input type="date" class="form-control" id="metadataDate" name="creation_date" value="{{ document.creation_date|date:'Y-m-d' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="metadataKeywords" class="form-label">Mots-clés</label>
+                                <input type="text" class="form-control" id="metadataKeywords" name="keywords" value="{{ document.keywords|default:'' }}">
+                                <div class="form-text">Séparés par des virgules</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Métadonnées personnalisées -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Métadonnées personnalisées</h6>
+                        <div id="customMetadata">
+                            {% for metadata in document.metadata.all %}
+                            <div class="row g-3 mb-3 metadata-item">
+                                <div class="col-md-4">
+                                    <label class="form-label">Nom</label>
+                                    <input type="text" class="form-control" name="custom_metadata[{{ forloop.counter }}][name]" value="{{ metadata.definition.name }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Valeur</label>
+                                    <input type="text" class="form-control" name="custom_metadata[{{ forloop.counter }}][value]" value="{{ metadata.value }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="button" class="btn btn-outline-danger d-block w-100" onclick="removeMetadata(this)">
+                                        <i class="fas fa-trash"></i> Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" onclick="addMetadata()">
+                            <i class="fas fa-plus"></i> Ajouter une métadonnée
+                        </button>
+                    </div>
+
+                    <!-- Métadonnées système -->
+                    <div>
+                        <h6 class="mb-3">Métadonnées système</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tbody>
+                                    <tr>
+                                        <th>ID du document</th>
+                                        <td>{{ document.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Type de fichier</th>
+                                        <td>{{ document.file_type }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Taille</th>
+                                        <td>{{ document.file_size|filesizeformat }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Version</th>
+                                        <td>{{ document.version }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Dernière modification</th>
+                                        <td>{{ document.updated_at|date:"d/m/Y H:i" }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="saveMetadata()">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Ajouter une métadonnée personnalisée
+    function addMetadata() {
+        const container = document.getElementById('customMetadata');
+        const count = container.children.length;
+        
+        const newItem = document.createElement('div');
+        newItem.className = 'row g-3 mb-3 metadata-item';
+        newItem.innerHTML = `
+            <div class="col-md-4">
+                <label class="form-label">Nom</label>
+                <input type="text" class="form-control" name="custom_metadata[${count + 1}][name]" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Valeur</label>
+                <input type="text" class="form-control" name="custom_metadata[${count + 1}][value]" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <button type="button" class="btn btn-outline-danger d-block w-100" onclick="removeMetadata(this)">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(newItem);
+    }
+
+    // Supprimer une métadonnée personnalisée
+    function removeMetadata(button) {
+        button.closest('.metadata-item').remove();
+    }
+
+    // Sauvegarder les métadonnées
+    function saveMetadata() {
+        const formData = new FormData(document.getElementById('metadataForm'));
+        
+        fetch(`/api/documents/{{ document.id }}/metadata/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showError(data.error || 'Une erreur est survenue lors de l\'enregistrement des métadonnées');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de l\'enregistrement des métadonnées');
+        });
+    }
+</script> 

@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Liste des dossiers{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Dossiers</h1>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#folderModal">
+            <i class="fas fa-plus"></i> Nouveau dossier
+        </button>
+    </div>
+
+    {% if folders %}
+    <div class="row">
+        {% for folder in folders %}
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-folder text-warning"></i>
+                            <a href="{% url 'folders:detail' folder.id %}" class="text-decoration-none text-dark">
+                                {{ folder.name }}
+                            </a>
+                        </h5>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'folders:detail' folder.id %}">
+                                        <i class="fas fa-eye"></i> Voir
+                                    </a>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item" onclick="editFolder({{ folder.id }})">
+                                        <i class="fas fa-edit"></i> Modifier
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item text-danger" onclick="deleteFolder({{ folder.id }})">
+                                        <i class="fas fa-trash"></i> Supprimer
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="card-text text-muted small mb-2">
+                        {{ folder.description|truncatechars:100|default:"Aucune description" }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> {{ folder.created_at|date:"d/m/Y" }}
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-file"></i> {{ folder.documents.count }} document(s)
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+        <h2 class="h4 text-muted">Aucun dossier</h2>
+        <p class="text-muted">Commencez par créer un nouveau dossier</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal pour créer/modifier un dossier -->
+<div class="modal fade" id="folderModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="folderModalTitle">Nouveau dossier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="folderForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="folderName" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="folderName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="folderDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="folderDescription" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="saveFolder()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentFolderId = null;
+
+function editFolder(folderId) {
+    currentFolderId = folderId;
+    fetch(`/folders/api/folders/${folderId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('folderName').value = data.name;
+            document.getElementById('folderDescription').value = data.description;
+            document.getElementById('folderModalTitle').textContent = 'Modifier le dossier';
+            new bootstrap.Modal(document.getElementById('folderModal')).show();
+        });
+}
+
+function saveFolder() {
+    const formData = new FormData(document.getElementById('folderForm'));
+    const method = currentFolderId ? 'PUT' : 'POST';
+    const url = currentFolderId ? `/folders/api/folders/${currentFolderId}/` : '/folders/api/folders/';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            window.location.reload();
+        } else {
+            alert('Une erreur est survenue');
+        }
+    })
+    .catch(error => {
+        alert('Une erreur est survenue');
+    });
+}
+
+function deleteFolder(folderId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce dossier ?')) {
+        fetch(`/folders/api/folders/${folderId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Une erreur est survenue');
+            }
+        })
+        .catch(error => {
+            alert('Une erreur est survenue');
+        });
+    }
+}
+
+// Réinitialiser le formulaire quand le modal est fermé
+document.getElementById('folderModal').addEventListener('hidden.bs.modal', function () {
+    currentFolderId = null;
+    document.getElementById('folderForm').reset();
+    document.getElementById('folderModalTitle').textContent = 'Nouveau dossier';
+});
+</script>
+{% endblock %} 

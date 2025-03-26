@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Modifier{% else %}Créer{% endif %} un modèle d'IA{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{% if form.instance.pk %}Modifier{% else %}Créer{% endif %} un modèle d'IA</h1>
+        <a href="{% url 'intelligence:model_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Nom</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.name.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.provider.id_for_label }}" class="form-label">Provider</label>
+                            {{ form.provider }}
+                            {% if form.provider.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.provider.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.version.id_for_label }}" class="form-label">Version</label>
+                            {{ form.version }}
+                            {% if form.version.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.version.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Statut</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.status.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.description.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.capabilities.id_for_label }}" class="form-label">Capacités</label>
+                            {{ form.capabilities }}
+                            {% if form.capabilities.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.capabilities.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.configuration.id_for_label }}" class="form-label">Configuration</label>
+                            {{ form.configuration }}
+                            {% if form.configuration.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.configuration.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.max_tokens.id_for_label }}" class="form-label">Tokens max</label>
+                                    {{ form.max_tokens }}
+                                    {% if form.max_tokens.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.max_tokens.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.max_context_length.id_for_label }}" class="form-label">Contexte max</label>
+                                    {{ form.max_context_length }}
+                                    {% if form.max_context_length.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.max_context_length.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.cost_per_token.id_for_label }}" class="form-label">Coût par token (€)</label>
+                                    {{ form.cost_per_token }}
+                                    {% if form.cost_per_token.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.cost_per_token.errors %}
+                                        {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Aide</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Providers disponibles</h6>
+                    <p>Choisissez le provider en fonction de vos besoins :</p>
+                    <ul>
+                        <li><strong>OpenAI</strong> : GPT-3, GPT-4, etc.</li>
+                        <li><strong>Anthropic</strong> : Claude, Claude 2</li>
+                        <li><strong>Google</strong> : PaLM, Gemini</li>
+                        <li><strong>Meta</strong> : LLaMA, Code LLaMA</li>
+                        <li><strong>Autre</strong> : Autres providers</li>
+                    </ul>
+
+                    <h6>Capacités</h6>
+                    <p>Les capacités sont définies sous forme d'un tableau JSON. Par exemple :</p>
+                    <pre class="bg-light p-2 rounded"><code>[
+    "text-generation",
+    "code-generation",
+    "text-classification",
+    "question-answering"
+]</code></pre>
+
+                    <h6>Configuration</h6>
+                    <p>La configuration est définie sous forme d'un objet JSON. Par exemple :</p>
+                    <pre class="bg-light p-2 rounded"><code>{
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "frequency_penalty": 0.5,
+    "presence_penalty": 0.5,
+    "stop": ["\n", "###"]
+}</code></pre>
+
+                    <h6>Limites</h6>
+                    <p>Définissez les limites techniques du modèle :</p>
+                    <ul>
+                        <li><strong>Tokens max :</strong> Nombre maximum de tokens générés</li>
+                        <li><strong>Contexte max :</strong> Longueur maximale du contexte d'entrée</li>
+                        <li><strong>Coût par token :</strong> Coût en euros par token utilisé</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialiser les champs JSON
+    document.addEventListener('DOMContentLoaded', function() {
+        const jsonFields = ['capabilities', 'configuration'];
+        jsonFields.forEach(field => {
+            const textarea = document.getElementById(`id_${field}`);
+            if (textarea) {
+                try {
+                    const value = JSON.parse(textarea.value || (field === 'capabilities' ? '[]' : '{}'));
+                    textarea.value = JSON.stringify(value, null, 2);
+                } catch (e) {
+                    textarea.value = field === 'capabilities' ? '[]' : '{}';
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

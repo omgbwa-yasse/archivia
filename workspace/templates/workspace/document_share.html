@@ -1,0 +1,164 @@
+{% extends 'workspace/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Share Document - {{ document.name }}{% endblock %}
+
+{% block workspace_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Share Document</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-share-alt"></i> Generate Share Link
+                        </button>
+                        <a href="{% url 'workspace:document_detail' workspace.pk folder.pk document.pk %}" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if shares %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Active Share Links</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Access Type</th>
+                                <th>Expires</th>
+                                <th>Access Count</th>
+                                <th>Created By</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for share in shares %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-{% if share.permission_type == 'read' %}secondary{% else %}primary{% endif %}">
+                                        {{ share.get_permission_type_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if share.expires_at %}
+                                        {{ share.expires_at|date:"M d, Y H:i" }}
+                                    {% else %}
+                                        Never
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ share.access_count }}
+                                    {% if share.max_access_count %}
+                                        / {{ share.max_access_count }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ share.created_by.username }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary copy-link" 
+                                                data-share-url="{{ share.share_token }}">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <a href="#" class="btn btn-sm btn-outline-danger revoke-link" 
+                                           data-share-id="{{ share.pk }}">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Document Information</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1">
+                    <strong>Name:</strong><br>
+                    {{ document.name }}
+                </p>
+                <p class="mb-1">
+                    <strong>Type:</strong><br>
+                    {{ document.file_type }}
+                </p>
+                <p class="mb-1">
+                    <strong>Size:</strong><br>
+                    {{ document.file_size|filesizeformat }}
+                </p>
+                <p class="mb-1">
+                    <strong>Version:</strong><br>
+                    v{{ document.version }}
+                </p>
+                {% if document.description %}
+                <p class="mb-0">
+                    <strong>Description:</strong><br>
+                    {{ document.description }}
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Sharing Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-info-circle text-info"></i> Share links can be password protected</li>
+                    <li><i class="fas fa-info-circle text-info"></i> You can set expiration dates</li>
+                    <li><i class="fas fa-info-circle text-info"></i> You can limit the number of accesses</li>
+                    <li><i class="fas fa-info-circle text-info"></i> You can revoke access at any time</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Copy share link
+    document.querySelectorAll('.copy-link').forEach(button => {
+        button.addEventListener('click', function() {
+            const shareUrl = this.dataset.shareUrl;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('Share link copied to clipboard!');
+            });
+        });
+    });
+    
+    // Revoke share link
+    document.querySelectorAll('.revoke-link').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to revoke this share link?')) {
+                const shareId = this.dataset.shareId;
+                // Add AJAX call to revoke the share link
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

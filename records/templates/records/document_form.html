@@ -1,0 +1,54 @@
+{% extends "records/base.html" %}
+{% load i18n %}
+
+{% block records_content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">{% if form.instance.pk %}{% trans "Edit Document" %}{% else %}{% trans "New Document" %}{% endif %}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% if field.name == 'file' %}
+                <div class="custom-file">
+                    {{ field }}
+                    <label class="custom-file-label" for="{{ field.id_for_label }}">{% trans "Choose file" %}</label>
+                </div>
+                {% else %}
+                {{ field }}
+                {% endif %}
+                {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    {% if form.instance.pk %}{% trans "Update" %}{% else %}{% trans "Create" %}{% endif %}
+                </button>
+                <a href="{% url 'records:document_list' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+    var fileName = e.target.files[0].name;
+    var nextSibling = e.target.nextElementSibling;
+    nextSibling.innerText = fileName;
+});
+</script>
+{% endblock %}
+{% endblock %} 

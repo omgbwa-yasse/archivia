@@ -1,0 +1,131 @@
+{% extends "mails/base.html" %}
+{% load static %}
+
+{% block mail_content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            {% if form.instance.pk %}Modifier le template{% else %}Nouveau template{% endif %}
+        </h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label">
+                            {{ form.name.label }}
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.name.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.category.id_for_label }}" class="form-label">
+                            {{ form.category.label }}
+                        </label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.category.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.subject.id_for_label }}" class="form-label">
+                    {{ form.subject.label }}
+                </label>
+                {{ form.subject }}
+                {% if form.subject.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.subject.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.body_html.id_for_label }}" class="form-label">
+                    {{ form.body_html.label }}
+                </label>
+                {{ form.body_html }}
+                {% if form.body_html.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.body_html.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.body_text.id_for_label }}" class="form-label">
+                    {{ form.body_text.label }}
+                </label>
+                {{ form.body_text }}
+                {% if form.body_text.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.body_text.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label for="{{ form.variables.id_for_label }}" class="form-label">
+                    {{ form.variables.label }}
+                </label>
+                {{ form.variables }}
+                <small class="form-text text-muted">{{ form.variables.help_text }}</small>
+                {% if form.variables.errors %}
+                <div class="invalid-feedback d-block">
+                    {{ form.variables.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="text-end">
+                <a href="{% url 'mails:template_list' %}" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-editor {
+        min-height: 200px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialiser l'éditeur Quill
+        var quill = new Quill('#{{ form.body_html.id_for_label }}', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+    });
+</script>
+{% endblock %} 

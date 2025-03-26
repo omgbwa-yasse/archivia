@@ -1,0 +1,35 @@
+{% extends 'tools/base.html' %}
+
+{% block page_title %}Supprimer l'Association{% endblock %}
+
+{% block page_content %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Êtes-vous sûr de vouloir supprimer cette association ?</h5>
+        <p class="card-text">
+            Vous êtes sur le point de supprimer l'association suivante :
+            <br>
+            <strong>Rétention :</strong> {{ retention_law_article.retention.code }} - {{ retention_law_article.retention.name }}
+            <br>
+            <strong>Article de Loi :</strong> {{ retention_law_article.law_article.code }} - {{ retention_law_article.law_article.name }}
+        </p>
+
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            Cette action est irréversible.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mt-4">
+                <a href="{% url 'tools:retention_law_article_detail' retention_law_article.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Confirmer la suppression
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

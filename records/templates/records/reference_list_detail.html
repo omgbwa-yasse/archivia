@@ -1,0 +1,94 @@
+{% extends "records/base.html" %}
+{% load i18n %}
+
+{% block records_content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ list.name }}</h5>
+        <div>
+            <a href="{% url 'records:reference_value_create' list.pk %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> {% trans "Add Value" %}
+            </a>
+            <a href="{% url 'records:reference_list_update' list.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> {% trans "Edit" %}
+            </a>
+            <a href="{% url 'records:reference_list_delete' list.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> {% trans "Delete" %}
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>{% trans "Basic Information" %}</h6>
+                <table class="table">
+                    <tr>
+                        <th>{% trans "Name" %}</th>
+                        <td>{{ list.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Description" %}</th>
+                        <td>{{ list.description|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Created By" %}</th>
+                        <td>{{ list.created_by }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Created At" %}</th>
+                        <td>{{ list.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>{% trans "Last Updated" %}</th>
+                        <td>{{ list.updated_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6>{% trans "Values" %}</h6>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Value" %}</th>
+                                <th>{% trans "Description" %}</th>
+                                <th>{% trans "Status" %}</th>
+                                <th>{% trans "Actions" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for value in list.values.all %}
+                            <tr>
+                                <td>{{ value.value }}</td>
+                                <td>{{ value.description|truncatewords:20 }}</td>
+                                <td>
+                                    {% if value.active %}
+                                    <span class="badge badge-success">{% trans "Active" %}</span>
+                                    {% else %}
+                                    <span class="badge badge-secondary">{% trans "Inactive" %}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'records:reference_value_update' value.pk %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'records:reference_value_delete' value.pk %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">{% trans "No values defined." %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

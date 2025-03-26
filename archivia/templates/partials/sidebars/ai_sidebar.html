@@ -1,0 +1,86 @@
+{% load static %}
+<div class="sidebar bg-light">
+    <div class="sidebar-sticky">
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Intelligence Artificielle</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'intelligence:dashboard' %}">
+                        <i class="fas fa-robot"></i> Tableau de bord
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'analysis' %}active{% endif %}" href="{% url 'intelligence:analysis' %}">
+                        <i class="fas fa-chart-line"></i> Analyse
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Analyse de Documents</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'document_analysis' %}active{% endif %}" href="{% url 'ai:document_analysis' %}">
+                        <i class="fas fa-file-alt"></i> Analyse de documents
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'text_extraction' %}active{% endif %}" href="{% url 'ai:text_extraction' %}">
+                        <i class="fas fa-keyboard"></i> Extraction de texte
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'classification' %}active{% endif %}" href="{% url 'ai:classification' %}">
+                        <i class="fas fa-tags"></i> Classification
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Prédictions</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'predictions' %}active{% endif %}" href="{% url 'intelligence:predictions' %}">
+                        <i class="fas fa-chart-bar"></i> Modèles de prédiction
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'training' %}active{% endif %}" href="{% url 'intelligence:training' %}">
+                        <i class="fas fa-graduation-cap"></i> Entraînement
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'evaluation' %}active{% endif %}" href="{% url 'intelligence:evaluation' %}">
+                        <i class="fas fa-chart-pie"></i> Évaluation
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Configuration</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'model_config' %}active{% endif %}" href="{% url 'ai:model_config' %}">
+                        <i class="fas fa-cog"></i> Configuration des modèles
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'api_config' %}active{% endif %}" href="{% url 'ai:api_config' %}">
+                        <i class="fas fa-plug"></i> Configuration API
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div> 

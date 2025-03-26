@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ task.name }} - Détails{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ task.name }}</h1>
+        <div class="btn-group">
+            <a href="{% url 'intelligence:task_update' task.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+            <a href="{% url 'intelligence:task_delete' task.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Supprimer
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Informations générales</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">Agent</dt>
+                        <dd class="col-sm-9">{{ task.agent.name }}</dd>
+
+                        <dt class="col-sm-3">Type</dt>
+                        <dd class="col-sm-9">{{ task.get_type_display }}</dd>
+
+                        <dt class="col-sm-3">Statut</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge {% if task.status == 'PENDING' %}bg-warning{% elif task.status == 'RUNNING' %}bg-info{% elif task.status == 'COMPLETED' %}bg-success{% elif task.status == 'FAILED' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                {{ task.get_status_display }}
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-3">Priorité</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge {% if task.priority == 'HIGH' %}bg-danger{% elif task.priority == 'MEDIUM' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ task.get_priority_display }}
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-3">Progression</dt>
+                        <dd class="col-sm-9">
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar" role="progressbar" style="width: {{ task.progress }}%">
+                                    {{ task.progress }}%
+                                </div>
+                            </div>
+                        </dd>
+
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9">{{ task.description|default:"Aucune description" }}</dd>
+
+                        <dt class="col-sm-3">Paramètres</dt>
+                        <dd class="col-sm-9">
+                            <pre class="bg-light p-3 rounded"><code>{{ task.parameters|default:"{}"|pprint }}</code></pre>
+                        </dd>
+
+                        <dt class="col-sm-3">Résultat</dt>
+                        <dd class="col-sm-9">
+                            <pre class="bg-light p-3 rounded"><code>{{ task.result|default:"Aucun résultat" }}</code></pre>
+                        </dd>
+
+                        <dt class="col-sm-3">Erreur</dt>
+                        <dd class="col-sm-9">
+                            {% if task.error %}
+                            <div class="alert alert-danger">
+                                {{ task.error }}
+                            </div>
+                            {% else %}
+                            <span class="text-muted">Aucune erreur</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Historique d'exécution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                    <th>Progression</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in task.logs.all %}
+                                <tr>
+                                    <td>{{ log.created_at|date:"d/m/Y H:i:s" }}</td>
+                                    <td>
+                                        <span class="badge {% if log.status == 'SUCCESS' %}bg-success{% elif log.status == 'ERROR' %}bg-danger{% else %}bg-info{% endif %}">
+                                            {{ log.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.progress }}%</td>
+                                    <td>{{ log.message }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Aucun historique disponible</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Métadonnées</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Créé par</dt>
+                        <dd class="col-sm-8">{{ task.created_by }}</dd>
+
+                        <dt class="col-sm-4">Crée le</dt>
+                        <dd class="col-sm-8">{{ task.created_at|date:"d/m/Y H:i" }}</dd>
+
+                        <dt class="col-sm-4">Modifié par</dt>
+                        <dd class="col-sm-8">{{ task.updated_by|default:"-" }}</dd>
+
+                        <dt class="col-sm-4">Modifié le</dt>
+                        <dd class="col-sm-8">{{ task.updated_at|date:"d/m/Y H:i" }}</dd>
+
+                        <dt class="col-sm-4">Début</dt>
+                        <dd class="col-sm-8">{{ task.started_at|date:"d/m/Y H:i"|default:"-" }}</dd>
+
+                        <dt class="col-sm-4">Fin</dt>
+                        <dd class="col-sm-8">{{ task.completed_at|date:"d/m/Y H:i"|default:"-" }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

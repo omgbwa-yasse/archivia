@@ -1,0 +1,198 @@
+<!-- Modal de gestion des versions -->
+<div class="modal fade" id="versionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gérer les versions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Liste des versions -->
+                <div class="list-group mb-4">
+                    {% for version in document.versions.all %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Version {{ version.number }}</h6>
+                                <p class="mb-1 small text-muted">{{ version.comment }}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> {{ version.created_by.get_full_name }} |
+                                    <i class="fas fa-calendar"></i> {{ version.created_at|date:"d/m/Y H:i" }}
+                                </small>
+                            </div>
+                            <div class="btn-group">
+                                <a href="{{ version.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank" title="Télécharger">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-info" onclick="previewVersion('{{ version.id }}')" title="Prévisualiser">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                {% if version.number != document.version %}
+                                <button type="button" class="btn btn-sm btn-outline-success" onclick="restoreVersion('{{ version.id }}')" title="Restaurer">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                {% endif %}
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteVersion('{{ version.id }}')" title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-history fa-3x mb-3"></i>
+                        <p>Aucune version précédente</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Formulaire de nouvelle version -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Nouvelle version</h6>
+                    </div>
+                    <div class="card-body">
+                        <form id="newVersionForm">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="versionFile" class="form-label">Fichier</label>
+                                <input type="file" class="form-control" id="versionFile" name="file" required>
+                                <div class="form-text">
+                                    Formats acceptés : PDF, DOC, DOCX, XLS, XLSX, TXT, etc.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="versionComment" class="form-label">Commentaire</label>
+                                <textarea class="form-control" id="versionComment" name="comment" rows="3" required></textarea>
+                                <div class="form-text">
+                                    Décrivez les modifications apportées dans cette version
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer la version
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de prévisualisation de version -->
+<div class="modal fade" id="versionPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Prévisualisation de la version</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="preview-container" style="height: 70vh;">
+                    <iframe id="versionPreviewFrame" class="w-100 h-100"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Gestionnaire de soumission du formulaire de nouvelle version
+    document.getElementById('newVersionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch(`/api/documents/{{ document.id }}/versions/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showError(data.error || 'Une erreur est survenue lors de l\'enregistrement de la version');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de l\'enregistrement de la version');
+        });
+    });
+
+    // Prévisualiser une version
+    function previewVersion(versionId) {
+        fetch(`/api/documents/{{ document.id }}/versions/${versionId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const frame = document.getElementById('versionPreviewFrame');
+                frame.src = data.file_url;
+                new bootstrap.Modal(document.getElementById('versionPreviewModal')).show();
+            } else {
+                showError(data.error || 'Une erreur est survenue lors de la prévisualisation');
+            }
+        })
+        .catch(error => {
+            showError('Une erreur est survenue lors de la prévisualisation');
+        });
+    }
+
+    // Restaurer une version
+    function restoreVersion(versionId) {
+        if (confirm('Êtes-vous sûr de vouloir restaurer cette version ? La version actuelle sera conservée comme version précédente.')) {
+            fetch(`/api/documents/{{ document.id }}/versions/${versionId}/restore/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    showError(data.error || 'Une erreur est survenue lors de la restauration');
+                }
+            })
+            .catch(error => {
+                showError('Une erreur est survenue lors de la restauration');
+            });
+        }
+    }
+
+    // Supprimer une version
+    function deleteVersion(versionId) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cette version ? Cette action est irréversible.')) {
+            fetch(`/api/documents/{{ document.id }}/versions/${versionId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    showError(data.error || 'Une erreur est survenue lors de la suppression');
+                }
+            })
+            .catch(error => {
+                showError('Une erreur est survenue lors de la suppression');
+            });
+        }
+    }
+</script>
+
+<style>
+    .preview-container {
+        background-color: #f8f9fa;
+    }
+    .preview-container iframe {
+        border: none;
+    }
+</style> 

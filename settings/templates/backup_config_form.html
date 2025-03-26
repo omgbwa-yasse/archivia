@@ -1,0 +1,241 @@
+{% extends "settings/base.html" %}
+
+{% block settings_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        {% if form.instance.pk %}
+        Edit Backup Configuration
+        {% else %}
+        New Backup Configuration
+        {% endif %}
+    </h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.name.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.enabled.id_for_label }}" class="form-label">Status</label>
+                            <div class="form-check form-switch">
+                                {{ form.enabled }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.description.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.storage_type.id_for_label }}" class="form-label">Storage Type</label>
+                            {{ form.storage_type }}
+                            {% if form.storage_type.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.storage_type.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.storage_path.id_for_label }}" class="form-label">Storage Path</label>
+                            {{ form.storage_path }}
+                            {% if form.storage_path.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.storage_path.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.retention_days.id_for_label }}" class="form-label">Retention Days</label>
+                            {{ form.retention_days }}
+                            {% if form.retention_days.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.retention_days.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.max_backups.id_for_label }}" class="form-label">Max Backups</label>
+                            {{ form.max_backups }}
+                            {% if form.max_backups.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.max_backups.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.include_files }}
+                                <label class="form-check-label" for="{{ form.include_files.id_for_label }}">Include Files</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.include_database }}
+                                <label class="form-check-label" for="{{ form.include_database.id_for_label }}">Include Database</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.compression_type.id_for_label }}" class="form-label">Compression Type</label>
+                            {{ form.compression_type }}
+                            {% if form.compression_type.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.compression_type.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.encryption_enabled }}
+                                <label class="form-check-label" for="{{ form.encryption_enabled.id_for_label }}">Enable Encryption</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="encryption-key-field" style="display: none;">
+                        <label for="{{ form.encryption_key.id_for_label }}" class="form-label">Encryption Key</label>
+                        {{ form.encryption_key }}
+                        {% if form.encryption_key.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.encryption_key.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.schedule_type.id_for_label }}" class="form-label">Schedule Type</label>
+                            {{ form.schedule_type }}
+                            {% if form.schedule_type.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.schedule_type.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.schedule_time.id_for_label }}" class="form-label">Schedule Time</label>
+                            {{ form.schedule_time }}
+                            {% if form.schedule_time.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.schedule_time.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="schedule-day-field" style="display: none;">
+                        <label for="{{ form.schedule_day.id_for_label }}" class="form-label">Schedule Day</label>
+                        {{ form.schedule_day }}
+                        {% if form.schedule_day.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.schedule_day.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'settings:backup_config_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Help</h5>
+            </div>
+            <div class="card-body">
+                <h6>Storage Configuration</h6>
+                <p>Choose where to store your backups. Local storage saves files on the server, while remote options (FTP, SFTP, S3) store them externally.</p>
+
+                <h6>Backup Options</h6>
+                <p>Configure what to include in your backups:</p>
+                <ul>
+                    <li>Files: Uploaded documents and media</li>
+                    <li>Database: All application data</li>
+                    <li>Compression: Reduces backup size</li>
+                    <li>Encryption: Secures sensitive data</li>
+                </ul>
+
+                <h6>Schedule</h6>
+                <p>Set up automatic backups:</p>
+                <ul>
+                    <li>Daily: Runs at specified time</li>
+                    <li>Weekly: Runs on chosen day</li>
+                    <li>Monthly: Runs on chosen date</li>
+                </ul>
+
+                <h6>Retention</h6>
+                <p>Manage backup storage:</p>
+                <ul>
+                    <li>Retention days: How long to keep backups</li>
+                    <li>Max backups: Maximum number to store</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Show/hide encryption key field based on encryption enabled
+    document.getElementById('{{ form.encryption_enabled.id_for_label }}').addEventListener('change', function() {
+        document.getElementById('encryption-key-field').style.display = this.checked ? 'block' : 'none';
+    });
+
+    // Show/hide schedule day field based on schedule type
+    document.getElementById('{{ form.schedule_type.id_for_label }}').addEventListener('change', function() {
+        const scheduleDayField = document.getElementById('schedule-day-field');
+        if (this.value === 'WEEKLY' || this.value === 'MONTHLY') {
+            scheduleDayField.style.display = 'block';
+        } else {
+            scheduleDayField.style.display = 'none';
+        }
+    });
+
+    // Trigger initial state
+    document.getElementById('{{ form.encryption_enabled.id_for_label }}').dispatchEvent(new Event('change'));
+    document.getElementById('{{ form.schedule_type.id_for_label }}').dispatchEvent(new Event('change'));
+</script>
+{% endblock %} 

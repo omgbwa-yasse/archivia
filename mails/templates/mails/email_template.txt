@@ -1,0 +1,20 @@
+{{ email.subject }}
+
+{% if email.recipient_name %}
+Bonjour {{ email.recipient_name }},
+{% else %}
+Bonjour,
+{% endif %}
+
+{{ email.body_text|linebreaks }}
+
+{% if attachments %}
+Pièces jointes :
+{% for attachment in attachments %}
+- {{ attachment.filename }} ({{ attachment.file_size|filesizeformat }})
+{% endfor %}
+{% endif %}
+
+---
+Cet email a été envoyé depuis {{ settings.SITE_NAME }}
+© {% now "Y" %} {{ settings.SITE_NAME }}. Tous droits réservés. 

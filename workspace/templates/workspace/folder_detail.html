@@ -1,0 +1,268 @@
+{% extends 'workspace/base.html' %}
+
+{% block page_title %}{{ folder.name }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+        <a href="{% url 'workspace:document_upload' workspace.pk folder.pk %}" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Upload Document
+        </a>
+        <a href="{% url 'workspace:folder_edit' workspace.pk folder.pk %}" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Edit Folder
+        </a>
+        <a href="{% url 'workspace:folder_delete' workspace.pk folder.pk %}" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Delete Folder
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block workspace_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Folder Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> {{ folder.name }}</p>
+                        <p><strong>Created By:</strong> {{ folder.created_by.username }}</p>
+                        <p><strong>Created At:</strong> {{ folder.created_at|date:"M d, Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Last Updated:</strong> {{ folder.updated_at|date:"M d, Y H:i" }}</p>
+                        <p><strong>Last Updated By:</strong> {{ folder.updated_by.username }}</p>
+                        <p><strong>Total Documents:</strong> {{ folder.documents.count }}</p>
+                        <p><strong>Total Subfolders:</strong> {{ folder.subfolders.count }}</p>
+                    </div>
+                </div>
+                
+                {% if folder.description %}
+                <div class="mt-4">
+                    <h6>Description</h6>
+                    <p>{{ folder.description }}</p>
+                </div>
+                {% endif %}
+                
+                {% if folder.path %}
+                <div class="mt-4">
+                    <h6>Path</h6>
+                    <p class="mb-0">{{ folder.path }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Documents</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Version</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for document in documents %}
+                            <tr>
+                                <td>
+                                    <i class="fas fa-file text-primary"></i>
+                                    <a href="{% url 'workspace:document_detail' workspace.pk folder.pk document.pk %}">
+                                        {{ document.name }}
+                                    </a>
+                                </td>
+                                <td>{{ document.file_type }}</td>
+                                <td>{{ document.file_size|filesizeformat }}</td>
+                                <td>v{{ document.version }}</td>
+                                <td>
+                                    {% if document.is_locked %}
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-lock"></i> Locked by {{ document.locked_by.username }}
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-success">Available</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ document.created_by.username }}</td>
+                                <td>{{ document.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'workspace:document_detail' workspace.pk folder.pk document.pk %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'workspace:document_download' workspace.pk folder.pk document.pk %}" 
+                                           class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        <a href="{% url 'workspace:document_edit' workspace.pk folder.pk document.pk %}" 
+                                           class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'workspace:document_delete' workspace.pk folder.pk document.pk %}" 
+                                           class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <div class="alert alert-info mb-0">
+                                        No documents found. Upload your first document to get started!
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Subfolders</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subfolder in folder.subfolders.all %}
+                            <tr>
+                                <td>
+                                    <i class="fas fa-folder text-warning"></i>
+                                    <a href="{% url 'workspace:folder_detail' workspace.pk subfolder.pk %}">
+                                        {{ subfolder.name }}
+                                    </a>
+                                </td>
+                                <td>{{ subfolder.description|truncatewords:20 }}</td>
+                                <td>{{ subfolder.created_by.username }}</td>
+                                <td>{{ subfolder.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'workspace:folder_detail' workspace.pk subfolder.pk %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'workspace:folder_edit' workspace.pk subfolder.pk %}" 
+                                           class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'workspace:folder_delete' workspace.pk subfolder.pk %}" 
+                                           class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <div class="alert alert-info mb-0">
+                                        No subfolders found.
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Folder Information</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1">
+                    <strong>Workspace:</strong><br>
+                    <a href="{% url 'workspace:workspace_detail' workspace.pk %}">
+                        {{ workspace.name }}
+                    </a>
+                </p>
+                {% if folder.parent_folder %}
+                <p class="mb-1">
+                    <strong>Parent Folder:</strong><br>
+                    <a href="{% url 'workspace:folder_detail' workspace.pk folder.parent_folder.pk %}">
+                        {{ folder.parent_folder.name }}
+                    </a>
+                </p>
+                {% endif %}
+                <p class="mb-0">
+                    <strong>Path:</strong><br>
+                    {{ folder.path }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ folder.documents.count }}</h3>
+                                <small class="text-muted">Documents</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ folder.subfolders.count }}</h3>
+                                <small class="text-muted">Subfolders</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ total_documents }}</h3>
+                                <small class="text-muted">Total Documents</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ total_storage|filesizeformat }}</h3>
+                                <small class="text-muted">Storage Used</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

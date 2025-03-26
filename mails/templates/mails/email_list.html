@@ -1,0 +1,156 @@
+{% extends "mails/base.html" %}
+{% load static %}
+
+{% block title %}Emails{% endblock %}
+
+{% block mail_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Emails</h5>
+                    <a href="{% url 'mails:email_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nouvel Email
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Filtres -->
+                    <form method="get" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="status">Statut</label>
+                                    <select name="status" id="status" class="form-control">
+                                        <option value="">Tous</option>
+                                        {% for status, label in status_choices %}
+                                        <option value="{{ status }}" {% if status == request.GET.status %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="search">Recherche</label>
+                                    <input type="text" name="search" id="search" class="form-control" 
+                                           value="{{ request.GET.search }}" placeholder="Rechercher...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="fas fa-search"></i> Filtrer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Liste des emails -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Sujet</th>
+                                    <th>Destinataire</th>
+                                    <th>Statut</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for email in emails %}
+                                <tr>
+                                    <td>{{ email.subject }}</td>
+                                    <td>{{ email.recipient_email }}</td>
+                                    <td>
+                                        <span class="badge {% if email.status == 'sent' %}bg-success
+                                                         {% elif email.status == 'failed' %}bg-danger
+                                                         {% elif email.status == 'pending' %}bg-warning
+                                                         {% else %}bg-secondary{% endif %}">
+                                            {{ email.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ email.created_at|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'mails:email_detail' email.pk %}" 
+                                               class="btn btn-sm btn-info" title="Voir">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'mails:email_edit' email.pk %}" 
+                                               class="btn btn-sm btn-warning" title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            {% if email.status != 'sent' %}
+                                            <a href="{% url 'mails:email_send' email.pk %}" 
+                                               class="btn btn-sm btn-success" title="Envoyer">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </a>
+                                            {% endif %}
+                                            <a href="{% url 'mails:email_delete' email.pk %}" 
+                                               class="btn btn-sm btn-danger" title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Aucun email trouvé</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if emails.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if emails.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ emails.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for num in emails.paginator.page_range %}
+                            <li class="page-item {% if emails.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                            {% endfor %}
+
+                            {% if emails.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ emails.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .badge-draft { background-color: #6c757d; }
+    .badge-pending { background-color: #ffc107; }
+    .badge-sent { background-color: #28a745; }
+    .badge-failed { background-color: #dc3545; }
+    .badge-delivered { background-color: #17a2b8; }
+    .badge-opened { background-color: #28a745; }
+</style>
+{% endblock %} 

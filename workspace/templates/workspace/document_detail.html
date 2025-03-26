@@ -1,0 +1,195 @@
+{% extends 'workspace/base.html' %}
+
+{% block page_title %}{{ document.name }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+        <a href="{% url 'workspace:document_download' workspace.pk folder.pk document.pk %}" class="btn btn-primary">
+            <i class="fas fa-download"></i> Download
+        </a>
+        {% if not document.is_locked or document.locked_by == request.user %}
+        <a href="{% url 'workspace:document_edit' workspace.pk folder.pk document.pk %}" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        {% endif %}
+        <a href="{% url 'workspace:document_share' workspace.pk folder.pk document.pk %}" class="btn btn-info">
+            <i class="fas fa-share-alt"></i> Share
+        </a>
+        <a href="{% url 'workspace:document_versions' workspace.pk folder.pk document.pk %}" class="btn btn-secondary">
+            <i class="fas fa-history"></i> Versions
+        </a>
+    </div>
+    <div class="btn-group">
+        <a href="{% url 'workspace:document_delete' workspace.pk folder.pk document.pk %}" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Delete
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block workspace_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Document Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> {{ document.name }}</p>
+                        <p><strong>Type:</strong> {{ document.file_type }}</p>
+                        <p><strong>Size:</strong> {{ document.file_size|filesizeformat }}</p>
+                        <p><strong>Version:</strong> v{{ document.version }}</p>
+                        <p><strong>Status:</strong>
+                            {% if document.is_locked %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-lock"></i> Locked by {{ document.locked_by.username }}
+                            </span>
+                            {% else %}
+                            <span class="badge bg-success">Available</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Created By:</strong> {{ document.created_by.username }}</p>
+                        <p><strong>Created At:</strong> {{ document.created_at|date:"M d, Y H:i" }}</p>
+                        <p><strong>Last Updated:</strong> {{ document.updated_at|date:"M d, Y H:i" }}</p>
+                        <p><strong>Last Updated By:</strong> {{ document.updated_by.username }}</p>
+                    </div>
+                </div>
+                
+                {% if document.description %}
+                <div class="mt-4">
+                    <h6>Description</h6>
+                    <p>{{ document.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% for activity in recent_activities %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-secondary"></div>
+                        <div class="timeline-content">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-1">{{ activity.action }}</h6>
+                                <small class="text-muted">{{ activity.created_at|date:"M d, Y H:i" }}</small>
+                            </div>
+                            <p class="mb-1">By {{ activity.user.username }}</p>
+                            {% if activity.details %}
+                            <p class="mb-0">{{ activity.details }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <div class="alert alert-info mb-0">
+                            No recent activity recorded.
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Document Information</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1">
+                    <strong>Folder:</strong><br>
+                    <a href="{% url 'workspace:folder_detail' workspace.pk folder.pk %}">
+                        {{ folder.name }}
+                    </a>
+                </p>
+                <p class="mb-1">
+                    <strong>Workspace:</strong><br>
+                    <a href="{% url 'workspace:workspace_detail' workspace.pk %}">
+                        {{ workspace.name }}
+                    </a>
+                </p>
+                <p class="mb-1">
+                    <strong>MIME Type:</strong><br>
+                    {{ document.mime_type }}
+                </p>
+                <p class="mb-0">
+                    <strong>File Path:</strong><br>
+                    {{ document.file_path }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Permissions</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    {% for permission in document.permissions.all %}
+                    <li class="mb-2">
+                        <i class="fas fa-user text-primary"></i>
+                        {{ permission.user.username }}
+                        <span class="badge bg-{{ permission.permission_type }}">
+                            {{ permission.get_permission_type_display }}
+                        </span>
+                    </li>
+                    {% empty %}
+                    <li class="text-muted">No specific permissions set</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.timeline-item:not(:last-child):before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 20px;
+    bottom: -30px;
+    width: 2px;
+    background: #dee2e6;
+}
+</style>
+{% endblock %}
+{% endblock %} 

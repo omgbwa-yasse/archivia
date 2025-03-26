@@ -1,0 +1,119 @@
+{% extends 'tools/base.html' %}
+
+{% block page_title %}Détails de l'Article de Loi{% endblock %}
+
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+        <a href="{% url 'tools:law_article_update' law_article.pk %}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{% url 'tools:law_article_delete' law_article.pk %}" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Supprimer
+        </a>
+    </div>
+    <a href="{% url 'tools:law_article_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
+</div>
+{% endblock %}
+
+{% block page_content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">{{ law_article.code }} - {{ law_article.name }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="mb-3">Informations générales</h6>
+                <table class="table table-sm">
+                    <tr>
+                        <th style="width: 150px;">Code</th>
+                        <td>{{ law_article.code }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nom</th>
+                        <td>{{ law_article.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Loi</th>
+                        <td>
+                            <a href="{% url 'tools:law_detail' law_article.law.pk %}">
+                                {{ law_article.law.code }} - {{ law_article.law.name }}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ law_article.description|default:"-"|linebreaks }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6 class="mb-3">Métadonnées</h6>
+                <table class="table table-sm">
+                    <tr>
+                        <th style="width: 150px;">Créé par</th>
+                        <td>{{ law_article.created_by }}</td>
+                    </tr>
+                    <tr>
+                        <th>Créé le</th>
+                        <td>{{ law_article.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Modifié par</th>
+                        <td>{{ law_article.updated_by }}</td>
+                    </tr>
+                    <tr>
+                        <th>Modifié le</th>
+                        <td>{{ law_article.updated_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        {% if law_article.retentionlawarticle_set.exists %}
+        <div class="mt-4">
+            <h6 class="mb-3">Conservations associées</h6>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Nom</th>
+                            <th>Durée (ans)</th>
+                            <th>Sort</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for retention_law_article in law_article.retentionlawarticle_set.all %}
+                        <tr>
+                            <td>{{ retention_law_article.retention.code }}</td>
+                            <td>{{ retention_law_article.retention.name }}</td>
+                            <td>{{ retention_law_article.retention.duration }}</td>
+                            <td>{{ retention_law_article.retention.sort.name }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'tools:retention_law_article_detail' retention_law_article.pk %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'tools:retention_law_article_update' retention_law_article.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'tools:retention_law_article_delete' retention_law_article.pk %}" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

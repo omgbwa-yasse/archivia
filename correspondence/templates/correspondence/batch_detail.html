@@ -1,0 +1,132 @@
+{% extends 'correspondence/base.html' %}
+
+{% block title %}Batch Details{% endblock %}
+
+{% block correspondence_content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="mb-0">{{ batch.code }} - {{ batch.name }}</h3>
+        <div class="btn-group">
+            <a href="{% url 'correspondence:batch_update' batch.pk %}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'correspondence:batch_delete' batch.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Basic Information</h5>
+                <table class="table">
+                    <tr>
+                        <th>Organisation Holder:</th>
+                        <td>{{ batch.organisation_holder.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Created At:</th>
+                        <td>{{ batch.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Updated At:</th>
+                        <td>{{ batch.updated_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Correspondences in Batch</h5>
+                    <a href="{% url 'correspondence:list' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add Correspondence
+                    </a>
+                </div>
+                
+                {% if batch.correspondences.exists %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Added By</th>
+                                <th>Added At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for batch_correspondence in batch.correspondences.all %}
+                            <tr>
+                                <td>{{ batch_correspondence.correspondence.code }}</td>
+                                <td>{{ batch_correspondence.correspondence.name }}</td>
+                                <td>{{ batch_correspondence.correspondence.date|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <span class="badge {% if batch_correspondence.correspondence.status == 'draft' %}bg-secondary
+                                                     {% elif batch_correspondence.correspondence.status == 'in_progress' %}bg-primary
+                                                     {% elif batch_correspondence.correspondence.status == 'transmitted' %}bg-success
+                                                     {% else %}bg-danger{% endif %}">
+                                        {{ batch_correspondence.correspondence.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ batch_correspondence.insert_by.get_full_name }}</td>
+                                <td>{{ batch_correspondence.insert_date|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'correspondence:detail' batch_correspondence.correspondence.pk %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if not batch_correspondence.remove_date %}
+                                        <a href="{% url 'correspondence:remove_from_batch' batch.pk batch_correspondence.correspondence.pk %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No correspondences in this batch yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if batch.batchtransaction_set.exists %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <h5>Transaction History</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>From</th>
+                                <th>To</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in batch.batchtransaction_set.all %}
+                            <tr>
+                                <td>{{ transaction.created_at|date:"d/m/Y H:i" }}</td>
+                                <td>{{ transaction.send_by_organisation.name }}</td>
+                                <td>{{ transaction.send_to_organisation.name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

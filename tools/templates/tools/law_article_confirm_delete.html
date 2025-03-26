@@ -1,0 +1,43 @@
+{% extends 'tools/base.html' %}
+
+{% block page_title %}Supprimer l'Article de Loi{% endblock %}
+
+{% block page_content %}
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Êtes-vous sûr de vouloir supprimer cet article de loi ?</h5>
+        <p class="card-text">
+            Vous êtes sur le point de supprimer l'article de loi suivant :
+            <br>
+            <strong>{{ law_article.code }} - {{ law_article.name }}</strong>
+            <br>
+            de la loi : <strong>{{ law_article.law.code }} - {{ law_article.law.name }}</strong>
+        </p>
+
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            Cette action est irréversible.
+        </div>
+
+        {% if law_article.retentionlawarticle_set.exists %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-circle"></i>
+            Cet article est associé à {{ law_article.retentionlawarticle_set.count }} conservation(s).
+            La suppression de l'article supprimera également toutes les associations.
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mt-3">
+                <a href="{% url 'tools:law_article_detail' law_article.pk %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Confirmer la suppression
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

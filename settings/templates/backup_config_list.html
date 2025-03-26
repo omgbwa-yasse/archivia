@@ -1,0 +1,86 @@
+{% extends "settings/base.html" %}
+
+{% block settings_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Backup Configurations</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'settings:backup_config_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> New Configuration
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Storage Type</th>
+                <th>Schedule</th>
+                <th>Last Backup</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for config in backup_configs %}
+            <tr>
+                <td>{{ config.name }}</td>
+                <td>{{ config.get_storage_type_display }}</td>
+                <td>
+                    {% if config.schedule_type == 'MANUAL' %}
+                    Manual
+                    {% else %}
+                    {{ config.get_schedule_type_display }} at {{ config.schedule_time|time:"H:i" }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% with last_backup=config.backup_logs.first %}
+                        {% if last_backup %}
+                            {{ last_backup.start_time|date:"Y-m-d H:i" }}
+                        {% else %}
+                            Never
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td>
+                    {% if config.enabled %}
+                    <span class="badge bg-success">Enabled</span>
+                    {% else %}
+                    <span class="badge bg-danger">Disabled</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'settings:backup_config_detail' config.pk %}" 
+                           class="btn btn-sm btn-info" 
+                           title="View Details">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'settings:backup_config_update' config.pk %}" 
+                           class="btn btn-sm btn-warning" 
+                           title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form method="post" 
+                              action="{% url 'settings:start_backup' config.pk %}" 
+                              class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    class="btn btn-sm btn-success" 
+                                    title="Start Backup">
+                                <i class="fas fa-play"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No backup configurations found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 

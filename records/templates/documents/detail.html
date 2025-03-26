@@ -1,0 +1,197 @@
+{% extends "documents/base.html" %}
+
+{% block content %}
+{{ block.super }}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Informations du document -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <h1 class="h3 mb-1">{{ document.name }}</h1>
+                            <p class="text-muted mb-0">
+                                Créé par {{ document.created_by.get_full_name }} le {{ document.created_at|date:"d/m/Y H:i" }}
+                            </p>
+                        </div>
+                        <div class="btn-group">
+                            <a href="{{ document.file.url }}" class="btn btn-primary" target="_blank">
+                                <i class="fas fa-download"></i> Télécharger
+                            </a>
+                            <button type="button" class="btn btn-outline-secondary" onclick="editDocument('{{ document.id }}')">
+                                <i class="fas fa-edit"></i> Modifier
+                            </button>
+                            <button type="button" class="btn btn-outline-info" onclick="shareDocument('{{ document.id }}')">
+                                <i class="fas fa-share-alt"></i> Partager
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" onclick="deleteDocument('{{ document.id }}')">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="mb-2">Description</h5>
+                        <p class="mb-0">{{ document.description|default:"Aucune description" }}</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Type de fichier</h6>
+                                <span class="badge bg-primary">{{ document.file_type }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Taille</h6>
+                                <p class="mb-0">{{ document.file_size|filesizeformat }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Dernière modification</h6>
+                                <p class="mb-0">{{ document.updated_at|date:"d/m/Y H:i" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Version</h6>
+                                <p class="mb-0">{{ document.version }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Métadonnées -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Métadonnées</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tbody>
+                                {% for metadata in document.metadata.all %}
+                                <tr>
+                                    <th>{{ metadata.definition.name }}</th>
+                                    <td>{{ metadata.value }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">
+                                        Aucune métadonnée définie
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panneau latéral -->
+        <div class="col-md-4">
+            <!-- Informations sur le dossier -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Dossier</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">
+                        <a href="{% url 'folders:detail' document.folder.id %}">
+                            <i class="fas fa-folder"></i> {{ document.folder.name }}
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Historique des versions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Historique des versions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for version in document.versions.all %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Version {{ version.number }}</h6>
+                                <small class="text-muted">{{ version.created_at|date:"d/m/Y H:i" }}</small>
+                            </div>
+                            <p class="mb-1 small text-muted">
+                                Par {{ version.created_by.get_full_name }}
+                            </p>
+                            <a href="{{ version.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-download"></i> Télécharger
+                            </a>
+                        </div>
+                        {% empty %}
+                        <div class="text-center text-muted py-3">
+                            Aucune version précédente
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partage -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Partage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Lien de partage</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="{{ document.share_url }}" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="copyShareUrl()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Accès partagés</label>
+                        <div class="list-group list-group-flush">
+                            {% for share in document.shares.all %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-user"></i> {{ share.user.get_full_name }}
+                                    <small class="text-muted d-block">{{ share.permission }}</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger" onclick="removeShare('{{ share.id }}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {% empty %}
+                            <div class="text-center text-muted py-3">
+                                Aucun accès partagé
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    function copyShareUrl() {
+        const shareUrl = document.querySelector('input[value*="{{ document.share_url }}"]').value;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            showSuccess('Lien de partage copié dans le presse-papiers');
+        }).catch(() => {
+            showError('Erreur lors de la copie du lien');
+        });
+    }
+
+    function removeShare(shareId) {
+        if (confirm('Êtes-vous sûr de vouloir supprimer cet accès partagé ?')) {
+            // Implémenter la suppression de l'accès partagé
+        }
+    }
+</script>
+{% endblock %} 
