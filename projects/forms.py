@@ -1,5 +1,5 @@
 from django import forms
-from .models import Project, ProjectMember, ProjectTask, ProjectResource, TaskDependency, TaskComment, TimeEntry
+from .models import Project, ProjectMember, ProjectTask, ProjectResource, TaskDependency, TaskComment, TimeEntry, Milestone
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -9,8 +9,8 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = ['name', 'description', 'owner', 'status', 'start_date', 'end_date']
         widgets = {
-            'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'end_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'end_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'description': forms.Textarea(attrs={'rows': 4}),
         }
 
@@ -113,4 +113,18 @@ class TimeEntryForm(forms.ModelForm):
         self.fields['user'].queryset = User.objects.filter(is_active=True)
         if self.instance.pk:
             self.fields['task'].disabled = True
-            self.fields['user'].disabled = True 
+            self.fields['user'].disabled = True
+
+class MilestoneForm(forms.ModelForm):
+    class Meta:
+        model = Milestone
+        fields = ['project', 'title', 'description', 'status', 'due_date']
+        widgets = {
+            'due_date': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'rows': 4}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['project'].disabled = True 

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Calendrier des tâches{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Calendrier des tâches</h1>
+        <a href="{% url 'tasks:task_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouvelle Tâche
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="calendar"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: [
+            {% for task in tasks %}
+            {
+                title: '{{ task.title }}',
+                start: '{{ task.due_date|date:"Y-m-d" }}',
+                url: '{% url "tasks:task_detail" task.pk %}',
+                backgroundColor: '{% if task.status == "completed" %}#28a745{% elif task.status == "in_progress" %}#007bff{% elif task.status == "pending" %}#ffc107{% else %}#6c757d{% endif %}',
+                borderColor: '{% if task.status == "completed" %}#28a745{% elif task.status == "in_progress" %}#007bff{% elif task.status == "pending" %}#ffc107{% else %}#6c757d{% endif %}'
+            },
+            {% endfor %}
+        ],
+        eventClick: function(info) {
+            if (info.event.url) {
+                window.location.href = info.event.url;
+            }
+        }
+    });
+    calendar.render();
+});
+</script>
+{% endblock %} 

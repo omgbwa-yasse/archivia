@@ -1,0 +1,49 @@
+{% extends 'correspondence/base.html' %}
+
+{% block title %}Numérisation de documents{% endblock %}
+
+{% block correspondence_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Numérisation de documents</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="document" class="form-label">Document à numériser</label>
+                            <input type="file" class="form-control" id="document" name="document" accept="image/*,.pdf">
+                        </div>
+                        <div class="mb-3">
+                            <label for="correspondence_type" class="form-label">Type de correspondance</label>
+                            <select class="form-select" id="correspondence_type" name="correspondence_type">
+                                <option value="incoming">Courrier entrant</option>
+                                <option value="outgoing">Courrier sortant</option>
+                                <option value="internal">Note interne</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="priority" class="form-label">Priorité</label>
+                            <select class="form-select" id="priority" name="priority">
+                                {% for priority in priorities %}
+                                <option value="{{ priority.id }}">{{ priority.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Numériser et créer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

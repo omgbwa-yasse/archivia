@@ -1,0 +1,41 @@
+{% extends "correspondence/base.html" %}
+{% load static %}
+
+{% block title %}Supprimer le dossier{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-trash me-2"></i>Supprimer le dossier
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">
+                        Êtes-vous sûr de vouloir supprimer le dossier "{{ object.name }}" ?
+                    </p>
+                    {% if object.correspondences.exists %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Ce dossier contient {{ object.correspondences.count }} correspondance(s).
+                        La suppression du dossier n'affectera pas les correspondances qu'il contient.
+                    </div>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Confirmer la suppression
+                        </button>
+                        <a href="{% url 'correspondence:folder_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

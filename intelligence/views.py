@@ -19,6 +19,7 @@ from .forms import (
     AIAgentForm, AIModelForm, AIPromptForm, AIChatForm,
     AIToolForm, AITaskForm, AIReferenceDataForm
 )
+from django.db import models
 
 @login_required
 def dashboard(request):
@@ -339,9 +340,51 @@ class AIUsageStatListView(LoginRequiredMixin, ListView):
     model = AIUsageStat
     template_name = 'intelligence/usage_stats_list.html'
     context_object_name = 'stats'
+    paginate_by = 20
 
     def get_queryset(self):
-        return AIUsageStat.objects.filter(user=self.request.user)
+        queryset = AIUsageStat.objects.all().order_by('-created_at')
+        
+        # Filtres
+        usage_type = self.request.GET.get('usage_type')
+        success = self.request.GET.get('success')
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+
+        if usage_type:
+            queryset = queryset.filter(usage_type=usage_type)
+        if success is not None:
+            queryset = queryset.filter(success=success == 'true')
+        if start_date:
+            queryset = queryset.filter(created_at__gte=start_date)
+        if end_date:
+            queryset = queryset.filter(created_at__lte=end_date)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+
+        # Statistiques globales
+        context['total_usage'] = queryset.count()
+        context['total_tokens'] = queryset.aggregate(
+            total=models.Sum(models.F('tokens_input') + models.F('tokens_output'))
+        )['total'] or 0
+        context['total_cost'] = queryset.aggregate(
+            total=models.Sum('cost')
+        )['total'] or 0
+
+        # Calcul du taux de succès
+        total_success = queryset.filter(success=True).count()
+        context['success_rate'] = round(
+            (total_success / context['total_usage'] * 100) if context['total_usage'] > 0 else 0
+        )
+
+        # Types d'utilisation pour le filtre
+        context['usage_types'] = AIUsageStat.USAGE_TYPES
+
+        return context
 
 def usage_stats_export(request):
     stats = AIUsageStat.objects.filter(user=request.user)

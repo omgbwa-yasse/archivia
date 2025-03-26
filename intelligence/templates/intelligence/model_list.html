@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Modèles AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Modèles AI</h1>
+        <a href="{% url 'intelligence:model_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouveau Modèle
+        </a>
+    </div>
+
+    {% if models %}
+    <div class="row">
+        {% for model in models %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ model.name }}</h5>
+                    <p class="card-text">{{ model.description|truncatewords:30 }}</p>
+                    <div class="mb-3">
+                        <span class="badge bg-{{ model.status_color }}">{{ model.get_status_display }}</span>
+                        <span class="badge bg-info">{{ model.provider }}</span>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            ID: {{ model.model_id }}<br>
+                            Version: {{ model.version }}
+                        </small>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Créé le {{ model.created_at|date:"d/m/Y" }}
+                        </small>
+                        <div class="btn-group">
+                            <a href="{% url 'intelligence:model_detail' model.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'intelligence:model_update' model.pk %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'intelligence:model_delete' model.pk %}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Aucun modèle AI n'a été créé pour le moment.
+        <a href="{% url 'intelligence:model_create' %}" class="alert-link">Créer un nouveau modèle</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

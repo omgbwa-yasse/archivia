@@ -1,0 +1,56 @@
+{% extends "correspondence/base.html" %}
+{% load static %}
+
+{% block title %}Dossiers{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Dossiers</h1>
+        <a href="{% url 'correspondence:folder_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouveau dossier
+        </a>
+    </div>
+
+    {% if folders %}
+    <div class="row">
+        {% for folder in folders %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-folder me-2"></i>
+                        <a href="{% url 'correspondence:folder_detail' folder.pk %}" class="text-decoration-none">
+                            {{ folder.name }}
+                        </a>
+                    </h5>
+                    {% if folder.description %}
+                    <p class="card-text text-muted">{{ folder.description|truncatewords:30 }}</p>
+                    {% endif %}
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-file-alt me-1"></i> {{ folder.correspondences.count }} correspondance(s)
+                        </small>
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="btn-group">
+                        <a href="{% url 'correspondence:folder_update' folder.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{% url 'correspondence:folder_delete' folder.pk %}" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i> Aucun dossier n'a été créé.
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

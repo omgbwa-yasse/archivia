@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Rapport de charge de travail{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Rapport de charge de travail</h1>
+    </div>
+
+    <div class="row">
+        <!-- Charge de travail par utilisateur -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Charge de travail par utilisateur</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Utilisateur</th>
+                                    <th>Total</th>
+                                    <th>Terminées</th>
+                                    <th>En attente</th>
+                                    <th>En cours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in workload_by_user %}
+                                <tr>
+                                    <td>{{ user.assigned_to__username|default:"Non assigné" }}</td>
+                                    <td>{{ user.total_tasks }}</td>
+                                    <td>
+                                        <span class="badge bg-success">{{ user.completed_tasks }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">{{ user.pending_tasks }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ user.in_progress_tasks }}</span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">Aucune tâche assignée</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charge de travail par statut -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Charge de travail par statut</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for status in workload_by_status %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ status.status|title }}
+                            <span class="badge bg-primary rounded-pill">{{ status.count }}</span>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center">
+                            Aucune tâche
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charge de travail par priorité -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Charge de travail par priorité</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for priority in workload_by_priority %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ priority.priority|title }}
+                            <span class="badge bg-primary rounded-pill">{{ priority.count }}</span>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center">
+                            Aucune tâche
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

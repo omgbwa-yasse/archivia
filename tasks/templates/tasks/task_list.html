@@ -26,7 +26,7 @@
                     <tbody>
                         {% for task in tasks %}
                         <tr>
-                            <td>{{ task.name }}</td>
+                            <td>{{ task.title }}</td>
                             <td>{{ task.workflow_instance.workflow_definition.name }}</td>
                             <td>
                                 <span class="badge {% if task.status == 'completed' %}bg-success

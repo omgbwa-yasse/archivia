@@ -21,29 +21,6 @@
 
         <div class="sidebar-section">
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                <span>Analyse de Documents</span>
-            </h6>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'document_analysis' %}active{% endif %}" href="{% url 'ai:document_analysis' %}">
-                        <i class="fas fa-file-alt"></i> Analyse de documents
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'text_extraction' %}active{% endif %}" href="{% url 'ai:text_extraction' %}">
-                        <i class="fas fa-keyboard"></i> Extraction de texte
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'classification' %}active{% endif %}" href="{% url 'ai:classification' %}">
-                        <i class="fas fa-tags"></i> Classification
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <div class="sidebar-section">
-            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                 <span>Prédictions</span>
             </h6>
             <ul class="nav flex-column">
@@ -67,20 +44,52 @@
 
         <div class="sidebar-section">
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                <span>Configuration</span>
+                <span>Agents & Modèles</span>
             </h6>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'model_config' %}active{% endif %}" href="{% url 'ai:model_config' %}">
-                        <i class="fas fa-cog"></i> Configuration des modèles
+                    <a class="nav-link {% if request.resolver_match.url_name == 'agent_list' %}active{% endif %}" href="{% url 'intelligence:agent_list' %}">
+                        <i class="fas fa-robot"></i> Agents
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'api_config' %}active{% endif %}" href="{% url 'ai:api_config' %}">
-                        <i class="fas fa-plug"></i> Configuration API
+                    <a class="nav-link {% if request.resolver_match.url_name == 'model_list' %}active{% endif %}" href="{% url 'intelligence:model_list' %}">
+                        <i class="fas fa-microchip"></i> Modèles
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Chats & Tâches</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'chat_list' %}active{% endif %}" href="{% url 'intelligence:chat_list' %}">
+                        <i class="fas fa-comments"></i> Chats
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'task_list' %}active{% endif %}" href="{% url 'intelligence:task_list' %}">
+                        <i class="fas fa-tasks"></i> Tâches
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Statistiques</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'usage_stats' %}active{% endif %}" href="{% url 'intelligence:usage_stats' %}">
+                        <i class="fas fa-chart-line"></i> Utilisation
                     </a>
                 </li>
             </ul>
         </div>
     </div>
+</div> 
 </div> 

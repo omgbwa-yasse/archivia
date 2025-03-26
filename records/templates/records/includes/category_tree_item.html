@@ -1,0 +1,31 @@
+{% load static %}
+
+<div class="category-tree-item">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">{{ category.name }}</h6>
+            <div class="category-actions">
+                <a href="{% url 'records:category_edit' category.pk %}" class="btn btn-sm btn-warning" title="Modifier">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'records:category_delete' category.pk %}" class="btn btn-sm btn-danger" title="Supprimer"
+                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if category.description %}
+            <p class="mb-0 text-muted">{{ category.description }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if category.children.exists %}
+    <div class="children">
+        {% for child in category.children.all %}
+            {% include "records/includes/category_tree_item.html" with category=child %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div> 

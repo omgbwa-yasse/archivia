@@ -38,7 +38,7 @@
                             <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            {% if project.owner == user or project.members.filter(user=user, role='MANAGER').exists %}
+                            {% if project.is_manager %}
                             <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-sm btn-outline-secondary">
                                 <i class="fas fa-edit"></i>
                             </a>

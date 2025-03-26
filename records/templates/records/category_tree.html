@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">{{ title }}</h5>
+                    <div class="btn-group">
+                        <a href="{% url 'records:category_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Nouvelle catégorie
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if root_categories %}
+                    <div class="category-tree">
+                        {% for category in root_categories %}
+                            {% include "records/includes/category_tree_item.html" with category=category %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Aucune catégorie trouvée. 
+                        <a href="{% url 'records:category_create' %}" class="alert-link">Créer une nouvelle catégorie</a>.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .category-tree {
+        margin-left: 20px;
+    }
+    .category-tree-item {
+        margin: 10px 0;
+    }
+    .category-tree-item .card {
+        border-left: 3px solid #007bff;
+    }
+    .category-tree-item .card-header {
+        background-color: #f8f9fa;
+        padding: 0.5rem 1rem;
+    }
+    .category-tree-item .card-body {
+        padding: 0.5rem 1rem;
+    }
+    .category-tree-item .children {
+        margin-left: 20px;
+        border-left: 2px dashed #dee2e6;
+        padding-left: 20px;
+    }
+    .category-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+</style>
+{% endblock %} 

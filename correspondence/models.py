@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from tools.models import Activity, Organisation
+from django.utils import timezone
 
 class CorrespondencePriority(models.Model):
     name = models.CharField(max_length=50)
@@ -46,20 +47,22 @@ class Correspondence(models.Model):
         ('reject', 'Rejected'),
     ]
 
-    code = models.CharField(max_length=25)
-    name = models.CharField(max_length=150)
-    date = models.DateTimeField()
+    code = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-    document_type = models.CharField(max_length=10, choices=DOCUMENT_TYPE_CHOICES, default='original')
+    date = models.DateTimeField(default=timezone.now)
+    document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPE_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
-    priority = models.ForeignKey(CorrespondencePriority, on_delete=models.CASCADE)
-    typology = models.ForeignKey(CorrespondenceTypology, on_delete=models.CASCADE)
-    action = models.ForeignKey(CorrespondenceAction, on_delete=models.CASCADE)
+    priority = models.ForeignKey(CorrespondencePriority, on_delete=models.SET_NULL, null=True)
+    typology = models.ForeignKey(CorrespondenceTypology, on_delete=models.SET_NULL, null=True)
+    action = models.ForeignKey(CorrespondenceAction, on_delete=models.SET_NULL, null=True)
     sender_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_correspondences')
     sender_organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name='sent_correspondences')
     recipient_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='received_correspondences')
     recipient_organisation = models.ForeignKey(Organisation, on_delete=models.SET_NULL, null=True, related_name='received_correspondences')
+    folder = models.ForeignKey('CorrespondenceFolder', on_delete=models.SET_NULL, null=True, blank=True, related_name='correspondences')
     is_archived = models.BooleanField(default=False)
+    is_favorite = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -126,4 +129,35 @@ class BatchTransaction(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Batch {self.batch.code} transaction from {self.send_by_organisation.name} to {self.send_to_organisation.name}" 
+        return f"Batch {self.batch.code} transaction from {self.send_by_organisation.name} to {self.send_to_organisation.name}"
+
+class CorrespondenceFolder(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Dossier'
+        verbose_name_plural = 'Dossiers'
+
+    def __str__(self):
+        return self.name
+
+class CorrespondenceTemplate(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
+    content = models.TextField()
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Modèle'
+        verbose_name_plural = 'Modèles'
+
+    def __str__(self):
+        return self.name 

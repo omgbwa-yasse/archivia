@@ -18,6 +18,10 @@ urlpatterns = [
     path('<int:workspace_pk>/members/<int:pk>/edit/', members.workspace_member_edit, name='workspace_member_edit'),
     path('<int:workspace_pk>/members/<int:pk>/remove/', members.workspace_member_remove, name='workspace_member_remove'),
     
+    # Global Member URLs
+    path('members/', members.member_list, name='member_list'),
+    path('roles/', members.roles, name='roles'),
+    
     # Workspace Folder URLs
     path('<int:workspace_pk>/folders/', folders.folder_list, name='folder_list'),
     path('<int:workspace_pk>/folders/create/', folders.folder_create, name='folder_create'),
@@ -34,4 +38,13 @@ urlpatterns = [
     path('<int:workspace_pk>/folders/<int:folder_pk>/documents/<int:pk>/download/', documents.document_download, name='document_download'),
     path('<int:workspace_pk>/folders/<int:folder_pk>/documents/<int:pk>/share/', documents.document_share, name='document_share'),
     path('<int:workspace_pk>/folders/<int:folder_pk>/documents/<int:pk>/versions/', documents.document_versions, name='document_versions'),
+    
+    # Global File URLs
+    path('files/', documents.file_list, name='files'),
+    path('files/recent/', documents.recent_files, name='files_recent'),
+    path('files/shared/', documents.shared_files, name='files_shared'),
+    
+    # Activity URLs
+    path('activity/', views.activity_log, name='activity_log'),
+    path('notifications/', views.notifications, name='notifications'),
 ] 

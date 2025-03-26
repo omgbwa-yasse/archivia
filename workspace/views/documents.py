@@ -194,4 +194,41 @@ def document_versions(request, workspace_pk, folder_pk, pk):
         'document': document,
         'versions': versions,
         'user_member': member
+    })
+
+@login_required
+def file_list(request):
+    """List all files across all workspaces the user has access to."""
+    documents = WorkspaceDocument.objects.filter(
+        folder__workspace__members__user=request.user
+    ).distinct()
+    
+    return render(request, 'workspace/documents/file_list.html', {
+        'documents': documents,
+        'title': 'Tous les fichiers'
+    })
+
+@login_required
+def recent_files(request):
+    """Show recently accessed files."""
+    documents = WorkspaceDocument.objects.filter(
+        folder__workspace__members__user=request.user
+    ).order_by('-updated_at')[:20]
+    
+    return render(request, 'workspace/documents/recent_files.html', {
+        'documents': documents,
+        'title': 'Fichiers récents'
+    })
+
+@login_required
+def shared_files(request):
+    """Show files shared with the user."""
+    documents = WorkspaceDocument.objects.filter(
+        folder__workspace__members__user=request.user,
+        shares__isnull=False
+    ).distinct()
+    
+    return render(request, 'workspace/documents/shared_files.html', {
+        'documents': documents,
+        'title': 'Fichiers partagés'
     }) 

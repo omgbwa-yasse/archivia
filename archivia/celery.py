@@ -15,14 +15,6 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
-# Configure Celery beat schedule
-app.conf.beat_schedule = {
-    'process-email-queue': {
-        'task': 'mails.tasks.process_email_queue',
-        'schedule': 300.0,  # Exécuter toutes les 5 minutes
-    },
-}
-
 @app.task(bind=True, ignore_result=True)
 def debug_task(self):
     print(f'Request: {self.request!r}') 

@@ -111,4 +111,23 @@ def workspace_member_remove(request, workspace_pk, pk):
     return JsonResponse({
         'status': 'success',
         'message': f'{member.user.get_full_name()} has been removed from the workspace.'
+    })
+
+@login_required
+def member_list(request):
+    """List all members across all workspaces."""
+    members = WorkspaceMember.objects.filter(
+        workspace__members__user=request.user
+    ).distinct()
+    
+    return render(request, 'workspace/members/member_list.html', {
+        'members': members,
+        'title': 'Tous les membres'
+    })
+
+@login_required
+def roles(request):
+    """View and manage workspace roles and permissions."""
+    return render(request, 'workspace/members/roles.html', {
+        'title': 'Rôles et permissions'
     }) 

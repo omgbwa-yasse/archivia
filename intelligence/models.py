@@ -42,6 +42,15 @@ class AIAgent(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def status_color(self):
+        status_colors = {
+            'ACTIVE': 'success',
+            'INACTIVE': 'secondary',
+            'MAINTENANCE': 'warning',
+        }
+        return status_colors.get(self.status, 'secondary')
+
 class AIModel(models.Model):
     MODEL_STATUS = [
         ('ACTIVE', 'Active'),
@@ -69,6 +78,15 @@ class AIModel(models.Model):
 
     def __str__(self):
         return f"{self.provider} - {self.name}"
+
+    @property
+    def status_color(self):
+        status_colors = {
+            'ACTIVE': 'success',
+            'INACTIVE': 'secondary',
+            'DEPRECATED': 'warning',
+        }
+        return status_colors.get(self.status, 'secondary')
 
 class AIAgentModel(models.Model):
     agent = models.ForeignKey(AIAgent, on_delete=models.CASCADE, related_name='agent_models')
@@ -145,6 +163,15 @@ class AIChat(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def status_color(self):
+        status_colors = {
+            'ACTIVE': 'success',
+            'ARCHIVED': 'secondary',
+            'DELETED': 'danger',
+        }
+        return status_colors.get(self.status, 'secondary')
 
 class AIChatMessage(models.Model):
     MESSAGE_ROLES = [
@@ -288,6 +315,27 @@ class AITask(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def status_color(self):
+        status_colors = {
+            'PENDING': 'secondary',
+            'PROCESSING': 'info',
+            'COMPLETED': 'success',
+            'FAILED': 'danger',
+            'CANCELLED': 'warning',
+        }
+        return status_colors.get(self.status, 'secondary')
+
+    @property
+    def priority_color(self):
+        priority_colors = {
+            'LOW': 'success',
+            'MEDIUM': 'info',
+            'HIGH': 'warning',
+            'URGENT': 'danger',
+        }
+        return priority_colors.get(self.priority, 'info')
 
     def start(self):
         self.status = 'PROCESSING'
@@ -454,6 +502,11 @@ class AIUsageStat(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.usage_type} - {self.created_at}"
+
+    @property
+    def duration_seconds(self):
+        """Retourne la durée en secondes"""
+        return self.duration_ms / 1000 if self.duration_ms else 0
 
 class AIReferenceData(models.Model):
     USAGE_TYPES = [

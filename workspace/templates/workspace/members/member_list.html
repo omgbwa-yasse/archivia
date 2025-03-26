@@ -1,0 +1,73 @@
+{% extends 'workspace/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block workspace_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if members %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Utilisateur</th>
+                                        <th>Workspace</th>
+                                        <th>Rôle</th>
+                                        <th>Date d'ajout</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for member in members %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-user-circle fa-2x me-2 text-primary"></i>
+                                                    <div>
+                                                        <div>{{ member.user.get_full_name|default:member.user.username }}</div>
+                                                        <small class="text-muted">{{ member.user.email }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ member.workspace.name }}</td>
+                                            <td>
+                                                <span class="badge bg-{% if member.role == 'admin' %}danger{% elif member.role == 'member' %}primary{% else %}secondary{% endif %}">
+                                                    {{ member.get_role_display }}
+                                                </span>
+                                            </td>
+                                            <td>{{ member.created_at|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="{% url 'workspace:workspace_member_edit' member.workspace.pk member.pk %}" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'workspace:workspace_member_remove' member.workspace.pk member.pk %}" 
+                                                       class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-user-minus"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            Aucun membre trouvé.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

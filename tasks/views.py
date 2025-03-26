@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.views import View
 from .models import Task, WorkflowInstance, WorkflowDefinition
 from .forms import TaskForm, WorkflowDefinitionForm, WorkflowInstanceForm
+from django.db import models
 
 # Workflow Definition Views
 class WorkflowDefinitionListView(LoginRequiredMixin, ListView):
@@ -147,6 +148,198 @@ class TaskAssignView(LoginRequiredMixin, View):
             return JsonResponse({'status': 'success'})
         except User.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'User not found'})
+
+class TaskCalendarView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_calendar.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            created_by=self.request.user
+        ).select_related('workflow_instance', 'assigned_to')
+
+class MyTasksView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            created_by=self.request.user
+        ).select_related('workflow_instance', 'assigned_to')
+
+class AssignedTasksView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            assigned_to=self.request.user
+        ).select_related('workflow_instance', 'assigned_to')
+
+class UrgentTasksView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            priority='urgent'
+        ).select_related('workflow_instance', 'assigned_to')
+
+class HighPriorityTasksView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            priority='high'
+        ).select_related('workflow_instance', 'assigned_to')
+
+class MediumPriorityTasksView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            priority='medium'
+        ).select_related('workflow_instance', 'assigned_to')
+
+class LowPriorityTasksView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            priority='low'
+        ).select_related('workflow_instance', 'assigned_to')
+
+class PendingTasksView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            status='pending'
+        ).select_related('workflow_instance', 'assigned_to')
+
+class InProgressTasksView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            status='in_progress'
+        ).select_related('workflow_instance', 'assigned_to')
+
+class CompletedTasksView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Task.objects.filter(
+            status='completed'
+        ).select_related('workflow_instance', 'assigned_to')
+
+class TaskReportView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_report.html'
+    context_object_name = 'tasks'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tasks = self.get_queryset()
+        
+        # Statistiques générales
+        context['total_tasks'] = tasks.count()
+        context['completed_tasks'] = tasks.filter(status='completed').count()
+        context['pending_tasks'] = tasks.filter(status='pending').count()
+        context['in_progress_tasks'] = tasks.filter(status='in_progress').count()
+        
+        # Statistiques par priorité
+        context['urgent_tasks'] = tasks.filter(priority='urgent').count()
+        context['high_priority_tasks'] = tasks.filter(priority='high').count()
+        context['medium_priority_tasks'] = tasks.filter(priority='medium').count()
+        context['low_priority_tasks'] = tasks.filter(priority='low').count()
+        
+        # Statistiques par utilisateur
+        context['tasks_by_user'] = tasks.values('assigned_to__username').annotate(
+            count=models.Count('id')
+        ).order_by('-count')
+        
+        return context
+
+class PerformanceReportView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/performance_report.html'
+    context_object_name = 'tasks'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tasks = self.get_queryset()
+        
+        # Statistiques de performance
+        context['completion_rate'] = (tasks.filter(status='completed').count() / tasks.count() * 100) if tasks.exists() else 0
+        context['on_time_tasks'] = tasks.filter(
+            status='completed',
+            completed_at__lte=models.F('due_date')
+        ).count()
+        context['late_tasks'] = tasks.filter(
+            status='completed',
+            completed_at__gt=models.F('due_date')
+        ).count()
+        
+        # Temps moyen de complétion
+        completed_tasks = tasks.filter(status='completed')
+        if completed_tasks.exists():
+            avg_completion_time = completed_tasks.annotate(
+                completion_duration=models.ExpressionWrapper(
+                    models.F('completed_at') - models.F('created_at'),
+                    output_field=models.DurationField()
+                )
+            ).aggregate(avg_duration=models.Avg('completion_duration'))
+            context['avg_completion_time'] = avg_completion_time['avg_duration']
+        
+        return context
+
+class WorkloadReportView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/workload_report.html'
+    context_object_name = 'tasks'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tasks = self.get_queryset()
+        
+        # Charge de travail par utilisateur
+        context['workload_by_user'] = tasks.values(
+            'assigned_to__username'
+        ).annotate(
+            total_tasks=models.Count('id'),
+            completed_tasks=models.Count('id', filter=models.Q(status='completed')),
+            pending_tasks=models.Count('id', filter=models.Q(status='pending')),
+            in_progress_tasks=models.Count('id', filter=models.Q(status='in_progress'))
+        ).order_by('-total_tasks')
+        
+        # Charge de travail par statut
+        context['workload_by_status'] = tasks.values('status').annotate(
+            count=models.Count('id')
+        ).order_by('status')
+        
+        # Charge de travail par priorité
+        context['workload_by_priority'] = tasks.values('priority').annotate(
+            count=models.Count('id')
+        ).order_by('priority')
+        
+        return context
 
 # Legacy function-based views - can be removed once templates are updated
 @login_required

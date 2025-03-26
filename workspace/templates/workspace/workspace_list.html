@@ -21,7 +21,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    {% for workspace in workspaces %}
+                    {% for workspace in page_obj %}
                     <div class="col-md-6 mb-4">
                         <div class="card h-100">
                             <div class="card-body">
@@ -83,6 +83,30 @@
                     </div>
                     {% endfor %}
                 </div>
+
+                {% if page_obj.paginator.num_pages > 1 %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -97,7 +121,7 @@
                     <div class="col-6 mb-3">
                         <div class="card bg-light">
                             <div class="card-body">
-                                <h3 class="mb-0">{{ total_workspaces }}</h3>
+                                <h3 class="mb-0">{{ page_obj.paginator.count }}</h3>
                                 <small class="text-muted">Total Workspaces</small>
                             </div>
                         </div>

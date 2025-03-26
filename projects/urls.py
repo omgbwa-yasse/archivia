@@ -6,14 +6,25 @@ app_name = 'projects'
 urlpatterns = [
     # Projets
     path('', views.project_list, name='project_list'),
+    path('my/', views.my_projects, name='my_projects'),
+    path('archived/', views.archived_projects, name='archived_projects'),
     path('create/', views.project_create, name='project_create'),
+    path('import/', views.project_import, name='project_import'),
     path('<int:pk>/', views.project_detail, name='project_detail'),
     path('<int:pk>/edit/', views.project_edit, name='project_edit'),
     path('<int:pk>/delete/', views.project_delete, name='project_delete'),
+    path('export/', views.export_data, name='export'),
     
     # Membres du projet
     path('<int:project_pk>/members/add/', views.project_member_add, name='project_member_add'),
     path('<int:project_pk>/members/<int:member_pk>/remove/', views.project_member_remove, name='project_member_remove'),
+    
+    # Jalons
+    path('milestones/', views.milestone_list, name='milestone_list'),
+    path('milestones/create/', views.milestone_create, name='milestone_create'),
+    path('milestones/<int:pk>/', views.milestone_detail, name='milestone_detail'),
+    path('milestones/<int:pk>/edit/', views.milestone_edit, name='milestone_edit'),
+    path('milestones/<int:pk>/delete/', views.milestone_delete, name='milestone_delete'),
     
     # Tâches
     path('<int:project_pk>/tasks/', views.task_list, name='task_list'),

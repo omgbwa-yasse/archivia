@@ -169,13 +169,13 @@
             </h6>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'ldap_config_list' %}active{% endif %}" href="{% url 'settings:ldap_config_list' %}">
-                        <i class="fas fa-server"></i> Configuration LDAP
+                    <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" href="{% url 'users:settings' %}">
+                        <i class="fas fa-cog"></i> Paramètres du compte
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'backup_config_list' %}active{% endif %}" href="{% url 'settings:backup_config_list' %}">
-                        <i class="fas fa-database"></i> Configuration Backup
+                    <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'users:profile' %}">
+                        <i class="fas fa-user"></i> Profil
                     </a>
                 </li>
             </ul>

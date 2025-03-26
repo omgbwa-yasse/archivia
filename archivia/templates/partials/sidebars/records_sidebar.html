@@ -4,24 +4,29 @@
         <div class="sidebar-section">
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                 <span>Gestion des Dossiers</span>
-                <a class="link-secondary" href="{% url 'records:document_create' %}" aria-label="Add a new record">
-                    <i class="fas fa-plus"></i>
-                </a>
+                <div>
+                    <a class="link-secondary me-2" href="{% url 'records:document_create' %}" aria-label="Créer un nouveau dossier">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                    <a class="link-secondary" href="{% url 'records:document_import' %}" aria-label="Importer des documents">
+                        <i class="fas fa-file-import"></i>
+                    </a>
+                </div>
             </h6>
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'document_list' %}active{% endif %}" href="{% url 'records:document_list' %}">
-                        <i class="fas fa-folder"></i> Tous les dossiers
+                        <i class="fas fa-folder text-primary"></i> Tous les dossiers
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'document_create' %}active{% endif %}" href="{% url 'records:document_create' %}">
-                        <i class="fas fa-plus-circle"></i> Nouveau dossier
+                    <a class="nav-link {% if request.resolver_match.url_name == 'recent_documents' %}active{% endif %}" href="{% url 'records:recent_documents' %}">
+                        <i class="fas fa-clock text-info"></i> Documents récents
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'document_import' %}active{% endif %}" href="{% url 'records:document_import' %}">
-                        <i class="fas fa-file-import"></i> Importer
+                    <a class="nav-link {% if request.resolver_match.url_name == 'favorite_documents' %}active{% endif %}" href="{% url 'records:favorite_documents' %}">
+                        <i class="fas fa-star text-warning"></i> Favoris
                     </a>
                 </li>
             </ul>
@@ -30,19 +35,29 @@
         <div class="sidebar-section">
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                 <span>Catégories</span>
-                <a class="link-secondary" href="{% url 'records:category_create' %}" aria-label="Add a new category">
-                    <i class="fas fa-plus"></i>
-                </a>
+                <div>
+                    <a class="link-secondary me-2" href="{% url 'records:category_create' %}" aria-label="Créer une nouvelle catégorie">
+                        <i class="fas fa-folder-plus"></i>
+                    </a>
+                    <a class="link-secondary" href="{% url 'records:category_import' %}" aria-label="Importer des catégories">
+                        <i class="fas fa-file-import"></i>
+                    </a>
+                </div>
             </h6>
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}" href="{% url 'records:category_list' %}">
-                        <i class="fas fa-tags"></i> Toutes les catégories
+                        <i class="fas fa-tags text-success"></i> Toutes les catégories
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'category_create' %}active{% endif %}" href="{% url 'records:category_create' %}">
-                        <i class="fas fa-plus-circle"></i> Nouvelle catégorie
+                    <a class="nav-link {% if request.resolver_match.url_name == 'category_tree' %}active{% endif %}" href="{% url 'records:category_tree' %}">
+                        <i class="fas fa-sitemap text-info"></i> Arborescence
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'category_stats' %}active{% endif %}" href="{% url 'records:category_stats' %}">
+                        <i class="fas fa-chart-pie text-primary"></i> Statistiques
                     </a>
                 </li>
             </ul>
@@ -51,16 +66,52 @@
         <div class="sidebar-section">
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                 <span>Archivage</span>
+                <a class="link-secondary" href="{% url 'records:archive_create' %}" aria-label="Créer une nouvelle archive">
+                    <i class="fas fa-archive"></i>
+                </a>
             </h6>
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'archive_list' %}active{% endif %}" href="{% url 'records:archive_list' %}">
-                        <i class="fas fa-archive"></i> Archives
+                        <i class="fas fa-archive text-muted"></i> Archives
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'retention_list' %}active{% endif %}" href="{% url 'records:retention_list' %}">
-                        <i class="fas fa-clock"></i> Durées de conservation
+                        <i class="fas fa-clock text-warning"></i> Durées de conservation
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'disposal_list' %}active{% endif %}" href="{% url 'records:disposal_list' %}">
+                        <i class="fas fa-trash text-danger"></i> Élimination
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>Outils</span>
+            </h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'search' %}active{% endif %}" href="{% url 'records:search' %}">
+                        <i class="fas fa-search"></i> Recherche avancée
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'audit_log' %}active{% endif %}" href="{% url 'records:audit_log' %}">
+                        <i class="fas fa-history"></i> Journal d'audit
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'export' %}active{% endif %}" href="{% url 'records:export' %}">
+                        <i class="fas fa-file-export"></i> Exporter
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" href="{% url 'records:settings' %}">
+                        <i class="fas fa-cog"></i> Paramètres
                     </a>
                 </li>
             </ul>

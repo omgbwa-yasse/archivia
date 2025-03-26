@@ -1,18 +1,8 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from . import views
 
 app_name = 'records'
 
-# URLs pour l'API REST
-router = DefaultRouter()
-router.register(r'folders', views.FolderViewSet, basename='folder')
-router.register(r'documents', views.DocumentViewSet, basename='document')
-router.register(r'metadata-definitions', views.MetadataDefinitionViewSet, basename='metadata-definition')
-router.register(r'reference-lists', views.ReferenceListViewSet, basename='reference-list')
-router.register(r'reference-values', views.ReferenceValueViewSet, basename='reference-value')
-
-# URLs pour les vues templates
 urlpatterns = [
     # Trash URL
     path('trash/', views.TrashView.as_view(), name='trash'),
@@ -33,6 +23,8 @@ urlpatterns = [
     path('documents/<int:pk>/update/', views.DocumentUpdateView.as_view(), name='document_update'),
     path('documents/<int:pk>/delete/', views.DocumentDeleteView.as_view(), name='document_delete'),
     path('documents/<int:pk>/download/', views.DocumentDownloadView.as_view(), name='document_download'),
+    path('documents/recent/', views.recent_documents, name='recent_documents'),
+    path('documents/favorites/', views.favorite_documents, name='favorite_documents'),
     
     # Metadata URLs
     path('metadata-definitions/', views.MetadataDefinitionListView.as_view(), name='metadata_definition_list'),
@@ -56,6 +48,9 @@ urlpatterns = [
     # Category URLs
     path('categories/', views.CategoryListView.as_view(), name='category_list'),
     path('categories/create/', views.CategoryCreateView.as_view(), name='category_create'),
+    path('categories/import/', views.CategoryImportView.as_view(), name='category_import'),
+    path('categories/tree/', views.CategoryTreeView.as_view(), name='category_tree'),
+    path('categories/stats/', views.CategoryStatsView.as_view(), name='category_stats'),
     path('categories/<int:pk>/', views.CategoryDetailView.as_view(), name='category_detail'),
     path('categories/<int:pk>/update/', views.CategoryUpdateView.as_view(), name='category_update'),
     path('categories/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category_delete'),
@@ -74,10 +69,18 @@ urlpatterns = [
     path('retentions/<int:pk>/update/', views.RetentionUpdateView.as_view(), name='retention_update'),
     path('retentions/<int:pk>/delete/', views.RetentionDeleteView.as_view(), name='retention_delete'),
     
-    # API URLs
-    path('api/folders/<int:pk>/metadata/', views.FolderMetadataViewSet.as_view({'get': 'list', 'post': 'create'}), name='folder-metadata'),
-    path('api/folders/<int:pk>/metadata/<int:metadata_id>/', views.FolderMetadataViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='folder-metadata-detail'),
-    path('api/folders/<int:pk>/children/', views.FolderChildrenView.as_view(), name='folder-children'),
-    path('api/folders/<int:pk>/tree/', views.FolderTreeView.as_view(), name='folder-tree'),
-    path('api/', include(router.urls)),
+    # Disposal URLs
+    path('disposals/', views.DisposalListView.as_view(), name='disposal_list'),
+    
+    # Search URLs
+    path('search/', views.SearchView.as_view(), name='search'),
+    
+    # Audit Log URLs
+    path('audit-log/', views.AuditLogView.as_view(), name='audit_log'),
+    
+    # Export URLs
+    path('export/', views.export_data, name='export'),
+    
+    # Settings URL
+    path('settings/', views.settings, name='settings'),
 ] 

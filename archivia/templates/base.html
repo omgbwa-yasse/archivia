@@ -64,10 +64,10 @@
                                 <i class="fas fa-user-circle"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">Profil</a></li>
-                                <li><a class="dropdown-item" href="#">Paramètres</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:profile' %}">Profil</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:settings' %}">Paramètres</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Déconnexion</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:logout' %}">Déconnexion</a></li>
                             </ul>
                         </div>
                     </div>

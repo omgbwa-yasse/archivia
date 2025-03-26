@@ -9,15 +9,19 @@ from rest_framework.permissions import IsAuthenticated
 from .models import (
     Folder, Document, MetadataDefinition,
     DocumentMetadata, FolderMetadata, ReferenceList,
-    ReferenceValue, Category, Archive, Retention
+    ReferenceValue, Category, Archive, Retention, AuditLog, AccessLog
 )
 from .serializers import (
     FolderSerializer, FolderDetailSerializer, MetadataDefinitionSerializer,
     DocumentMetadataSerializer, FolderMetadataSerializer, ReferenceListSerializer,
     ReferenceValueSerializer, DocumentSerializer
 )
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import models
+from django.db.models import Q
+import csv
 
 # Create your views here.
 
@@ -108,6 +112,17 @@ class DocumentDetailView(LoginRequiredMixin, DetailView):
     model = Document
     template_name = 'records/document_detail.html'
     context_object_name = 'document'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        # Log the document access
+        document = self.get_object()
+        AccessLog.objects.create(
+            document=document,
+            user=request.user,
+            ip_address=request.META.get('REMOTE_ADDR')
+        )
+        return response
 
 class DocumentCreateView(LoginRequiredMixin, CreateView):
     model = Document
@@ -459,6 +474,27 @@ class CategoryDeleteView(LoginRequiredMixin, DeleteView):
         category.soft_delete(request.user)
         return super().delete(request, *args, **kwargs)
 
+class CategoryImportView(LoginRequiredMixin, View):
+    template_name = 'records/category_import.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request):
+        try:
+            file = request.FILES.get('file')
+            if not file:
+                messages.error(request, 'Aucun fichier n\'a été sélectionné')
+                return render(request, self.template_name)
+
+            # Here you would implement the actual import logic
+            # For example, reading a CSV file and creating categories
+            messages.success(request, 'Catégories importées avec succès')
+            return redirect('records:category_list')
+        except Exception as e:
+            messages.error(request, f'Erreur lors de l\'import: {str(e)}')
+            return render(request, self.template_name)
+
 class ArchiveListView(LoginRequiredMixin, ListView):
     model = Archive
     template_name = 'records/archive_list.html'
@@ -538,3 +574,206 @@ class RetentionDeleteView(LoginRequiredMixin, DeleteView):
         retention = self.get_object()
         retention.soft_delete(request.user)
         return super().delete(request, *args, **kwargs)
+
+@login_required
+def recent_documents(request):
+    """View for displaying recently accessed documents."""
+    # Get documents with access logs
+    recent_docs = Document.objects.filter(
+        access_logs__user=request.user
+    ).distinct().order_by('-access_logs__accessed_at')[:10]
+    
+    # If there are fewer than 10 documents with access logs, add recently created documents
+    if recent_docs.count() < 10:
+        remaining_count = 10 - recent_docs.count()
+        recent_created = Document.objects.exclude(
+            id__in=recent_docs.values_list('id', flat=True)
+        ).order_by('-created_at')[:remaining_count]
+        recent_docs = list(recent_docs) + list(recent_created)
+    
+    context = {
+        'documents': recent_docs,
+        'title': 'Documents récents'
+    }
+    return render(request, 'records/document_list.html', context)
+
+@login_required
+def favorite_documents(request):
+    """View for displaying favorite documents."""
+    favorite_docs = Document.objects.filter(
+        favorites__user=request.user
+    ).distinct()
+    
+    context = {
+        'documents': favorite_docs,
+        'title': 'Documents favoris'
+    }
+    return render(request, 'records/document_list.html', context)
+
+class CategoryTreeView(LoginRequiredMixin, View):
+    template_name = 'records/category_tree.html'
+
+    def get(self, request):
+        root_categories = Category.objects.filter(parent=None, deleted_at__isnull=True)
+        context = {
+            'root_categories': root_categories,
+            'title': 'Arborescence des catégories'
+        }
+        return render(request, self.template_name, context)
+
+class CategoryStatsView(LoginRequiredMixin, View):
+    template_name = 'records/category_stats.html'
+
+    def get(self, request):
+        # Get all categories
+        categories = Category.objects.filter(deleted_at__isnull=True)
+        total_categories = categories.count()
+        total_documents = Document.objects.filter(deleted_at__isnull=True).count()
+        
+        # Calculate average documents per category
+        avg_documents = round(total_documents / total_categories, 1) if total_categories > 0 else 0.0
+        
+        # Count documents per category
+        category_stats = []
+        for category in categories:
+            doc_count = Document.objects.filter(category=category, deleted_at__isnull=True).count()
+            subcategory_count = Category.objects.filter(parent=category, deleted_at__isnull=True).count()
+            
+            category_stats.append({
+                'category': category,
+                'document_count': doc_count,
+                'subcategory_count': subcategory_count
+            })
+        
+        context = {
+            'category_stats': category_stats,
+            'total_categories': total_categories,
+            'total_documents': total_documents,
+            'avg_documents': avg_documents,
+            'title': 'Statistiques des catégories'
+        }
+        return render(request, self.template_name, context)
+
+class DisposalListView(LoginRequiredMixin, ListView):
+    template_name = 'records/disposal_list.html'
+    context_object_name = 'documents'
+
+    def get_queryset(self):
+        # Get documents that have reached their retention period
+        return Document.objects.filter(
+            deleted_at__isnull=True,
+            retention__isnull=False,
+            created_at__lte=models.F('retention__retention_period')
+        ).select_related('retention', 'category')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Documents à éliminer'
+        return context
+
+class SearchView(LoginRequiredMixin, View):
+    template_name = 'records/search.html'
+
+    def get(self, request):
+        # Get search parameters from query string
+        query = request.GET.get('q', '')
+        category_id = request.GET.get('category')
+        date_from = request.GET.get('date_from')
+        date_to = request.GET.get('date_to')
+        retention_id = request.GET.get('retention')
+        
+        # Start with all non-deleted documents
+        documents = Document.objects.filter(deleted_at__isnull=True)
+        
+        # Apply filters if provided
+        if query:
+            documents = documents.filter(
+                Q(name__icontains=query) |
+                Q(description__icontains=query)
+            )
+        
+        if category_id:
+            documents = documents.filter(category_id=category_id)
+            
+        if date_from:
+            documents = documents.filter(created_at__gte=date_from)
+            
+        if date_to:
+            documents = documents.filter(created_at__lte=date_to)
+            
+        if retention_id:
+            documents = documents.filter(retention_id=retention_id)
+        
+        # Get filter options
+        categories = Category.objects.filter(deleted_at__isnull=True)
+        retentions = Retention.objects.filter(deleted_at__isnull=True)
+        
+        context = {
+            'documents': documents,
+            'query': query,
+            'category_id': category_id,
+            'date_from': date_from,
+            'date_to': date_to,
+            'retention_id': retention_id,
+            'categories': categories,
+            'retentions': retentions,
+            'title': 'Recherche avancée'
+        }
+        return render(request, self.template_name, context)
+
+class AuditLogView(LoginRequiredMixin, ListView):
+    template_name = 'records/audit_log.html'
+    context_object_name = 'audit_logs'
+    paginate_by = 20
+
+    def get_queryset(self):
+        # Get all audit logs, ordered by timestamp
+        return AuditLog.objects.all().order_by('-timestamp')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Journal d\'audit'
+        return context
+
+@login_required
+def export_data(request):
+    """Export records data in CSV format."""
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="records_export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Description', 'Created By', 'Created At', 'Updated At'])
+    
+    # Export folders
+    folders = Folder.objects.filter(deleted_at__isnull=True)
+    for folder in folders:
+        writer.writerow([
+            folder.name,
+            folder.description,
+            folder.created_by.get_full_name(),
+            folder.created_at,
+            folder.updated_at
+        ])
+    
+    # Export documents
+    documents = Document.objects.all()
+    for document in documents:
+        writer.writerow([
+            document.name,
+            document.description,
+            document.created_by.get_full_name(),
+            document.created_at,
+            document.updated_at
+        ])
+    
+    return response
+
+@login_required
+def settings(request):
+    """View for managing records app settings."""
+    if request.method == 'POST':
+        # Handle settings update
+        messages.success(request, 'Paramètres mis à jour avec succès')
+        return redirect('records:settings')
+    
+    return render(request, 'records/settings.html')

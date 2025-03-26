@@ -65,7 +65,11 @@
                                 {% for email in emails %}
                                 <tr>
                                     <td>{{ email.subject }}</td>
-                                    <td>{{ email.recipient_email }}</td>
+                                    <td>
+                                        {% for recipient in email.recipients.all %}
+                                            {{ recipient.email }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </td>
                                     <td>
                                         <span class="badge {% if email.status == 'sent' %}bg-success
                                                          {% elif email.status == 'failed' %}bg-danger

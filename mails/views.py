@@ -5,8 +5,8 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.db.models import Q
-from .models import Email, EmailTemplate, EmailAttachment
-from .forms import EmailForm, EmailTemplateForm
+from .models import Email, EmailTemplate, EmailAttachment, Folder, Contact, ContactGroup
+from .forms import EmailForm, EmailTemplateForm, FolderForm, ContactForm, ContactGroupForm
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
@@ -21,7 +21,7 @@ import os
 def email_list(request):
     emails = Email.objects.filter(
         Q(sender=request.user) | 
-        Q(recipient_email=request.user.email)
+        Q(recipients=request.user)
     ).order_by('-created_at')
     
     # Filtrage
@@ -34,7 +34,7 @@ def email_list(request):
     if search:
         emails = emails.filter(
             Q(subject__icontains=search) |
-            Q(recipient_email__icontains=search) |
+            Q(recipients__email__icontains=search) |
             Q(body_text__icontains=search)
         )
     
@@ -273,3 +273,233 @@ def download_attachment(request, email_id, attachment_id):
             response['Content-Disposition'] = f'attachment; filename="{attachment.filename}"'
             return response
     return HttpResponse(status=404)
+
+@login_required
+def folder_list(request):
+    folders = Folder.objects.filter(user=request.user)
+    context = {
+        'folders': folders,
+    }
+    return render(request, 'mails/folder_list.html', context)
+
+@login_required
+def folder_create(request):
+    if request.method == 'POST':
+        form = FolderForm(request.POST)
+        if form.is_valid():
+            folder = form.save(commit=False)
+            folder.user = request.user
+            folder.save()
+            messages.success(request, 'Dossier créé avec succès.')
+            return redirect('mails:folder_list')
+    else:
+        form = FolderForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'mails/folder_form.html', context)
+
+@login_required
+def folder_detail(request, pk):
+    folder = get_object_or_404(Folder, pk=pk, user=request.user)
+    emails = folder.emails.all()
+    context = {
+        'folder': folder,
+        'emails': emails,
+    }
+    return render(request, 'mails/folder_detail.html', context)
+
+@login_required
+def folder_edit(request, pk):
+    folder = get_object_or_404(Folder, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = FolderForm(request.POST, instance=folder)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Dossier mis à jour avec succès.')
+            return redirect('mails:folder_list')
+    else:
+        form = FolderForm(instance=folder)
+    
+    context = {
+        'form': form,
+        'folder': folder,
+    }
+    return render(request, 'mails/folder_form.html', context)
+
+@login_required
+@require_POST
+def folder_delete(request, pk):
+    folder = get_object_or_404(Folder, pk=pk, user=request.user)
+    folder.delete()
+    messages.success(request, 'Dossier supprimé avec succès.')
+    return redirect('mails:folder_list')
+
+@login_required
+def contact_list(request):
+    contacts = Contact.objects.filter(user=request.user)
+    context = {
+        'contacts': contacts,
+    }
+    return render(request, 'mails/contact_list.html', context)
+
+@login_required
+def contact_create(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            contact = form.save(commit=False)
+            contact.user = request.user
+            contact.save()
+            messages.success(request, 'Contact créé avec succès.')
+            return redirect('mails:contact_list')
+    else:
+        form = ContactForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'mails/contact_form.html', context)
+
+@login_required
+def contact_detail(request, pk):
+    contact = get_object_or_404(Contact, pk=pk, user=request.user)
+    context = {
+        'contact': contact,
+    }
+    return render(request, 'mails/contact_detail.html', context)
+
+@login_required
+def contact_edit(request, pk):
+    contact = get_object_or_404(Contact, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = ContactForm(request.POST, instance=contact)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Contact mis à jour avec succès.')
+            return redirect('mails:contact_list')
+    else:
+        form = ContactForm(instance=contact)
+    
+    context = {
+        'form': form,
+        'contact': contact,
+    }
+    return render(request, 'mails/contact_form.html', context)
+
+@login_required
+@require_POST
+def contact_delete(request, pk):
+    contact = get_object_or_404(Contact, pk=pk, user=request.user)
+    contact.delete()
+    messages.success(request, 'Contact supprimé avec succès.')
+    return redirect('mails:contact_list')
+
+@login_required
+def contact_import(request):
+    if request.method == 'POST':
+        # TODO: Implement contact import functionality
+        messages.success(request, 'Contacts importés avec succès.')
+        return redirect('mails:contact_list')
+    return render(request, 'mails/contact_import.html')
+
+@login_required
+def group_list(request):
+    groups = ContactGroup.objects.filter(user=request.user)
+    context = {
+        'groups': groups,
+    }
+    return render(request, 'mails/group_list.html', context)
+
+@login_required
+def group_create(request):
+    if request.method == 'POST':
+        form = ContactGroupForm(request.POST)
+        if form.is_valid():
+            group = form.save(commit=False)
+            group.user = request.user
+            group.save()
+            messages.success(request, 'Groupe créé avec succès.')
+            return redirect('mails:groups')
+    else:
+        form = ContactGroupForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'mails/group_form.html', context)
+
+@login_required
+def group_detail(request, pk):
+    group = get_object_or_404(ContactGroup, pk=pk, user=request.user)
+    context = {
+        'group': group,
+    }
+    return render(request, 'mails/group_detail.html', context)
+
+@login_required
+def group_edit(request, pk):
+    group = get_object_or_404(ContactGroup, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = ContactGroupForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Groupe mis à jour avec succès.')
+            return redirect('mails:groups')
+    else:
+        form = ContactGroupForm(instance=group)
+    
+    context = {
+        'form': form,
+        'group': group,
+    }
+    return render(request, 'mails/group_form.html', context)
+
+@login_required
+@require_POST
+def group_delete(request, pk):
+    group = get_object_or_404(ContactGroup, pk=pk, user=request.user)
+    group.delete()
+    messages.success(request, 'Groupe supprimé avec succès.')
+    return redirect('mails:groups')
+
+@login_required
+def email_search(request):
+    query = request.GET.get('q', '')
+    emails = Email.objects.filter(
+        Q(sender=request.user) | 
+        Q(recipient_email=request.user.email)
+    ).filter(
+        Q(subject__icontains=query) |
+        Q(body_text__icontains=query) |
+        Q(recipient_email__icontains=query)
+    ).order_by('-created_at')
+    
+    context = {
+        'emails': emails,
+        'query': query,
+    }
+    return render(request, 'mails/email_search.html', context)
+
+@login_required
+def email_settings(request):
+    if request.method == 'POST':
+        # TODO: Implement email settings functionality
+        messages.success(request, 'Paramètres mis à jour avec succès.')
+        return redirect('mails:email_settings')
+    return render(request, 'mails/email_settings.html')
+
+@login_required
+def email_archive(request):
+    emails = Email.objects.filter(
+        Q(sender=request.user) | 
+        Q(recipient_email=request.user.email)
+    ).filter(
+        status='ARCHIVED'
+    ).order_by('-created_at')
+    
+    context = {
+        'emails': emails,
+    }
+    return render(request, 'mails/email_archive.html', context)

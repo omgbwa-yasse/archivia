@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
-from ..models import Workspace, WorkspaceMember
+from ..models import Workspace, WorkspaceMember, ActivityLog, WorkspaceFolder, WorkspaceDocument
 from ..forms import WorkspaceForm
 from django.utils import timezone
 
@@ -19,8 +19,31 @@ def workspace_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
+    # Get total counts using efficient queries
+    total_members = WorkspaceMember.objects.filter(
+        workspace__members__user=request.user
+    ).distinct().count()
+    
+    # Get total folders and documents using annotations
+    total_folders = WorkspaceFolder.objects.filter(
+        workspace__members__user=request.user
+    ).count()
+    
+    total_documents = WorkspaceDocument.objects.filter(
+        folder__workspace__members__user=request.user
+    ).count()
+    
+    # Get recent activities
+    recent_activities = ActivityLog.objects.filter(
+        workspace__members__user=request.user
+    ).order_by('-timestamp')[:5]
+    
     return render(request, 'workspace/workspace_list.html', {
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'total_members': total_members,
+        'total_documents': total_documents,
+        'total_folders': total_folders,
+        'recent_activities': recent_activities
     })
 
 @login_required
@@ -110,4 +133,27 @@ def workspace_delete(request, pk):
     return JsonResponse({
         'status': 'success',
         'message': 'Workspace deleted successfully.'
+    })
+
+@login_required
+def activity_log(request):
+    """View the activity log for all workspaces the user has access to."""
+    activities = ActivityLog.objects.filter(
+        workspace__members__user=request.user
+    ).select_related('user', 'workspace').order_by('-timestamp')
+    
+    paginator = Paginator(activities, 20)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'workspace/activity_log.html', {
+        'page_obj': page_obj,
+        'title': 'Activity Log'
+    })
+
+@login_required
+def notifications(request):
+    """View user's notifications."""
+    return render(request, 'workspace/notifications.html', {
+        'title': 'Notifications'
     }) 

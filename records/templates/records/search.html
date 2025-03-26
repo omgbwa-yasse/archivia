@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Search Form -->
+                    <form method="get" class="mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="query">Rechercher</label>
+                                    <input type="text" class="form-control" id="query" name="query" 
+                                           value="{{ query|default:'' }}" placeholder="Nom ou description...">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="category">Catégorie</label>
+                                    <select class="form-control" id="category" name="category_id">
+                                        <option value="">Toutes les catégories</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}" 
+                                                {% if category.id|stringformat:"i" == category_id %}selected{% endif %}>
+                                                {{ category.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="retention">Durée de conservation</label>
+                                    <select class="form-control" id="retention" name="retention_id">
+                                        <option value="">Toutes les durées</option>
+                                        {% for retention in retentions %}
+                                            <option value="{{ retention.id }}"
+                                                {% if retention.id|stringformat:"i" == retention_id %}selected{% endif %}>
+                                                {{ retention.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="date_from">Date de début</label>
+                                    <input type="date" class="form-control" id="date_from" name="date_from" 
+                                           value="{{ date_from|date:'Y-m-d'|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="date_to">Date de fin</label>
+                                    <input type="date" class="form-control" id="date_to" name="date_to" 
+                                           value="{{ date_to|date:'Y-m-d'|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>Rechercher
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Results -->
+                    {% if documents %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Description</th>
+                                        <th>Catégorie</th>
+                                        <th>Conservation</th>
+                                        <th>Créé le</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for document in documents %}
+                                        <tr>
+                                            <td>{{ document.name }}</td>
+                                            <td>{{ document.description|truncatewords:30|default:"-" }}</td>
+                                            <td>
+                                                {% if document.category %}
+                                                    <span class="badge bg-info">{{ document.category.name }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Non catégorisé</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if document.retention %}
+                                                    <span class="badge bg-warning">{{ document.retention.name }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Non défini</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ document.created_at|date:"d/m/Y" }}</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="{% url 'records:document_detail' document.pk %}" 
+                                                       class="btn btn-sm btn-info" title="Voir">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'records:document_edit' document.pk %}" 
+                                                       class="btn btn-sm btn-warning" title="Modifier">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'records:document_delete' document.pk %}" 
+                                                       class="btn btn-sm btn-danger" title="Supprimer"
+                                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        {% if query or category_id or date_from or date_to or retention_id %}
+                            <div class="alert alert-info">
+                                Aucun document ne correspond à vos critères de recherche.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                Utilisez le formulaire ci-dessus pour rechercher des documents.
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .btn-group {
+        gap: 0.25rem;
+    }
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.8em;
+    }
+</style>
+{% endblock %} 

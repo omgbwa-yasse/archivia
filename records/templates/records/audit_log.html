@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if audit_logs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Utilisateur</th>
+                                        <th>Action</th>
+                                        <th>Modèle</th>
+                                        <th>ID Objet</th>
+                                        <th>Détails</th>
+                                        <th>Adresse IP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in audit_logs %}
+                                        <tr>
+                                            <td>{{ log.timestamp|date:"d/m/Y H:i:s" }}</td>
+                                            <td>
+                                                {% if log.user %}
+                                                    {{ log.user.get_full_name|default:log.user.username }}
+                                                {% else %}
+                                                    <span class="text-muted">Utilisateur supprimé</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if log.action == 'create' %}
+                                                    <span class="badge bg-success">Création</span>
+                                                {% elif log.action == 'update' %}
+                                                    <span class="badge bg-warning">Modification</span>
+                                                {% elif log.action == 'delete' %}
+                                                    <span class="badge bg-danger">Suppression</span>
+                                                {% elif log.action == 'restore' %}
+                                                    <span class="badge bg-info">Restauration</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ log.action }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ log.model }}</td>
+                                            <td>{{ log.object_id }}</td>
+                                            <td>{{ log.details|truncatechars:100 }}</td>
+                                            <td>
+                                                {% if log.ip_address %}
+                                                    <small class="text-muted">{{ log.ip_address }}</small>
+                                                {% else %}
+                                                    <small class="text-muted">-</small>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% if is_paginated %}
+                            <nav aria-label="Navigation des pages">
+                                <ul class="pagination justify-content-center">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1" aria-label="Première">
+                                                <span aria-hidden="true">&laquo;&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Précédente">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Suivante">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Dernière">
+                                                <span aria-hidden="true">&raquo;&raquo;</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            Aucune entrée dans le journal d'audit.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.8em;
+    }
+    .table td {
+        vertical-align: middle;
+    }
+    .pagination {
+        margin-bottom: 0;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %} 

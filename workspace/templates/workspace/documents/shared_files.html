@@ -1,0 +1,78 @@
+{% extends 'workspace/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block workspace_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    {% if documents %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Dossier</th>
+                                        <th>Workspace</th>
+                                        <th>Partagé par</th>
+                                        <th>Date de partage</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for doc in documents %}
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-file me-2"></i>
+                                                {{ doc.name }}
+                                            </td>
+                                            <td>{{ doc.folder.name }}</td>
+                                            <td>{{ doc.folder.workspace.name }}</td>
+                                            <td>
+                                                {% with share=doc.shares.first %}
+                                                    {{ share.created_by.get_full_name|default:share.created_by.username }}
+                                                {% endwith %}
+                                            </td>
+                                            <td>
+                                                {% with share=doc.shares.first %}
+                                                    {{ share.created_at|date:"d/m/Y H:i" }}
+                                                {% endwith %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="{% url 'workspace:document_detail' doc.folder.workspace.pk doc.folder.pk doc.pk %}" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="{% url 'workspace:document_download' doc.folder.workspace.pk doc.folder.pk doc.pk %}" 
+                                                       class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                    <a href="{% url 'workspace:document_share' doc.folder.workspace.pk doc.folder.pk doc.pk %}" 
+                                                       class="btn btn-sm btn-outline-info">
+                                                        <i class="fas fa-share-alt"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            Aucun fichier partagé trouvé.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

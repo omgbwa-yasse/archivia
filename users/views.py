@@ -6,6 +6,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.db import transaction
+import json
 
 from .models import User, Group, UserGroup, Role, Permission, AccessControl
 
@@ -214,4 +215,16 @@ def add_user_to_group(request, group_id):
 
         return JsonResponse({'message': 'User added to group successfully'})
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400) 
+        return JsonResponse({'error': str(e)}, status=400)
+
+@login_required
+def settings(request):
+    if request.method == 'POST':
+        # Handle settings update
+        user = request.user
+        user.email = request.POST.get('email', user.email)
+        user.save()
+        messages.success(request, 'Paramètres mis à jour avec succès')
+        return redirect('users:settings')
+    
+    return render(request, 'users/settings.html') 

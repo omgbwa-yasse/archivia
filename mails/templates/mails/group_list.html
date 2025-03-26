@@ -1,0 +1,70 @@
+{% extends "mails/base.html" %}
+{% load static %}
+
+{% block title %}Groupes de contacts{% endblock %}
+
+{% block mail_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Groupes de contacts</h5>
+                    <a href="{% url 'mails:group_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nouveau groupe
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if groups %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Description</th>
+                                    <th>Contacts</th>
+                                    <th>Date de création</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for group in groups %}
+                                <tr>
+                                    <td>{{ group.name }}</td>
+                                    <td>{{ group.description|truncatewords:30 }}</td>
+                                    <td>{{ group.contacts.count }}</td>
+                                    <td>{{ group.created_at|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'mails:group_detail' group.pk %}" 
+                                               class="btn btn-sm btn-info" title="Voir">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'mails:group_edit' group.pk %}" 
+                                               class="btn btn-sm btn-warning" title="Modifier">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'mails:group_delete' group.pk %}" 
+                                               class="btn btn-sm btn-danger" title="Supprimer"
+                                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce groupe ?');">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Aucun groupe de contacts trouvé. 
+                        <a href="{% url 'mails:group_create' %}" class="alert-link">Créer un nouveau groupe</a>.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

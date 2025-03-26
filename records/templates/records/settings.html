@@ -1,0 +1,60 @@
+{% extends "records/base.html" %}
+{% load i18n %}
+
+{% block records_content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">{% trans "Records Management Settings" %}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <h6 class="mb-3">{% trans "General Settings" %}</h6>
+            <div class="mb-3">
+                <label class="form-label">{% trans "Default Folder View" %}</label>
+                <select class="form-select" name="default_folder_view">
+                    <option value="list">{% trans "List View" %}</option>
+                    <option value="grid">{% trans "Grid View" %}</option>
+                    <option value="tree">{% trans "Tree View" %}</option>
+                </select>
+            </div>
+            
+            <h6 class="mb-3 mt-4">{% trans "Document Settings" %}</h6>
+            <div class="mb-3">
+                <label class="form-label">{% trans "Default Sort Order" %}</label>
+                <select class="form-select" name="default_sort_order">
+                    <option value="name">{% trans "Name" %}</option>
+                    <option value="date">{% trans "Date" %}</option>
+                    <option value="type">{% trans "Type" %}</option>
+                </select>
+            </div>
+            
+            <h6 class="mb-3 mt-4">{% trans "Metadata Settings" %}</h6>
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="require_metadata" name="require_metadata">
+                    <label class="form-check-label" for="require_metadata">
+                        {% trans "Require metadata for all documents" %}
+                    </label>
+                </div>
+            </div>
+            
+            <h6 class="mb-3 mt-4">{% trans "Archive Settings" %}</h6>
+            <div class="mb-3">
+                <label class="form-label">{% trans "Default Retention Period" %}</label>
+                <select class="form-select" name="default_retention_period">
+                    <option value="1">{% trans "1 year" %}</option>
+                    <option value="3">{% trans "3 years" %}</option>
+                    <option value="5">{% trans "5 years" %}</option>
+                    <option value="10">{% trans "10 years" %}</option>
+                </select>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">{% trans "Save Settings" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

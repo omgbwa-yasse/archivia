@@ -189,4 +189,35 @@ class TimeEntry(models.Model):
         ordering = ['-work_date']
 
     def __str__(self):
-        return f"{self.user} - {self.task} - {self.hours_spent}h - {self.work_date}" 
+        return f"{self.user} - {self.task} - {self.hours_spent}h - {self.work_date}"
+
+class Milestone(models.Model):
+    STATUS_CHOICES = [
+        ('PLANNED', 'Planifié'),
+        ('IN_PROGRESS', 'En cours'),
+        ('COMPLETED', 'Terminé'),
+        ('DELAYED', 'Retardé'),
+        ('CANCELLED', 'Annulé'),
+    ]
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='milestones', verbose_name="Projet")
+    title = models.CharField(max_length=190, verbose_name="Titre")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PLANNED', verbose_name="Statut")
+    due_date = models.DateTimeField(verbose_name="Date d'échéance")
+    completed_at = models.DateTimeField(null=True, blank=True, verbose_name="Date de complétion")
+    version = models.IntegerField(default=1, verbose_name="Version")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_milestones', verbose_name="Créé par")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Créé le")
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_milestones', verbose_name="Mis à jour par")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Mis à jour le")
+    deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='deleted_milestones', verbose_name="Supprimé par")
+    deleted_at = models.DateTimeField(null=True, blank=True, verbose_name="Supprimé le")
+
+    class Meta:
+        verbose_name = "Jalon"
+        verbose_name_plural = "Jalons"
+        ordering = ['due_date']
+
+    def __str__(self):
+        return f"{self.title} - {self.project}" 

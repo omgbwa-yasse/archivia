@@ -19,7 +19,7 @@ User = get_user_model()
 
 class EmailTemplate(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nom")
-    subject = models.CharField(max_length=200, verbose_name="Sujet")
+    subject = models.CharField(max_length=191, verbose_name="Sujet")
     body_html = models.TextField(verbose_name="Contenu HTML")
     body_text = models.TextField(blank=True, verbose_name="Contenu texte")
     variables = models.TextField(blank=True, help_text="Liste des variables disponibles (une par ligne)", verbose_name="Variables")
@@ -58,56 +58,42 @@ class Email(models.Model):
         ('pending', 'En attente'),
         ('sent', 'Envoyé'),
         ('failed', 'Échec'),
+        ('archived', 'Archivé'),
     ]
 
-    PRIORITY_CHOICES = [
-        ('low', 'Basse'),
-        ('normal', 'Normale'),
-        ('high', 'Haute'),
-        ('urgent', 'Urgente'),
-    ]
-
-    recipient_email = models.EmailField(verbose_name="Email du destinataire")
-    recipient_name = models.CharField(max_length=100, blank=True, verbose_name="Nom du destinataire")
-    cc = models.TextField(blank=True, help_text="Adresses email séparées par des virgules", verbose_name="Copie carbone")
-    bcc = models.TextField(blank=True, help_text="Adresses email séparées par des virgules", verbose_name="Copie carbone cachée")
-    subject = models.CharField(max_length=200, verbose_name="Sujet")
+    subject = models.CharField(max_length=191, verbose_name="Sujet")
     body_html = models.TextField(verbose_name="Contenu HTML")
     body_text = models.TextField(blank=True, verbose_name="Contenu texte")
-    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='normal', verbose_name="Priorité")
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft', verbose_name="Statut")
-    template = models.ForeignKey(EmailTemplate, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Template")
-    related_entity_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Type d'entité liée")
-    related_entity_id = models.PositiveIntegerField(null=True, blank=True, verbose_name="ID de l'entité liée")
-    related_entity = GenericForeignKey('related_entity_type', 'related_entity_id')
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='sent_emails')
+    recipients = models.ManyToManyField(User, related_name='received_emails')
+    cc = models.ManyToManyField(User, related_name='cc_emails', blank=True)
+    bcc = models.ManyToManyField(User, related_name='bcc_emails', blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft', verbose_name="Statut")
+    is_read = models.BooleanField(default=False)
+    is_flagged = models.BooleanField(default=False)
+    is_important = models.BooleanField(default=False)
+    is_draft = models.BooleanField(default=False)
+    is_sent = models.BooleanField(default=False)
+    error_message = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de modification")
     sent_at = models.DateTimeField(null=True, blank=True, verbose_name="Date d'envoi")
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='sent_emails', verbose_name="Expéditeur")
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_emails', verbose_name="Créé par")
-    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_emails', verbose_name="Modifié par")
-
-    class Meta:
-        verbose_name = "Email"
-        verbose_name_plural = "Emails"
-        ordering = ['-created_at']
+    template = models.ForeignKey('EmailTemplate', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.subject} - {self.recipient_email}"
+        return self.subject
 
     def get_absolute_url(self):
         return reverse('mails:email_detail', kwargs={'pk': self.pk})
 
     def send(self):
         """Envoie l'email"""
-        if self.status == 'sent':
+        if self.is_sent:
             return False
 
         try:
             # Préparer les destinataires
-            recipients = [self.recipient_email]
-            if self.cc:
-                recipients.extend([email.strip() for email in self.cc.split(',')])
+            recipients = list(self.recipients.all()) + list(self.cc.all()) + list(self.bcc.all())
 
             # Préparer le contenu HTML
             html_content = render_to_string('mails/email_template.html', {
@@ -133,12 +119,15 @@ class Email(models.Model):
 
             # Mettre à jour le statut
             self.status = 'sent'
+            self.is_sent = True
             self.sent_at = timezone.now()
             self.save()
 
             return True
         except Exception as e:
             self.status = 'failed'
+            self.is_sent = False
+            self.error_message = str(e)
             self.save()
             raise e
 
@@ -170,3 +159,57 @@ class EmailAttachment(models.Model):
             'email_id': self.email.pk,
             'attachment_id': self.pk
         })
+
+class Folder(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Nom")
+    description = models.TextField(blank=True, verbose_name="Description")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='email_folders', verbose_name="Utilisateur")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de modification")
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children', verbose_name="Dossier parent")
+
+    class Meta:
+        verbose_name = "Dossier"
+        verbose_name_plural = "Dossiers"
+        ordering = ['name']
+        unique_together = ['name', 'user', 'parent']
+
+    def __str__(self):
+        return self.name
+
+class Contact(models.Model):
+    first_name = models.CharField(max_length=100, verbose_name="Prénom")
+    last_name = models.CharField(max_length=100, verbose_name="Nom")
+    email = models.EmailField(verbose_name="Email")
+    phone = models.CharField(max_length=20, blank=True, verbose_name="Téléphone")
+    company = models.CharField(max_length=100, blank=True, verbose_name="Entreprise")
+    notes = models.TextField(blank=True, verbose_name="Notes")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='contacts', verbose_name="Utilisateur")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de modification")
+    groups = models.ManyToManyField('ContactGroup', blank=True, related_name='contacts', verbose_name="Groupes")
+
+    class Meta:
+        verbose_name = "Contact"
+        verbose_name_plural = "Contacts"
+        ordering = ['last_name', 'first_name']
+        unique_together = ['email', 'user']
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
+class ContactGroup(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Nom")
+    description = models.TextField(blank=True, verbose_name="Description")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='contact_groups', verbose_name="Utilisateur")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de modification")
+
+    class Meta:
+        verbose_name = "Groupe de contacts"
+        verbose_name_plural = "Groupes de contacts"
+        ordering = ['name']
+        unique_together = ['name', 'user']
+
+    def __str__(self):
+        return self.name

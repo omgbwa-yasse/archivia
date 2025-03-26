@@ -31,17 +31,17 @@
             </h6>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'file_list' %}active{% endif %}" href="{% url 'workspace:file_list' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'file_list' %}active{% endif %}" href="{% url 'workspace:files' %}">
                         <i class="fas fa-file"></i> Tous les fichiers
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'recent_files' %}active{% endif %}" href="{% url 'workspace:recent_files' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'recent_files' %}active{% endif %}" href="{% url 'workspace:files_recent' %}">
                         <i class="fas fa-clock"></i> Fichiers récents
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'shared_files' %}active{% endif %}" href="{% url 'workspace:shared_files' %}">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'shared_files' %}active{% endif %}" href="{% url 'workspace:files_shared' %}">
                         <i class="fas fa-share-alt"></i> Fichiers partagés
                     </a>
                 </li>

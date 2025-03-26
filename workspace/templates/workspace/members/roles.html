@@ -1,0 +1,126 @@
+{% extends 'workspace/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block workspace_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">{{ title }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-header bg-danger text-white">
+                                    <h6 class="card-title mb-0">Administrateur</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Les administrateurs ont un accès complet à tous les aspects du workspace.</p>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>Gestion des membres</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Gestion des dossiers</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Gestion des documents</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Configuration du workspace</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="card-title mb-0">Membre</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Les membres peuvent accéder et collaborer sur les documents partagés.</p>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>Lecture des documents</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Modification des documents</li>
+                                        <li><i class="fas fa-times text-danger me-2"></i>Gestion des membres</li>
+                                        <li><i class="fas fa-times text-danger me-2"></i>Configuration du workspace</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-header bg-secondary text-white">
+                                    <h6 class="card-title mb-0">Invité</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">Les invités ont un accès limité aux documents partagés avec eux.</p>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>Lecture des documents</li>
+                                        <li><i class="fas fa-times text-danger me-2"></i>Modification des documents</li>
+                                        <li><i class="fas fa-times text-danger me-2"></i>Gestion des membres</li>
+                                        <li><i class="fas fa-times text-danger me-2"></i>Configuration du workspace</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">Permissions détaillées</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Permission</th>
+                                                    <th class="text-center">Administrateur</th>
+                                                    <th class="text-center">Membre</th>
+                                                    <th class="text-center">Invité</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Gérer les membres</td>
+                                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Créer des dossiers</td>
+                                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Modifier des documents</td>
+                                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Partager des documents</td>
+                                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Configurer le workspace</td>
+                                                    <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                                    <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

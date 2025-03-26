@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-fcmk@rk443=81ekbq68&#xcb(gpz0f*3dt!ut*h9hs@8a!dq19
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "intelligence.apps.IntelligenceConfig",
     "projects.apps.ProjectsConfig",
     "tasks.apps.TasksConfig",
-    "admin_panel.apps.AdminPanelConfig",
     "correspondence.apps.CorrespondenceConfig",
     "workspace.apps.WorkspaceConfig",
 ]
@@ -95,6 +94,12 @@ DATABASES = {
         "OPTIONS": {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
             "charset": "utf8mb4",
+            "use_unicode": True,
+            "collation": "utf8mb4_unicode_ci",
+        },
+        "TEST": {
+            "CHARSET": "utf8mb4",
+            "COLLATION": "utf8mb4_unicode_ci",
         }
     }
 }
@@ -167,10 +172,10 @@ EMAIL_HOST_USER = ''  # À remplir avec votre adresse email
 EMAIL_HOST_PASSWORD = ''  # À remplir avec votre mot de passe
 DEFAULT_FROM_EMAIL = ''  # À remplir avec votre adresse email par défaut
 
-# Celery settings
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# Celery Configuration
+CELERY_TASK_ALWAYS_EAGER = True  # Run tasks synchronously in development
+CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = TIME_ZONE
+CELERY_TIMEZONE = 'UTC'

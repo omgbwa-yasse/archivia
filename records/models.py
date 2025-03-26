@@ -43,15 +43,55 @@ class Document(models.Model):
     description = models.TextField(blank=True)
     file = models.FileField(upload_to='documents/')
     folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='documents')
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')
+    retention = models.ForeignKey('Retention', on_delete=models.SET_NULL, null=True, blank=True, related_name='documents')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_documents')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    document_metadata = models.JSONField(default=dict)
+    favorite_users = models.ManyToManyField(User, through='Favorite', related_name='favorite_documents')
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['name']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['deleted_at']),
+        ]
 
     def __str__(self):
         return self.name
+
+    def soft_delete(self, user):
+        self.deleted_at = timezone.now()
+        self.save()
+        AuditLog.objects.create(
+            action='delete',
+            model='Document',
+            object_id=self.id,
+            user=user,
+            details=f'Document "{self.name}" soft deleted'
+        )
+
+    def restore(self):
+        self.deleted_at = None
+        self.save()
+        AuditLog.objects.create(
+            action='restore',
+            model='Document',
+            object_id=self.id,
+            user=self.created_by,
+            details=f'Document "{self.name}" restored'
+        )
+
+    def hard_delete(self):
+        self.file.delete(save=False)
+        self.delete()
+
+    @property
+    def is_deleted(self):
+        return self.deleted_at is not None
 
 class MetadataDefinition(models.Model):
     name = models.CharField(_('Name'), max_length=50)
@@ -200,35 +240,64 @@ class Archive(models.Model):
         self.save()
 
 class Retention(models.Model):
-    name = models.CharField(_('Name'), max_length=190)
-    description = models.TextField(_('Description'), blank=True, null=True)
-    retention_period = models.IntegerField(_('Retention Period'), help_text=_('Retention period in years'))
-    retention_type = models.CharField(_('Retention Type'), max_length=20, choices=[
-        ('permanent', _('Permanent')),
-        ('temporary', _('Temporary')),
-        ('confidential', _('Confidential')),
-    ])
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_retentions')
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    retention_period = models.IntegerField()  # in days
+    retention_type = models.CharField(max_length=50)
+    created_by = models.ForeignKey('users.User', on_delete=models.PROTECT, related_name='records_created_retentions')
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_retentions')
+    updated_by = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True, blank=True, related_name='records_updated_retentions')
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='deleted_retentions')
+    deleted_by = models.ForeignKey('users.User', on_delete=models.PROTECT, null=True, blank=True, related_name='records_deleted_retentions')
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = _('Retention')
-        verbose_name_plural = _('Retentions')
-        ordering = ['name']
+        verbose_name = 'Retention'
+        verbose_name_plural = 'Retentions'
 
     def __str__(self):
         return self.name
 
-    def soft_delete(self, user):
-        self.deleted_by = user
-        self.deleted_at = timezone.now()
-        self.save()
+class AuditLog(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    action = models.CharField(_('Action'), max_length=50)
+    model = models.CharField(_('Model'), max_length=50)
+    object_id = models.IntegerField(_('Object ID'))
+    details = models.TextField(_('Details'), blank=True)
+    timestamp = models.DateTimeField(_('Timestamp'), auto_now_add=True)
+    ip_address = models.GenericIPAddressField(_('IP Address'), null=True, blank=True)
 
-    def restore(self):
-        self.deleted_by = None
-        self.deleted_at = None
-        self.save()
+    class Meta:
+        verbose_name = _('Audit Log')
+        verbose_name_plural = _('Audit Logs')
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.user} - {self.action} - {self.model} - {self.timestamp}"
+
+class AccessLog(models.Model):
+    """Model for tracking document access."""
+    document = models.ForeignKey('Document', on_delete=models.CASCADE, related_name='access_logs')
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    accessed_at = models.DateTimeField(auto_now_add=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-accessed_at']
+        verbose_name = 'Access Log'
+        verbose_name_plural = 'Access Logs'
+    
+    def __str__(self):
+        return f"{self.user} accessed {self.document} at {self.accessed_at}"
+
+class Favorite(models.Model):
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name='favorite_entries')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_entries')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['document', 'user']
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username}'s favorite: {self.document.name}"

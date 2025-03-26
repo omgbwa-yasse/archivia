@@ -34,7 +34,7 @@ class WorkspaceMember(models.Model):
     
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='members')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='workspace_memberships')
-    role = models.CharField(max_length=50, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_workspace_memberships')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_workspace_memberships')
@@ -53,9 +53,9 @@ class WorkspaceMember(models.Model):
 class WorkspaceFolder(models.Model):
     workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='folders')
     parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='subfolders')
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=191)
     description = models.TextField(null=True, blank=True)
-    path = models.CharField(max_length=1000, null=True, blank=True)
+    path = models.CharField(max_length=191, null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_workspace_folders')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_workspace_folders')
@@ -78,11 +78,11 @@ class WorkspaceFolder(models.Model):
 
 class WorkspaceDocument(models.Model):
     folder = models.ForeignKey(WorkspaceFolder, on_delete=models.CASCADE, related_name='documents')
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=191)
     description = models.TextField(null=True, blank=True)
-    file_path = models.CharField(max_length=1000, null=True, blank=True)
+    file_path = models.CharField(max_length=191, null=True, blank=True)
     file_size = models.BigIntegerField(null=True)
-    file_type = models.CharField(max_length=100, null=True)
+    file_type = models.CharField(max_length=50, null=True)
     mime_type = models.CharField(max_length=100, null=True)
     version = models.IntegerField(default=1)
     is_locked = models.BooleanField(default=False)
@@ -113,7 +113,7 @@ class WorkspaceDocument(models.Model):
 class WorkspaceDocumentVersion(models.Model):
     document = models.ForeignKey(WorkspaceDocument, on_delete=models.CASCADE, related_name='versions')
     version = models.IntegerField()
-    file_path = models.CharField(max_length=1000, null=True)
+    file_path = models.CharField(max_length=191, null=True)
     file_size = models.BigIntegerField(null=True)
     change_summary = models.TextField(null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_workspace_document_versions')
@@ -140,7 +140,7 @@ class WorkspaceDocumentPermission(models.Model):
     document = models.ForeignKey(WorkspaceDocument, on_delete=models.CASCADE, related_name='permissions')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, related_name='workspace_document_permissions')
     group = models.ForeignKey('auth.Group', on_delete=models.CASCADE, null=True, related_name='workspace_document_permissions')
-    permission_type = models.CharField(max_length=50, choices=PERMISSION_CHOICES)
+    permission_type = models.CharField(max_length=20, choices=PERMISSION_CHOICES)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_workspace_document_permissions')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_workspace_document_permissions')
@@ -160,13 +160,13 @@ class WorkspaceDocumentPermission(models.Model):
 
 class WorkspaceDocumentShare(models.Model):
     document = models.ForeignKey(WorkspaceDocument, on_delete=models.CASCADE, related_name='shares')
-    share_token = models.CharField(max_length=255, unique=True)
+    share_token = models.CharField(max_length=191, unique=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     access_count = models.IntegerField(default=0)
     max_access_count = models.IntegerField(null=True, blank=True)
-    permission_type = models.CharField(max_length=50, default='read')
+    permission_type = models.CharField(max_length=20, default='read')
     password_protected = models.BooleanField(default=False)
-    password_hash = models.CharField(max_length=255, null=True, blank=True)
+    password_hash = models.CharField(max_length=191, null=True, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='created_workspace_document_shares')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -178,4 +178,45 @@ class WorkspaceDocumentShare(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.document.name} - {self.share_token}" 
+        return f"{self.document.name} - {self.share_token}"
+
+class ActivityLog(models.Model):
+    ACTION_CHOICES = [
+        ('create', 'Created'),
+        ('update', 'Updated'),
+        ('delete', 'Deleted'),
+        ('share', 'Shared'),
+        ('unshare', 'Unshared'),
+        ('lock', 'Locked'),
+        ('unlock', 'Unlocked'),
+        ('upload', 'Uploaded'),
+        ('download', 'Downloaded'),
+        ('comment', 'Commented'),
+        ('move', 'Moved'),
+        ('copy', 'Copied'),
+        ('rename', 'Renamed'),
+        ('restore', 'Restored'),
+        ('archive', 'Archived'),
+    ]
+
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='activities')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='workspace_activities')
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    target_type = models.CharField(max_length=50)  # e.g., 'document', 'folder', 'workspace'
+    target_id = models.IntegerField()  # ID of the target object
+    target_name = models.CharField(max_length=191)  # Name or description of the target
+    details = models.TextField(null=True, blank=True)  # Additional details about the action
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['workspace']),
+            models.Index(fields=['user']),
+            models.Index(fields=['action']),
+            models.Index(fields=['target_type']),
+            models.Index(fields=['timestamp']),
+        ]
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.user.username} {self.action} {self.target_type} '{self.target_name}' in {self.workspace.name}" 

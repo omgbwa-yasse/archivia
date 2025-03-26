@@ -67,23 +67,29 @@
                     <tr>
                         <th style="width: 150px;">À</th>
                         <td>
-                            {% if email.recipient_name %}
-                            {{ email.recipient_name }} &lt;{{ email.recipient_email }}&gt;
-                            {% else %}
-                            {{ email.recipient_email }}
-                            {% endif %}
+                            {% for recipient in email.recipients.all %}
+                                {{ recipient.get_full_name|default:recipient.username }} &lt;{{ recipient.email }}&gt;
+                            {% endfor %}
                         </td>
                     </tr>
-                    {% if email.cc %}
+                    {% if email.cc.all %}
                     <tr>
                         <th>Copie à</th>
-                        <td>{{ email.cc }}</td>
+                        <td>
+                            {% for cc in email.cc.all %}
+                                {{ cc.get_full_name|default:cc.username }} &lt;{{ cc.email }}&gt;
+                            {% endfor %}
+                        </td>
                     </tr>
                     {% endif %}
-                    {% if email.bcc %}
+                    {% if email.bcc.all %}
                     <tr>
                         <th>Copie cachée</th>
-                        <td>{{ email.bcc }}</td>
+                        <td>
+                            {% for bcc in email.bcc.all %}
+                                {{ bcc.get_full_name|default:bcc.username }} &lt;{{ bcc.email }}&gt;
+                            {% endfor %}
+                        </td>
                     </tr>
                     {% endif %}
                 </table>
