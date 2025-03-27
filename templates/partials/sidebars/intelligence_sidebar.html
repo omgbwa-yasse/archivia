@@ -1,9 +1,6 @@
 <div class="sidebar">
     <div class="sidebar-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Intelligence Artificielle</h5>
-        <button class="btn btn-sm btn-outline-primary" onclick="location.href='{% url 'intelligence:chat_create' %}'">
-            <i class="fas fa-plus"></i>
-        </button>
     </div>
     
     <!-- Accès rapide -->
@@ -26,7 +23,7 @@
     </ul>
     
     <!-- Analyse et prédictions -->
-    <h6 class="sidebar-subtitle"><i class="fas fa-brain"></i> Analyse</h6>
+    <h6 class="sidebar-subtitle"> Analyse</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'analysis' %}active{% endif %}" href="{% url 'intelligence:analysis' %}">
@@ -47,9 +44,9 @@
     
     <!-- Configuration IA -->
     <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#iaConfigCollapse" aria-expanded="false">
-        <i class="fas fa-cogs"></i> Configuration IA <i class="fas fa-chevron-down float-end"></i>
+         Configuration IA 
     </h6>
-    <ul class="nav flex-column collapse" id="iaConfigCollapse">
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'agent_list' %}active{% endif %}" href="{% url 'intelligence:agent_list' %}">
                 <i class="fas fa-robot"></i> Agents IA
@@ -74,9 +71,9 @@
     
     <!-- Apprentissage -->
     <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#learningCollapse" aria-expanded="false">
-        <i class="fas fa-graduation-cap"></i> Apprentissage <i class="fas fa-chevron-down float-end"></i>
+         Apprentissage
     </h6>
-    <ul class="nav flex-column collapse" id="learningCollapse">
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'training' %}active{% endif %}" href="{% url 'intelligence:training' %}">
                 <i class="fas fa-dumbbell"></i> Formation
