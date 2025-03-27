@@ -211,7 +211,7 @@ def export_data(request):
     return response
 
 @login_required
-def scan(request):
+def scan_create(request):
     """Vue pour la numérisation de documents"""
     if request.method == 'POST':
         # TODO: Implémenter le traitement du formulaire
@@ -221,7 +221,11 @@ def scan(request):
     context = {
         'priorities': CorrespondencePriority.objects.all(),
     }
-    return render(request, 'templates/scan.html', context)
+    return render(request, 'templates/scan_form.html', context)
+
+
+
+
 
 # Folder Views
 class CorrespondenceFolderListView(LoginRequiredMixin, ListView):

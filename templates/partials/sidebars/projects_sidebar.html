@@ -19,7 +19,7 @@
     </div>
     
     <!-- Projets -->
-    <h6 class="sidebar-subtitle"><i class="fas fa-project-diagram"></i> Projets</h6>
+    <h6 class="sidebar-subtitle"> Projets</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'project_list' and request.resolver_match.namespace == 'projects' %}active{% endif %}" href="{% url 'projects:project_list' %}">
@@ -39,7 +39,7 @@
     </ul>
     
     <!-- Tâches -->
-    <h6 class="sidebar-subtitle"><i class="fas fa-tasks"></i> Tâches</h6>
+    <h6 class="sidebar-subtitle"> Tâches</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'task_list' and request.resolver_match.namespace == 'tasks' %}active{% endif %}" href="{% url 'tasks:task_list' %}">
@@ -60,7 +60,7 @@
     
     <!-- Filtres de tâches -->
     <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#taskFiltersCollapse" aria-expanded="false">
-        <i class="fas fa-filter"></i> Filtres de tâches <i class="fas fa-chevron-down float-end"></i>
+         Filtres de tâches
     </h6>
     <ul class="nav flex-column collapse" id="taskFiltersCollapse">
         <li class="nav-item">
@@ -92,7 +92,7 @@
     
     <!-- Rapports -->
     <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#reportsCollapse" aria-expanded="false">
-        <i class="fas fa-chart-bar"></i> Rapports <i class="fas fa-chevron-down float-end"></i>
+         Rapports
     </h6>
     <ul class="nav flex-column collapse" id="reportsCollapse">
         <li class="nav-item">

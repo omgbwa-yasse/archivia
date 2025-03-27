@@ -14,7 +14,7 @@
     </div>
     
     <!-- Outils principaux -->
-    <h6 class="sidebar-subtitle"><i class="fas fa-tools"></i> Outils principaux</h6>
+    <h6 class="sidebar-subtitle"> Outils principaux</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'communicability_list' %}active{% endif %}" href="{% url 'tools:communicability_list' %}">
@@ -34,7 +34,7 @@
     </ul>
     
     <!-- Gestion de la conservation -->
-    <h6 class="sidebar-subtitle"><i class="fas fa-archive"></i> Conservation</h6>
+    <h6 class="sidebar-subtitle"> Conservation</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'retention_list' %}active{% endif %}" href="{% url 'tools:retention_list' %}">
@@ -50,7 +50,7 @@
     
     <!-- Cadre juridique -->
     <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#legalCollapse" aria-expanded="false">
-        <i class="fas fa-balance-scale"></i> Cadre juridique <i class="fas fa-chevron-down float-end"></i>
+         Cadre juridique 
     </h6>
     <ul class="nav flex-column collapse" id="legalCollapse">
         <li class="nav-item">
@@ -72,7 +72,7 @@
     
     <!-- Organisation -->
     <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#orgCollapse" aria-expanded="false">
-        <i class="fas fa-sitemap"></i> Organisation <i class="fas fa-chevron-down float-end"></i>
+         Organisation
     </h6>
     <ul class="nav flex-column collapse" id="orgCollapse">
         <li class="nav-item">

@@ -71,4 +71,7 @@ urlpatterns = [
     path('actions/<int:pk>/', views.CorrespondenceActionDetailView.as_view(), name='action_detail'),
     path('actions/<int:pk>/update/', views.CorrespondenceActionUpdateView.as_view(), name='action_update'),
     path('actions/<int:pk>/delete/', views.CorrespondenceActionDeleteView.as_view(), name='action_delete'),
+    
+    # Scan views
+    path('scan/', views.CorrespondenceScanListView.as_view(), name='scan'),
 ]
