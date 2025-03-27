@@ -7,16 +7,20 @@
     </div>
     
     <!-- Accès rapide -->
-    <div class="mb-3 mt-2">
-        <div class="btn-group w-100">
-            <a class="btn btn-primary" href="{% url 'correspondence:create' %}">
-                <i class="fas fa-plus"></i> Nouveau
+    <ul class="nav flex-column mb-3">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'incoming' %}active{% endif %}" href="{% url 'correspondence:incoming_list' %}">
+                <i class="fas fa-inbox"></i> Nouveau
             </a>
-            <a class="btn btn-outline-primary" href="{% url 'correspondence:scan' %}">
-                <i class="fas fa-scanner"></i> Scanner
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'outgoing' %}active{% endif %}" href="{% url 'correspondence:outgoing_list' %}">
+                <i class="fas fa-paper-plane"></i> Scanner
             </a>
-        </div>
-    </div>
+        </li>
+    </ul>
+
+
     
     <!-- Vue d'ensemble -->
     <h6 class="sidebar-subtitle"><i class="fas fa-home"></i> Principal</h6>
@@ -32,17 +36,17 @@
     <h6 class="sidebar-subtitle"><i class="fas fa-mail-bulk"></i> Par type</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'incoming' %}active{% endif %}" href="{% url 'correspondence:incoming' %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'incoming' %}active{% endif %}" href="{% url 'correspondence:incoming_list' %}">
                 <i class="fas fa-inbox"></i> Courrier entrant
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'outgoing' %}active{% endif %}" href="{% url 'correspondence:outgoing' %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'outgoing' %}active{% endif %}" href="{% url 'correspondence:outgoing_list' %}">
                 <i class="fas fa-paper-plane"></i> Courrier sortant
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'internal' %}active{% endif %}" href="{% url 'correspondence:internal' %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'internal' %}active{% endif %}" href="{% url 'correspondence:internal_list' %}">
                 <i class="fas fa-building"></i> Interne
             </a>
         </li>
@@ -52,12 +56,12 @@
     <h6 class="sidebar-subtitle"><i class="fas fa-filter"></i> Filtres</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'recent' %}active{% endif %}" href="{% url 'correspondence:recent' %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'recent' %}active{% endif %}" href="{% url 'correspondence:recent_list' %}">
                 <i class="fas fa-clock"></i> Récents
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'favorites' %}active{% endif %}" href="{% url 'correspondence:favorites' %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'favorites' %}active{% endif %}" href="{% url 'correspondence:favorites_list' %}">
                 <i class="fas fa-star"></i> Favoris
             </a>
         </li>

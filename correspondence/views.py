@@ -523,3 +523,13 @@ class CorrespondenceActionDeleteView(LoginRequiredMixin, DeleteView):
     model = CorrespondenceAction
     template_name = 'correspondence/actions/action_confirm_delete.html'
     success_url = reverse_lazy('correspondence:action_list') 
+    
+class CorrespondenceScanListView(LoginRequiredMixin, ListView):
+    model = Correspondence
+    template_name = 'correspondence/scans/scan_list.html'
+    context_object_name = 'scans'
+
+    def get_queryset(self):
+        return Correspondence.objects.filter(
+            created_by=self.request.user
+        ).order_by('-created_at')

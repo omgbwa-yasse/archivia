@@ -1,0 +1,115 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}Scans - Archivia{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Scans de correspondance</h2>
+        <a href="{% url 'correspondence:scan_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouveau scan
+        </a>
+    </div>
+
+    <!-- Recherche simple -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="q" value="{{ query }}" placeholder="Rechercher...">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Liste des scans -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-list"></i> Liste des scans
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Nom du fichier</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scan in scans %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'correspondence:scan_detail' scan.id %}">
+                                {{ scan.filename }}
+                            </a>
+                        </td>
+                        <td>{{ scan.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if scan.status == 'pending' %}
+                            <span class="badge bg-warning">En attente</span>
+                            {% elif scan.status == 'processed' %}
+                            <span class="badge bg-success">Traité</span>
+                            {% else %}
+                            <span class="badge bg-danger">Erreur</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{% url 'correspondence:scan_detail' scan.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'correspondence:scan_edit' scan.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'correspondence:scan_delete' scan.id %}" class="btn btn-sm btn-outline-danger" 
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce scan ?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-3">
+                            <p class="text-muted">Aucun scan trouvé</p>
+                            <a href="{% url 'correspondence:scan_create' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-plus"></i> Ajouter un scan
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if is_paginated %}
+        <div class="card-footer">
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Précédent</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item disabled">
+                        <span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant &raquo;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
