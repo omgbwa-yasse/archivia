@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .models import Correspondence, CorrespondencePriority, CorrespondenceTypology, CorrespondenceAction, CorrespondenceAttachment, CorrespondenceRelated, Batch, BatchCorrespondence, BatchTransaction, CorrespondenceFolder, CorrespondenceTemplate, CorrespondenceBatch
+from .models import Correspondence, CorrespondencePriority, CorrespondenceTypology, CorrespondenceAction, CorrespondenceAttachment, CorrespondenceRelated, Batch, BatchCorrespondence, BatchTransaction, CorrespondenceFolder, CorrespondenceTemplate
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
 import csv
@@ -129,43 +129,38 @@ def correspondence_archive(request, pk):
 
 # Batch Views
 class CorrespondenceBatchListView(LoginRequiredMixin, ListView):
-    model = CorrespondenceBatch
+    model = Batch
     template_name = 'correspondence/batches/batch_list.html'
     context_object_name = 'batches'
 
     def get_queryset(self):
-        return CorrespondenceBatch.objects.filter(
-            Q(created_by=self.request.user) | Q(shared_with=self.request.user)
-        ).distinct()
+        return Batch.objects.all()
 
 class CorrespondenceBatchDetailView(LoginRequiredMixin, DetailView):
-    model = CorrespondenceBatch
+    model = Batch
     template_name = 'correspondence/batches/batch_detail.html'
     context_object_name = 'batch'
 
     def get_queryset(self):
-        return CorrespondenceBatch.objects.filter(
-            Q(created_by=self.request.user) | Q(shared_with=self.request.user)
-        )
+        return Batch.objects.all()
 
 class CorrespondenceBatchCreateView(LoginRequiredMixin, CreateView):
-    model = CorrespondenceBatch
+    model = Batch
     template_name = 'correspondence/batches/batch_form.html'
-    fields = ['name', 'description', 'status', 'shared_with']
+    fields = ['code', 'name', 'organisation_holder']
     success_url = reverse_lazy('correspondence:batch_list')
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
         return super().form_valid(form)
 
 class CorrespondenceBatchUpdateView(LoginRequiredMixin, UpdateView):
-    model = CorrespondenceBatch
+    model = Batch
     template_name = 'correspondence/batches/batch_form.html'
-    fields = ['name', 'description', 'status', 'shared_with']
+    fields = ['code', 'name', 'organisation_holder']
     success_url = reverse_lazy('correspondence:batch_list')
 
 class CorrespondenceBatchDeleteView(LoginRequiredMixin, DeleteView):
-    model = CorrespondenceBatch
+    model = Batch
     template_name = 'correspondence/batches/batch_confirm_delete.html'
     success_url = reverse_lazy('correspondence:batch_list')
 
