@@ -1,103 +1,210 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends 'workspace/base.html' %}
 
-{% block title %}{{ workspace.name }} - Members{% endblock %}
+{% block page_title %}Members - {{ workspace.name }}{% endblock %}
 
-{% block content %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>{{ workspace.name }} - Members</h1>
-        {% if user_member.role == 'admin' %}
-        <a href="{% url 'workspace:workspace_member_add' workspace.pk %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Add Member
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+        <a href="{% url 'workspace:member_add' workspace.pk %}" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Add Member
         </a>
-        {% endif %}
     </div>
+</div>
+{% endblock %}
 
-    {% if messages %}
-    <div class="messages">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
+{% block workspace_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Workspace Members</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Added By</th>
+                                <th>Last Active</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in members %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-2">
+                                            {{ member.user.username|first|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">{{ member.user.username }}</div>
+                                            <small class="text-muted">{{ member.user.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {% if member.role == 'admin' %}bg-danger{% elif member.role == 'member' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                        {{ member.get_role_display }}
+                                    </span>
+                                </td>
+                                <td>{{ member.created_at|date:"M d, Y" }}</td>
+                                <td>{{ member.created_by.username }}</td>
+                                <td>
+                                    {% if member.user.last_login %}
+                                        {{ member.user.last_login|date:"M d, Y" }}
+                                    {% else %}
+                                        <span class="text-muted">Never</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'workspace:member_edit' workspace.pk member.pk %}" 
+                                           class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {% if member.user != workspace.owner %}
+                                        <a href="{% url 'workspace:member_remove' workspace.pk member.pk %}" 
+                                           class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-user-minus"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="alert alert-info mb-0">
+                                        No members found. Add your first member to get started!
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        {% endfor %}
     </div>
-    {% endif %}
-
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Joined</th>
-                            {% if user_member.role == 'admin' %}
-                            <th>Actions</th>
-                            {% endif %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for member in members %}
-                        <tr>
-                            <td>{{ member.user.get_full_name }}</td>
-                            <td>{{ member.user.email }}</td>
-                            <td>
-                                <span class="badge {% if member.role == 'admin' %}bg-primary{% else %}bg-secondary{% endif %}">
-                                    {{ member.role|title }}
-                                </span>
-                            </td>
-                            <td>{{ member.created_at|date:"M d, Y" }}</td>
-                            {% if user_member.role == 'admin' %}
-                            <td>
-                                <div class="btn-group">
-                                    <a href="{% url 'workspace:workspace_member_edit' workspace.pk member.pk %}" 
-                                       class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button type="button" 
-                                            class="btn btn-sm btn-outline-danger"
-                                            onclick="removeMember({{ member.pk }})">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Workspace Information</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1">
+                    <strong>Name:</strong><br>
+                    {{ workspace.name }}
+                </p>
+                {% if workspace.description %}
+                <p class="mb-1">
+                    <strong>Description:</strong><br>
+                    {{ workspace.description }}
+                </p>
+                {% endif %}
+                <p class="mb-1">
+                    <strong>Owner:</strong><br>
+                    {{ workspace.owner.username }}
+                </p>
+                <p class="mb-0">
+                    <strong>Created:</strong><br>
+                    {{ workspace.created_at|date:"M d, Y" }}
+                </p>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Member Roles</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="mb-2">
+                        <span class="badge bg-danger">Administrator</span>
+                    </h6>
+                    <p class="small text-muted mb-0">
+                        Full access to all workspace features, including member management and workspace settings.
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <h6 class="mb-2">
+                        <span class="badge bg-primary">Member</span>
+                    </h6>
+                    <p class="small text-muted mb-0">
+                        Can create and manage documents, folders, and share content with others.
+                    </p>
+                </div>
+                <div>
+                    <h6 class="mb-2">
+                        <span class="badge bg-secondary">Viewer</span>
+                    </h6>
+                    <p class="small text-muted mb-0">
+                        Can view documents and folders but cannot modify or share content.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ total_members }}</h3>
+                                <small class="text-muted">Total Members</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ active_members }}</h3>
+                                <small class="text-muted">Active Members</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ total_documents }}</h3>
+                                <small class="text-muted">Total Documents</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h3 class="mb-0">{{ total_folders }}</h3>
+                                <small class="text-muted">Total Folders</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-{% if user_member.role == 'admin' %}
-<script>
-function removeMember(memberId) {
-    if (confirm('Are you sure you want to remove this member?')) {
-        fetch(`{% url 'workspace:workspace_member_remove' workspace.pk 0 %}`.replace('0', memberId), {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while removing the member.');
-        });
-    }
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
 }
-</script>
-{% endif %}
+</style>
 {% endblock %} 

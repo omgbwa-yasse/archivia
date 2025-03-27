@@ -1,0 +1,35 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}Supprimer le commentaire{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Supprimer le commentaire</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Attention</h4>
+                        <p>Êtes-vous sûr de vouloir supprimer ce commentaire ?</p>
+                        <p>Cette action est irréversible.</p>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                            <a href="{% url 'projects:task_detail' project.pk task.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

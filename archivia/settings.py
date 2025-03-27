@@ -64,7 +64,7 @@ ROOT_URLCONF = "archivia.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "archivia" / "templates"],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -143,6 +143,7 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / 'archivia' / 'static',
 ]
+
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type

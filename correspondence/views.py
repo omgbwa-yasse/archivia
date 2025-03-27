@@ -4,17 +4,18 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .models import Correspondence, CorrespondencePriority, CorrespondenceTypology, CorrespondenceAction, CorrespondenceAttachment, CorrespondenceRelated, Batch, BatchCorrespondence, BatchTransaction, CorrespondenceFolder, CorrespondenceTemplate
+from .models import Correspondence, CorrespondencePriority, CorrespondenceTypology, CorrespondenceAction, CorrespondenceAttachment, CorrespondenceRelated, Batch, BatchCorrespondence, BatchTransaction, CorrespondenceFolder, CorrespondenceTemplate, CorrespondenceBatch
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
 import csv
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
 from .forms import CorrespondenceForm, BatchForm, CorrespondenceFolderForm, CorrespondenceTemplateForm
+from django.db.models import Q
 
 class CorrespondenceListView(LoginRequiredMixin, ListView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_list.html'
+    template_name = 'correspondence/correspondences/correspondence_list.html'
     context_object_name = 'correspondences'
 
     def get_queryset(self):
@@ -26,7 +27,7 @@ class CorrespondenceListView(LoginRequiredMixin, ListView):
 
 class IncomingCorrespondenceListView(LoginRequiredMixin, ListView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_list.html'
+    template_name = 'correspondence/correspondences/correspondence_list.html'
     context_object_name = 'correspondences'
 
     def get_queryset(self):
@@ -37,7 +38,7 @@ class IncomingCorrespondenceListView(LoginRequiredMixin, ListView):
 
 class OutgoingCorrespondenceListView(LoginRequiredMixin, ListView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_list.html'
+    template_name = 'correspondence/correspondences/correspondence_list.html'
     context_object_name = 'correspondences'
 
     def get_queryset(self):
@@ -48,7 +49,7 @@ class OutgoingCorrespondenceListView(LoginRequiredMixin, ListView):
 
 class InternalCorrespondenceListView(LoginRequiredMixin, ListView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_list.html'
+    template_name = 'correspondence/correspondences/correspondence_list.html'
     context_object_name = 'correspondences'
 
     def get_queryset(self):
@@ -59,7 +60,7 @@ class InternalCorrespondenceListView(LoginRequiredMixin, ListView):
 
 class RecentCorrespondenceListView(LoginRequiredMixin, ListView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_list.html'
+    template_name = 'correspondence/correspondences/correspondence_list.html'
     context_object_name = 'correspondences'
 
     def get_queryset(self):
@@ -71,7 +72,7 @@ class RecentCorrespondenceListView(LoginRequiredMixin, ListView):
 
 class FavoritesCorrespondenceListView(LoginRequiredMixin, ListView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_list.html'
+    template_name = 'correspondence/correspondences/correspondence_list.html'
     context_object_name = 'correspondences'
 
     def get_queryset(self):
@@ -85,7 +86,7 @@ class FavoritesCorrespondenceListView(LoginRequiredMixin, ListView):
 
 class CorrespondenceDetailView(LoginRequiredMixin, DetailView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_detail.html'
+    template_name = 'correspondence/correspondences/correspondence_detail.html'
     context_object_name = 'correspondence'
 
     def get_queryset(self):
@@ -96,7 +97,7 @@ class CorrespondenceDetailView(LoginRequiredMixin, DetailView):
 
 class CorrespondenceCreateView(LoginRequiredMixin, CreateView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_form.html'
+    template_name = 'correspondence/correspondences/correspondence_form.html'
     fields = ['code', 'name', 'date', 'description', 'document_type', 'status', 
               'priority', 'typology', 'action', 'recipient_user', 'recipient_organisation']
     success_url = reverse_lazy('correspondence:list')
@@ -108,14 +109,14 @@ class CorrespondenceCreateView(LoginRequiredMixin, CreateView):
 
 class CorrespondenceUpdateView(LoginRequiredMixin, UpdateView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_form.html'
+    template_name = 'correspondence/correspondences/correspondence_form.html'
     fields = ['code', 'name', 'date', 'description', 'document_type', 'status', 
               'priority', 'typology', 'action', 'recipient_user', 'recipient_organisation']
     success_url = reverse_lazy('correspondence:list')
 
 class CorrespondenceDeleteView(LoginRequiredMixin, DeleteView):
     model = Correspondence
-    template_name = 'correspondence/correspondence_confirm_delete.html'
+    template_name = 'correspondence/correspondences/correspondence_confirm_delete.html'
     success_url = reverse_lazy('correspondence:list')
 
 @login_required
@@ -127,31 +128,45 @@ def correspondence_archive(request, pk):
     return redirect('correspondence:list')
 
 # Batch Views
-class BatchListView(LoginRequiredMixin, ListView):
-    model = Batch
-    template_name = 'correspondence/batch_list.html'
+class CorrespondenceBatchListView(LoginRequiredMixin, ListView):
+    model = CorrespondenceBatch
+    template_name = 'correspondence/batches/batch_list.html'
     context_object_name = 'batches'
 
-class BatchDetailView(LoginRequiredMixin, DetailView):
-    model = Batch
-    template_name = 'correspondence/batch_detail.html'
+    def get_queryset(self):
+        return CorrespondenceBatch.objects.filter(
+            Q(created_by=self.request.user) | Q(shared_with=self.request.user)
+        ).distinct()
+
+class CorrespondenceBatchDetailView(LoginRequiredMixin, DetailView):
+    model = CorrespondenceBatch
+    template_name = 'correspondence/batches/batch_detail.html'
     context_object_name = 'batch'
 
-class BatchCreateView(LoginRequiredMixin, CreateView):
-    model = Batch
-    template_name = 'correspondence/batch_form.html'
-    fields = ['code', 'name', 'organisation_holder']
+    def get_queryset(self):
+        return CorrespondenceBatch.objects.filter(
+            Q(created_by=self.request.user) | Q(shared_with=self.request.user)
+        )
+
+class CorrespondenceBatchCreateView(LoginRequiredMixin, CreateView):
+    model = CorrespondenceBatch
+    template_name = 'correspondence/batches/batch_form.html'
+    fields = ['name', 'description', 'status', 'shared_with']
     success_url = reverse_lazy('correspondence:batch_list')
 
-class BatchUpdateView(LoginRequiredMixin, UpdateView):
-    model = Batch
-    template_name = 'correspondence/batch_form.html'
-    fields = ['code', 'name', 'organisation_holder']
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+class CorrespondenceBatchUpdateView(LoginRequiredMixin, UpdateView):
+    model = CorrespondenceBatch
+    template_name = 'correspondence/batches/batch_form.html'
+    fields = ['name', 'description', 'status', 'shared_with']
     success_url = reverse_lazy('correspondence:batch_list')
 
-class BatchDeleteView(LoginRequiredMixin, DeleteView):
-    model = Batch
-    template_name = 'correspondence/batch_confirm_delete.html'
+class CorrespondenceBatchDeleteView(LoginRequiredMixin, DeleteView):
+    model = CorrespondenceBatch
+    template_name = 'correspondence/batches/batch_confirm_delete.html'
     success_url = reverse_lazy('correspondence:batch_list')
 
 @login_required
@@ -214,82 +229,298 @@ def scan(request):
     return render(request, 'correspondence/scan.html', context)
 
 # Folder Views
-class FolderListView(LoginRequiredMixin, ListView):
+class CorrespondenceFolderListView(LoginRequiredMixin, ListView):
     model = CorrespondenceFolder
-    template_name = 'correspondence/folder_list.html'
+    template_name = 'correspondence/folders/folder_list.html'
     context_object_name = 'folders'
 
     def get_queryset(self):
         return CorrespondenceFolder.objects.filter(
-            created_by=self.request.user
-        ).order_by('name')
+            Q(created_by=self.request.user) | Q(shared_with=self.request.user)
+        ).distinct()
 
-class FolderCreateView(LoginRequiredMixin, CreateView):
+class CorrespondenceFolderDetailView(LoginRequiredMixin, DetailView):
     model = CorrespondenceFolder
-    template_name = 'correspondence/folder_form.html'
-    form_class = CorrespondenceFolderForm
+    template_name = 'correspondence/folders/folder_detail.html'
+    context_object_name = 'folder'
+
+    def get_queryset(self):
+        return CorrespondenceFolder.objects.filter(
+            Q(created_by=self.request.user) | Q(shared_with=self.request.user)
+        )
+
+class CorrespondenceFolderCreateView(LoginRequiredMixin, CreateView):
+    model = CorrespondenceFolder
+    template_name = 'correspondence/folders/folder_form.html'
+    fields = ['name', 'description', 'parent', 'shared_with']
     success_url = reverse_lazy('correspondence:folder_list')
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-class FolderUpdateView(LoginRequiredMixin, UpdateView):
+class CorrespondenceFolderUpdateView(LoginRequiredMixin, UpdateView):
     model = CorrespondenceFolder
-    template_name = 'correspondence/folder_form.html'
-    form_class = CorrespondenceFolderForm
+    template_name = 'correspondence/folders/folder_form.html'
+    fields = ['name', 'description', 'parent', 'shared_with']
     success_url = reverse_lazy('correspondence:folder_list')
 
-class FolderDeleteView(LoginRequiredMixin, DeleteView):
+class CorrespondenceFolderDeleteView(LoginRequiredMixin, DeleteView):
     model = CorrespondenceFolder
-    template_name = 'correspondence/folder_confirm_delete.html'
+    template_name = 'correspondence/folders/folder_confirm_delete.html'
     success_url = reverse_lazy('correspondence:folder_list')
-
-class FolderDetailView(LoginRequiredMixin, DetailView):
-    model = CorrespondenceFolder
-    template_name = 'correspondence/folder_detail.html'
-    context_object_name = 'folder'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['correspondences'] = Correspondence.objects.filter(
-            folder=self.object
-        ).order_by('-date')
-        return context 
 
 # Template Views
-class TemplateListView(LoginRequiredMixin, ListView):
+class CorrespondenceTemplateListView(LoginRequiredMixin, ListView):
     model = CorrespondenceTemplate
-    template_name = 'correspondence/template_list.html'
+    template_name = 'correspondence/templates/template_list.html'
     context_object_name = 'templates'
 
     def get_queryset(self):
         return CorrespondenceTemplate.objects.filter(
-            created_by=self.request.user
-        ).order_by('name')
+            Q(created_by=self.request.user) | Q(shared_with=self.request.user)
+        ).distinct()
 
-class TemplateCreateView(LoginRequiredMixin, CreateView):
+class CorrespondenceTemplateDetailView(LoginRequiredMixin, DetailView):
     model = CorrespondenceTemplate
-    template_name = 'correspondence/template_form.html'
-    form_class = CorrespondenceTemplateForm
+    template_name = 'correspondence/templates/template_detail.html'
+    context_object_name = 'template'
+
+    def get_queryset(self):
+        return CorrespondenceTemplate.objects.filter(
+            Q(created_by=self.request.user) | Q(shared_with=self.request.user)
+        )
+
+class CorrespondenceTemplateCreateView(LoginRequiredMixin, CreateView):
+    model = CorrespondenceTemplate
+    template_name = 'correspondence/templates/template_form.html'
+    fields = ['name', 'description', 'content', 'document_type', 'shared_with']
     success_url = reverse_lazy('correspondence:template_list')
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
-class TemplateUpdateView(LoginRequiredMixin, UpdateView):
+class CorrespondenceTemplateUpdateView(LoginRequiredMixin, UpdateView):
     model = CorrespondenceTemplate
-    template_name = 'correspondence/template_form.html'
-    form_class = CorrespondenceTemplateForm
+    template_name = 'correspondence/templates/template_form.html'
+    fields = ['name', 'description', 'content', 'document_type', 'shared_with']
     success_url = reverse_lazy('correspondence:template_list')
 
-class TemplateDeleteView(LoginRequiredMixin, DeleteView):
+class CorrespondenceTemplateDeleteView(LoginRequiredMixin, DeleteView):
     model = CorrespondenceTemplate
-    template_name = 'correspondence/template_confirm_delete.html'
+    template_name = 'correspondence/templates/template_confirm_delete.html'
     success_url = reverse_lazy('correspondence:template_list')
 
-class TemplateDetailView(LoginRequiredMixin, DetailView):
-    model = CorrespondenceTemplate
-    template_name = 'correspondence/template_detail.html'
-    context_object_name = 'template' 
+class CorrespondenceAttachmentListView(LoginRequiredMixin, ListView):
+    model = CorrespondenceAttachment
+    template_name = 'correspondence/attachments/attachment_list.html'
+    context_object_name = 'attachments'
+
+    def get_queryset(self):
+        return CorrespondenceAttachment.objects.filter(
+            correspondence__sender_user=self.request.user
+        ) | CorrespondenceAttachment.objects.filter(
+            correspondence__recipient_user=self.request.user
+        ).distinct()
+
+class CorrespondenceAttachmentDetailView(LoginRequiredMixin, DetailView):
+    model = CorrespondenceAttachment
+    template_name = 'correspondence/attachments/attachment_detail.html'
+    context_object_name = 'attachment'
+
+    def get_queryset(self):
+        return CorrespondenceAttachment.objects.filter(
+            correspondence__sender_user=self.request.user
+        ) | CorrespondenceAttachment.objects.filter(
+            correspondence__recipient_user=self.request.user
+        )
+
+class CorrespondenceAttachmentCreateView(LoginRequiredMixin, CreateView):
+    model = CorrespondenceAttachment
+    template_name = 'correspondence/attachments/attachment_form.html'
+    fields = ['correspondence', 'file', 'name', 'description']
+    success_url = reverse_lazy('correspondence:attachment_list')
+
+    def form_valid(self, form):
+        form.instance.uploaded_by = self.request.user
+        return super().form_valid(form)
+
+class CorrespondenceAttachmentUpdateView(LoginRequiredMixin, UpdateView):
+    model = CorrespondenceAttachment
+    template_name = 'correspondence/attachments/attachment_form.html'
+    fields = ['correspondence', 'file', 'name', 'description']
+    success_url = reverse_lazy('correspondence:attachment_list')
+
+class CorrespondenceAttachmentDeleteView(LoginRequiredMixin, DeleteView):
+    model = CorrespondenceAttachment
+    template_name = 'correspondence/attachments/attachment_confirm_delete.html'
+    success_url = reverse_lazy('correspondence:attachment_list')
+
+class CorrespondenceRelatedListView(LoginRequiredMixin, ListView):
+    model = CorrespondenceRelated
+    template_name = 'correspondence/related/related_list.html'
+    context_object_name = 'related_correspondences'
+
+    def get_queryset(self):
+        return CorrespondenceRelated.objects.filter(
+            correspondence__sender_user=self.request.user
+        ) | CorrespondenceRelated.objects.filter(
+            correspondence__recipient_user=self.request.user
+        ).distinct()
+
+class CorrespondenceRelatedDetailView(LoginRequiredMixin, DetailView):
+    model = CorrespondenceRelated
+    template_name = 'correspondence/related/related_detail.html'
+    context_object_name = 'related_correspondence'
+
+    def get_queryset(self):
+        return CorrespondenceRelated.objects.filter(
+            correspondence__sender_user=self.request.user
+        ) | CorrespondenceRelated.objects.filter(
+            correspondence__recipient_user=self.request.user
+        )
+
+class CorrespondenceRelatedCreateView(LoginRequiredMixin, CreateView):
+    model = CorrespondenceRelated
+    template_name = 'correspondence/related/related_form.html'
+    fields = ['correspondence', 'related_correspondence', 'relation_type']
+    success_url = reverse_lazy('correspondence:related_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+class CorrespondenceRelatedUpdateView(LoginRequiredMixin, UpdateView):
+    model = CorrespondenceRelated
+    template_name = 'correspondence/related/related_form.html'
+    fields = ['correspondence', 'related_correspondence', 'relation_type']
+    success_url = reverse_lazy('correspondence:related_list')
+
+class CorrespondenceRelatedDeleteView(LoginRequiredMixin, DeleteView):
+    model = CorrespondenceRelated
+    template_name = 'correspondence/related/related_confirm_delete.html'
+    success_url = reverse_lazy('correspondence:related_list')
+
+class CorrespondencePriorityListView(LoginRequiredMixin, ListView):
+    model = CorrespondencePriority
+    template_name = 'correspondence/priorities/priority_list.html'
+    context_object_name = 'priorities'
+
+    def get_queryset(self):
+        return CorrespondencePriority.objects.filter(
+            created_by=self.request.user
+        ).order_by('name')
+
+class CorrespondencePriorityDetailView(LoginRequiredMixin, DetailView):
+    model = CorrespondencePriority
+    template_name = 'correspondence/priorities/priority_detail.html'
+    context_object_name = 'priority'
+
+    def get_queryset(self):
+        return CorrespondencePriority.objects.filter(
+            created_by=self.request.user
+        )
+
+class CorrespondencePriorityCreateView(LoginRequiredMixin, CreateView):
+    model = CorrespondencePriority
+    template_name = 'correspondence/priorities/priority_form.html'
+    fields = ['name', 'description', 'color']
+    success_url = reverse_lazy('correspondence:priority_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+class CorrespondencePriorityUpdateView(LoginRequiredMixin, UpdateView):
+    model = CorrespondencePriority
+    template_name = 'correspondence/priorities/priority_form.html'
+    fields = ['name', 'description', 'color']
+    success_url = reverse_lazy('correspondence:priority_list')
+
+class CorrespondencePriorityDeleteView(LoginRequiredMixin, DeleteView):
+    model = CorrespondencePriority
+    template_name = 'correspondence/priorities/priority_confirm_delete.html'
+    success_url = reverse_lazy('correspondence:priority_list')
+
+class CorrespondenceTypologyListView(LoginRequiredMixin, ListView):
+    model = CorrespondenceTypology
+    template_name = 'correspondence/typologies/typology_list.html'
+    context_object_name = 'typologies'
+
+    def get_queryset(self):
+        return CorrespondenceTypology.objects.filter(
+            created_by=self.request.user
+        ).order_by('name')
+
+class CorrespondenceTypologyDetailView(LoginRequiredMixin, DetailView):
+    model = CorrespondenceTypology
+    template_name = 'correspondence/typologies/typology_detail.html'
+    context_object_name = 'typology'
+
+    def get_queryset(self):
+        return CorrespondenceTypology.objects.filter(
+            created_by=self.request.user
+        )
+
+class CorrespondenceTypologyCreateView(LoginRequiredMixin, CreateView):
+    model = CorrespondenceTypology
+    template_name = 'correspondence/typologies/typology_form.html'
+    fields = ['name', 'description']
+    success_url = reverse_lazy('correspondence:typology_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+class CorrespondenceTypologyUpdateView(LoginRequiredMixin, UpdateView):
+    model = CorrespondenceTypology
+    template_name = 'correspondence/typologies/typology_form.html'
+    fields = ['name', 'description']
+    success_url = reverse_lazy('correspondence:typology_list')
+
+class CorrespondenceTypologyDeleteView(LoginRequiredMixin, DeleteView):
+    model = CorrespondenceTypology
+    template_name = 'correspondence/typologies/typology_confirm_delete.html'
+    success_url = reverse_lazy('correspondence:typology_list')
+
+class CorrespondenceActionListView(LoginRequiredMixin, ListView):
+    model = CorrespondenceAction
+    template_name = 'correspondence/actions/action_list.html'
+    context_object_name = 'actions'
+
+    def get_queryset(self):
+        return CorrespondenceAction.objects.filter(
+            created_by=self.request.user
+        ).order_by('name')
+
+class CorrespondenceActionDetailView(LoginRequiredMixin, DetailView):
+    model = CorrespondenceAction
+    template_name = 'correspondence/actions/action_detail.html'
+    context_object_name = 'action'
+
+    def get_queryset(self):
+        return CorrespondenceAction.objects.filter(
+            created_by=self.request.user
+        )
+
+class CorrespondenceActionCreateView(LoginRequiredMixin, CreateView):
+    model = CorrespondenceAction
+    template_name = 'correspondence/actions/action_form.html'
+    fields = ['name', 'description']
+    success_url = reverse_lazy('correspondence:action_list')
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
+
+class CorrespondenceActionUpdateView(LoginRequiredMixin, UpdateView):
+    model = CorrespondenceAction
+    template_name = 'correspondence/actions/action_form.html'
+    fields = ['name', 'description']
+    success_url = reverse_lazy('correspondence:action_list')
+
+class CorrespondenceActionDeleteView(LoginRequiredMixin, DeleteView):
+    model = CorrespondenceAction
+    template_name = 'correspondence/actions/action_confirm_delete.html'
+    success_url = reverse_lazy('correspondence:action_list') 

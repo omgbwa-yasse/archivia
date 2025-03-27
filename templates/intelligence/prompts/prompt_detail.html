@@ -1,0 +1,111 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}{{ prompt.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ prompt.name }}</h3>
+                    <div class="card-tools">
+                        <a href="{% url 'intelligence:prompt_update' prompt.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{% url 'intelligence:prompt_delete' prompt.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Informations générales</h4>
+                            <table class="table">
+                                <tr>
+                                    <th>Nom</th>
+                                    <td>{{ prompt.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Description</th>
+                                    <td>{{ prompt.description|linebreaks }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Type</th>
+                                    <td>{{ prompt.get_prompt_type_display }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Modèle</th>
+                                    <td>{{ prompt.model.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Statut</th>
+                                    <td>
+                                        <span class="badge {% if prompt.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ prompt.is_active|yesno:"Actif,Inactif" }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Créé par</th>
+                                    <td>{{ prompt.created_by.get_full_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date de création</th>
+                                    <td>{{ prompt.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Contenu du prompt</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <pre class="bg-light p-3 rounded">{{ prompt.content }}</pre>
+                                </div>
+                            </div>
+                            <h4 class="mt-4">Paramètres</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <pre class="bg-light p-3 rounded">{{ prompt.parameters|default:"Aucun paramètre" }}</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h4>Historique d'utilisation</h4>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Utilisateur</th>
+                                            <th>Résultat</th>
+                                            <th>Durée</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for usage in prompt.usage_history.all %}
+                                        <tr>
+                                            <td>{{ usage.created_at|date:"d/m/Y H:i" }}</td>
+                                            <td>{{ usage.user.get_full_name }}</td>
+                                            <td>{{ usage.result|truncatewords:30 }}</td>
+                                            <td>{{ usage.duration }}s</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">Aucun historique d'utilisation.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

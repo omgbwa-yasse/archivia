@@ -1,0 +1,40 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}Supprimer la tâche{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Supprimer la tâche</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Attention</h4>
+                        <p>Êtes-vous sûr de vouloir supprimer la tâche "{{ task.name }}" ?</p>
+                        <p>Cette action est irréversible et supprimera également :</p>
+                        <ul>
+                            <li>Tous les commentaires associés à cette tâche</li>
+                            <li>Toutes les pièces jointes associées à cette tâche</li>
+                            <li>Toutes les dépendances avec d'autres tâches</li>
+                        </ul>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                            <a href="{% url 'tasks:task_detail' task.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

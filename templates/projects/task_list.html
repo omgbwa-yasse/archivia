@@ -1,0 +1,76 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}Tâches - {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Tâches - {{ project.name }}</h1>
+        <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouvelle tâche
+        </a>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Statut</th>
+                            <th>Priorité</th>
+                            <th>Assigné à</th>
+                            <th>Échéance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks %}
+                        <tr>
+                            <td>{{ task.title }}</td>
+                            <td>
+                                <span class="badge bg-{{ task.status|lower }}">{{ task.get_status_display }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ task.priority|lower }}">{{ task.get_priority_display }}</span>
+                            </td>
+                            <td>{{ task.assigned_to.get_full_name|default:task.assigned_to.username|default:"Non assigné" }}</td>
+                            <td>{{ task.due_date|date:"d/m/Y"|default:"-" }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'projects:task_detail' project.pk task.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'projects:task_edit' project.pk task.pk %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'projects:task_delete' project.pk task.pk %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucune tâche trouvée</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

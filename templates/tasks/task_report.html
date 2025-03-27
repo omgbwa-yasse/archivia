@@ -1,0 +1,110 @@
+{% extends "partials/base.html" %}
+
+{% block title %}Rapport des tâches{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Rapport des tâches</h1>
+    </div>
+
+    <div class="row">
+        <!-- Statistiques générales -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Statistiques générales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total des tâches</h5>
+                                    <p class="card-text display-4">{{ total_tasks }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Tâches terminées</h5>
+                                    <p class="card-text display-4">{{ completed_tasks }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Tâches en attente</h5>
+                                    <p class="card-text display-4">{{ pending_tasks }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Tâches en cours</h5>
+                                    <p class="card-text display-4">{{ in_progress_tasks }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques par priorité -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Statistiques par priorité</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Tâches urgentes
+                            <span class="badge bg-danger rounded-pill">{{ urgent_tasks }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Tâches de haute priorité
+                            <span class="badge bg-warning rounded-pill">{{ high_priority_tasks }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Tâches de priorité moyenne
+                            <span class="badge bg-info rounded-pill">{{ medium_priority_tasks }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Tâches de basse priorité
+                            <span class="badge bg-success rounded-pill">{{ low_priority_tasks }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques par utilisateur -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Statistiques par utilisateur</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for user in tasks_by_user %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ user.assigned_to__username|default:"Non assigné" }}
+                            <span class="badge bg-primary rounded-pill">{{ user.count }}</span>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item text-center">
+                            Aucune tâche assignée
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,54 @@
+<!-- Sidebar pour les outils -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h5 class="mb-0">Outils</h5>
+    </div>
+    <ul class="nav flex-column">
+        <!-- Communicabilité -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'communicability_list' %}active{% endif %}" href="{% url 'tools:communicability_list' %}">
+                <i class="fas fa-comments"></i> Communicabilité
+            </a>
+        </li>
+
+        <!-- Activité -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'activity_list' %}active{% endif %}" href="{% url 'tools:activity_list' %}">
+                <i class="fas fa-tasks"></i> Activité
+            </a>
+        </li>
+
+        <!-- Tri -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'sort_list' %}active{% endif %}" href="{% url 'tools:sort_list' %}">
+                <i class="fas fa-sort"></i> Tri
+            </a>
+        </li>
+
+        <!-- Conservation -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'retention_list' %}active{% endif %}" href="{% url 'tools:retention_list' %}">
+                <i class="fas fa-archive"></i> Conservation
+            </a>
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- Lois et réglementations -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'law_list' %}active{% endif %}" href="{% url 'tools:law_list' %}">
+                <i class="fas fa-gavel"></i> Lois
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'law_type_list' %}active{% endif %}" href="{% url 'tools:law_type_list' %}">
+                <i class="fas fa-tags"></i> Types de lois
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'law_article_list' %}active{% endif %}" href="{% url 'tools:law_article_list' %}">
+                <i class="fas fa-book"></i> Articles de loi
+            </a>
+        </li>
+    </ul>
+</div> 

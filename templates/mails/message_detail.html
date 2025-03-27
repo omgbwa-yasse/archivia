@@ -1,0 +1,92 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}{{ message.subject }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ message.subject }}</h3>
+                    <div class="card-tools">
+                        <div class="btn-group">
+                            <a href="{% url 'mails:message_reply' message.pk %}" class="btn btn-success">
+                                <i class="fas fa-reply"></i> Répondre
+                            </a>
+                            <a href="{% url 'mails:message_forward' message.pk %}" class="btn btn-info">
+                                <i class="fas fa-share"></i> Transférer
+                            </a>
+                            <a href="{% url 'mails:message_delete' message.pk %}" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table">
+                                <tr>
+                                    <th style="width: 120px">De</th>
+                                    <td>{{ message.sender.get_full_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>À</th>
+                                    <td>
+                                        {% for recipient in message.recipients.all %}
+                                            {{ recipient.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Date</th>
+                                    <td>{{ message.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-end">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-secondary">
+                                        <i class="fas fa-star"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary">
+                                        <i class="fas fa-flag"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="message-content">
+                                {{ message.content|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% if message.attachments.exists %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5>Pièces jointes</h5>
+                            <div class="list-group">
+                                {% for attachment in message.attachments.all %}
+                                <a href="{% url 'mails:download_attachment' attachment.pk %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-paperclip me-2"></i>
+                                    {{ attachment.filename }}
+                                    <small class="text-muted float-end">{{ attachment.size|filesizeformat }}</small>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

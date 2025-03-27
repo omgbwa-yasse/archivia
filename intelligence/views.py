@@ -50,13 +50,13 @@ def evaluation(request):
 # AI Agent Views
 class AIAgentListView(LoginRequiredMixin, ListView):
     model = AIAgent
-    template_name = 'intelligence/agent_list.html'
+    template_name = 'intelligence/agent/agent_list.html'
     context_object_name = 'agents'
 
 class AIAgentCreateView(LoginRequiredMixin, CreateView):
     model = AIAgent
     form_class = AIAgentForm
-    template_name = 'intelligence/agent_form.html'
+    template_name = 'intelligence/agent/agent_form.html'
     success_url = reverse_lazy('intelligence:agent_list')
 
     def form_valid(self, form):
@@ -65,13 +65,13 @@ class AIAgentCreateView(LoginRequiredMixin, CreateView):
 
 class AIAgentDetailView(LoginRequiredMixin, DetailView):
     model = AIAgent
-    template_name = 'intelligence/agent_detail.html'
+    template_name = 'intelligence/agent/agent_detail.html'
     context_object_name = 'agent'
 
 class AIAgentUpdateView(LoginRequiredMixin, UpdateView):
     model = AIAgent
     form_class = AIAgentForm
-    template_name = 'intelligence/agent_form.html'
+    template_name = 'intelligence/agent/agent_form.html'
     success_url = reverse_lazy('intelligence:agent_list')
 
     def form_valid(self, form):
@@ -80,19 +80,19 @@ class AIAgentUpdateView(LoginRequiredMixin, UpdateView):
 
 class AIAgentDeleteView(LoginRequiredMixin, DeleteView):
     model = AIAgent
-    template_name = 'intelligence/agent_confirm_delete.html'
+    template_name = 'intelligence/agent/agent_confirm_delete.html'
     success_url = reverse_lazy('intelligence:agent_list')
 
 # AI Model Views
 class AIModelListView(LoginRequiredMixin, ListView):
     model = AIModel
-    template_name = 'intelligence/model_list.html'
+    template_name = 'intelligence/model/model_list.html'
     context_object_name = 'models'
 
 class AIModelCreateView(LoginRequiredMixin, CreateView):
     model = AIModel
     form_class = AIModelForm
-    template_name = 'intelligence/model_form.html'
+    template_name = 'intelligence/model/model_form.html'
     success_url = reverse_lazy('intelligence:model_list')
 
     def form_valid(self, form):
@@ -101,13 +101,13 @@ class AIModelCreateView(LoginRequiredMixin, CreateView):
 
 class AIModelDetailView(LoginRequiredMixin, DetailView):
     model = AIModel
-    template_name = 'intelligence/model_detail.html'
+    template_name = 'intelligence/model/model_detail.html'
     context_object_name = 'model'
 
 class AIModelUpdateView(LoginRequiredMixin, UpdateView):
     model = AIModel
     form_class = AIModelForm
-    template_name = 'intelligence/model_form.html'
+    template_name = 'intelligence/model/model_form.html'
     success_url = reverse_lazy('intelligence:model_list')
 
     def form_valid(self, form):
@@ -116,19 +116,19 @@ class AIModelUpdateView(LoginRequiredMixin, UpdateView):
 
 class AIModelDeleteView(LoginRequiredMixin, DeleteView):
     model = AIModel
-    template_name = 'intelligence/model_confirm_delete.html'
+    template_name = 'intelligence/model/model_confirm_delete.html'
     success_url = reverse_lazy('intelligence:model_list')
 
 # AI Prompt Views
 class AIPromptListView(LoginRequiredMixin, ListView):
     model = AIPrompt
-    template_name = 'intelligence/prompt_list.html'
+    template_name = 'intelligence/prompt/prompt_list.html'
     context_object_name = 'prompts'
 
 class AIPromptCreateView(LoginRequiredMixin, CreateView):
     model = AIPrompt
     form_class = AIPromptForm
-    template_name = 'intelligence/prompt_form.html'
+    template_name = 'intelligence/prompt/prompt_form.html'
     success_url = reverse_lazy('intelligence:prompt_list')
 
     def form_valid(self, form):
@@ -137,13 +137,13 @@ class AIPromptCreateView(LoginRequiredMixin, CreateView):
 
 class AIPromptDetailView(LoginRequiredMixin, DetailView):
     model = AIPrompt
-    template_name = 'intelligence/prompt_detail.html'
+    template_name = 'intelligence/prompt/prompt_detail.html'
     context_object_name = 'prompt'
 
 class AIPromptUpdateView(LoginRequiredMixin, UpdateView):
     model = AIPrompt
     form_class = AIPromptForm
-    template_name = 'intelligence/prompt_form.html'
+    template_name = 'intelligence/prompt/prompt_form.html'
     success_url = reverse_lazy('intelligence:prompt_list')
 
     def form_valid(self, form):
@@ -152,12 +152,12 @@ class AIPromptUpdateView(LoginRequiredMixin, UpdateView):
 
 class AIPromptDeleteView(LoginRequiredMixin, DeleteView):
     model = AIPrompt
-    template_name = 'intelligence/prompt_confirm_delete.html'
+    template_name = 'intelligence/prompt/prompt_confirm_delete.html'
     success_url = reverse_lazy('intelligence:prompt_list')
 
 class AIPromptVersionListView(LoginRequiredMixin, ListView):
     model = AIPromptVersion
-    template_name = 'intelligence/prompt_version_list.html'
+    template_name = 'intelligence/prompt/prompt_versions.html'
     context_object_name = 'versions'
 
     def get_queryset(self):
@@ -166,7 +166,7 @@ class AIPromptVersionListView(LoginRequiredMixin, ListView):
 # AI Chat Views
 class AIChatListView(LoginRequiredMixin, ListView):
     model = AIChat
-    template_name = 'intelligence/chat_list.html'
+    template_name = 'intelligence/chat/chat_list.html'
     context_object_name = 'chats'
 
     def get_queryset(self):
@@ -175,7 +175,7 @@ class AIChatListView(LoginRequiredMixin, ListView):
 class AIChatCreateView(LoginRequiredMixin, CreateView):
     model = AIChat
     form_class = AIChatForm
-    template_name = 'intelligence/chat_form.html'
+    template_name = 'intelligence/chat/chat_form.html'
     success_url = reverse_lazy('intelligence:chat_list')
 
     def form_valid(self, form):
@@ -184,13 +184,13 @@ class AIChatCreateView(LoginRequiredMixin, CreateView):
 
 class AIChatDetailView(LoginRequiredMixin, DetailView):
     model = AIChat
-    template_name = 'intelligence/chat_detail.html'
+    template_name = 'intelligence/chat/chat_detail.html'
     context_object_name = 'chat'
 
 class AIChatUpdateView(LoginRequiredMixin, UpdateView):
     model = AIChat
     form_class = AIChatForm
-    template_name = 'intelligence/chat_form.html'
+    template_name = 'intelligence/chat/chat_form.html'
     success_url = reverse_lazy('intelligence:chat_list')
 
     def form_valid(self, form):
@@ -199,7 +199,7 @@ class AIChatUpdateView(LoginRequiredMixin, UpdateView):
 
 class AIChatDeleteView(LoginRequiredMixin, DeleteView):
     model = AIChat
-    template_name = 'intelligence/chat_confirm_delete.html'
+    template_name = 'intelligence/chat/chat_confirm_delete.html'
     success_url = reverse_lazy('intelligence:chat_list')
 
 @require_POST
@@ -212,7 +212,7 @@ def chat_archive(request, pk):
 
 class AIChatMessageListView(LoginRequiredMixin, ListView):
     model = AIChatMessage
-    template_name = 'intelligence/chat_message_list.html'
+    template_name = 'intelligence/chat/chat_message_list.html'
     context_object_name = 'messages'
 
     def get_queryset(self):
@@ -220,7 +220,7 @@ class AIChatMessageListView(LoginRequiredMixin, ListView):
 
 class AIChatMessageCreateView(LoginRequiredMixin, CreateView):
     model = AIChatMessage
-    template_name = 'intelligence/chat_message_form.html'
+    template_name = 'intelligence/chat/chat_message_form.html'
     fields = ['content']
     success_url = reverse_lazy('intelligence:chat_detail')
 
@@ -232,13 +232,13 @@ class AIChatMessageCreateView(LoginRequiredMixin, CreateView):
 # AI Tool Views
 class AIToolListView(LoginRequiredMixin, ListView):
     model = AITool
-    template_name = 'intelligence/tool_list.html'
+    template_name = 'intelligence/tool/tool_list.html'
     context_object_name = 'tools'
 
 class AIToolCreateView(LoginRequiredMixin, CreateView):
     model = AITool
     form_class = AIToolForm
-    template_name = 'intelligence/tool_form.html'
+    template_name = 'intelligence/tool/tool_form.html'
     success_url = reverse_lazy('intelligence:tool_list')
 
     def form_valid(self, form):
@@ -247,13 +247,13 @@ class AIToolCreateView(LoginRequiredMixin, CreateView):
 
 class AIToolDetailView(LoginRequiredMixin, DetailView):
     model = AITool
-    template_name = 'intelligence/tool_detail.html'
+    template_name = 'intelligence/tool/tool_detail.html'
     context_object_name = 'tool'
 
 class AIToolUpdateView(LoginRequiredMixin, UpdateView):
     model = AITool
     form_class = AIToolForm
-    template_name = 'intelligence/tool_form.html'
+    template_name = 'intelligence/tool/tool_form.html'
     success_url = reverse_lazy('intelligence:tool_list')
 
     def form_valid(self, form):
@@ -262,13 +262,13 @@ class AIToolUpdateView(LoginRequiredMixin, UpdateView):
 
 class AIToolDeleteView(LoginRequiredMixin, DeleteView):
     model = AITool
-    template_name = 'intelligence/tool_confirm_delete.html'
+    template_name = 'intelligence/tool/tool_confirm_delete.html'
     success_url = reverse_lazy('intelligence:tool_list')
 
 # AI Task Views
 class AITaskListView(LoginRequiredMixin, ListView):
     model = AITask
-    template_name = 'intelligence/task_list.html'
+    template_name = 'intelligence/task/task_list.html'
     context_object_name = 'tasks'
 
     def get_queryset(self):
@@ -277,7 +277,7 @@ class AITaskListView(LoginRequiredMixin, ListView):
 class AITaskCreateView(LoginRequiredMixin, CreateView):
     model = AITask
     form_class = AITaskForm
-    template_name = 'intelligence/task_form.html'
+    template_name = 'intelligence/task/task_form.html'
     success_url = reverse_lazy('intelligence:task_list')
 
     def form_valid(self, form):
@@ -286,19 +286,39 @@ class AITaskCreateView(LoginRequiredMixin, CreateView):
 
 class AITaskDetailView(LoginRequiredMixin, DetailView):
     model = AITask
-    template_name = 'intelligence/task_detail.html'
+    template_name = 'intelligence/task/task_detail.html'
     context_object_name = 'task'
 
 class AITaskUpdateView(LoginRequiredMixin, UpdateView):
     model = AITask
     form_class = AITaskForm
-    template_name = 'intelligence/task_form.html'
+    template_name = 'intelligence/task/task_form.html'
     success_url = reverse_lazy('intelligence:task_list')
+
+    def form_valid(self, form):
+        form.instance.updated_by = self.request.user
+        return super().form_valid(form)
 
 class AITaskDeleteView(LoginRequiredMixin, DeleteView):
     model = AITask
-    template_name = 'intelligence/task_confirm_delete.html'
+    template_name = 'intelligence/task/task_confirm_delete.html'
     success_url = reverse_lazy('intelligence:task_list')
+
+class AITaskResourceListView(LoginRequiredMixin, ListView):
+    model = AITaskResource
+    template_name = 'intelligence/task/task_resource_list.html'
+    context_object_name = 'resources'
+
+    def get_queryset(self):
+        return AITaskResource.objects.filter(task_id=self.kwargs['pk'])
+
+class AITaskLogListView(LoginRequiredMixin, ListView):
+    model = AITaskLog
+    template_name = 'intelligence/task/task_log_list.html'
+    context_object_name = 'logs'
+
+    def get_queryset(self):
+        return AITaskLog.objects.filter(task_id=self.kwargs['pk'])
 
 @require_POST
 def task_start(request, pk):

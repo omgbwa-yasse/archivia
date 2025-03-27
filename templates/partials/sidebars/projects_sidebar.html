@@ -1,0 +1,18 @@
+<!-- Sidebar pour la gestion des projets -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h5 class="mb-0">Gestion des projets</h5>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.namespace == 'projects' %}active{% endif %}" href="{% url 'projects:project_list' %}">
+                <i class="fas fa-project-diagram"></i> Projets
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.namespace == 'tasks' %}active{% endif %}" href="{% url 'tasks:task_list' %}">
+                <i class="fas fa-tasks"></i> Tâches
+            </a>
+        </li>
+    </ul>
+</div> 

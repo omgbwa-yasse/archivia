@@ -1,0 +1,89 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Versions du prompt : {{ prompt.name }}</h1>
+        <a href="{% url 'intelligence:prompt_detail' prompt.pk %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au prompt
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>Contenu</th>
+                            <th>Variables</th>
+                            <th>Modifié par</th>
+                            <th>Date de modification</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for version in versions %}
+                        <tr>
+                            <td>{{ version.version_number }}</td>
+                            <td>
+                                <pre class="mb-0"><code>{{ version.content }}</code></pre>
+                            </td>
+                            <td>
+                                {% if version.variables %}
+                                <pre class="mb-0"><code>{{ version.variables|pprint }}</code></pre>
+                                {% else %}
+                                <em>Aucune variable</em>
+                                {% endif %}
+                            </td>
+                            <td>{{ version.updated_by|default:version.created_by }}</td>
+                            <td>{{ version.created_at|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary restore-version" data-version="{{ version.pk }}">
+                                    <i class="fas fa-history"></i> Restaurer
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucune version trouvée</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.restore-version').forEach(button => {
+    button.addEventListener('click', async (e) => {
+        if (confirm('Êtes-vous sûr de vouloir restaurer cette version ?')) {
+            const versionId = e.target.dataset.version;
+            try {
+                const response = await fetch(`/intelligence/prompts/{{ prompt.pk }}/versions/${versionId}/restore/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                });
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Une erreur est survenue lors de la restauration de la version');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors de la restauration de la version');
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% endblock %} 

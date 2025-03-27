@@ -1,0 +1,144 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}{{ task.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{{ task.name }}</h3>
+                    <div class="card-tools">
+                        <a href="{% url 'tasks:task_update' task.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{% url 'tasks:task_delete' task.pk %}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Informations générales</h4>
+                            <table class="table">
+                                <tr>
+                                    <th>Description</th>
+                                    <td>{{ task.description|linebreaks }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Statut</th>
+                                    <td>
+                                        <span class="badge {% if task.status == 'completed' %}bg-success{% elif task.status == 'in_progress' %}bg-primary{% elif task.status == 'on_hold' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                            {{ task.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Priorité</th>
+                                    <td>
+                                        <span class="badge {% if task.priority == 'high' %}bg-danger{% elif task.priority == 'medium' %}bg-warning{% else %}bg-info{% endif %}">
+                                            {{ task.get_priority_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Assigné à</th>
+                                    <td>{{ task.assigned_to.get_full_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date d'échéance</th>
+                                    <td>{{ task.due_date|date:"d/m/Y" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Progression</th>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ task.progress }}%">
+                                                {{ task.progress }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Commentaires</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    {% for comment in task.comments.all %}
+                                    <div class="comment mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ comment.user.get_full_name }}</strong>
+                                                <small class="text-muted ms-2">{{ comment.created_at|date:"d/m/Y H:i" }}</small>
+                                            </div>
+                                            <div class="btn-group">
+                                                <a href="{% url 'tasks:comment_update' task.pk comment.pk %}" class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'tasks:comment_delete' task.pk comment.pk %}" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <p class="mb-0 mt-2">{{ comment.content|linebreaks }}</p>
+                                    </div>
+                                    {% empty %}
+                                    <p class="text-center text-muted">Aucun commentaire.</p>
+                                    {% endfor %}
+                                    <a href="{% url 'tasks:comment_create' task.pk %}" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> Ajouter un commentaire
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if task.attachments.exists %}
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h4>Pièces jointes</h4>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom du fichier</th>
+                                            <th>Taille</th>
+                                            <th>Type</th>
+                                            <th>Date d'ajout</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for attachment in task.attachments.all %}
+                                        <tr>
+                                            <td>{{ attachment.filename }}</td>
+                                            <td>{{ attachment.size|filesizeformat }}</td>
+                                            <td>{{ attachment.file_type }}</td>
+                                            <td>{{ attachment.created_at|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <a href="{% url 'tasks:download_attachment' task.pk attachment.pk %}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                <a href="{% url 'tasks:delete_attachment' task.pk attachment.pk %}" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <a href="{% url 'tasks:upload_attachment' task.pk %}" class="btn btn-success">
+                                <i class="fas fa-upload"></i> Ajouter une pièce jointe
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,95 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}Supprimer le prompt {{ prompt.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Confirmation de suppression</h5>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer le prompt <strong>{{ prompt.name }}</strong> ?</p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Cette action est irréversible. Toutes les données associées à ce prompt seront définitivement supprimées.
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">Informations du prompt</h6>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3">Type</dt>
+                                <dd class="col-sm-9">{{ prompt.get_type_display }}</dd>
+
+                                <dt class="col-sm-3">Catégorie</dt>
+                                <dd class="col-sm-9">{{ prompt.category }}</dd>
+
+                                <dt class="col-sm-3">Version</dt>
+                                <dd class="col-sm-9">{{ prompt.version }}</dd>
+
+                                <dt class="col-sm-3">Statut</dt>
+                                <dd class="col-sm-9">
+                                    <span class="badge {% if prompt.status == 'ACTIVE' %}bg-success{% elif prompt.status == 'INACTIVE' %}bg-secondary{% else %}bg-warning{% endif %}">
+                                        {{ prompt.get_status_display }}
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-3">Description</dt>
+                                <dd class="col-sm-9">{{ prompt.description|default:"Aucune description" }}</dd>
+
+                                <dt class="col-sm-3">Variables</dt>
+                                <dd class="col-sm-9">
+                                    {% for var in prompt.variables %}
+                                    <span class="badge bg-info me-1">{{ var }}</span>
+                                    {% empty %}
+                                    <span class="text-muted">Aucune variable</span>
+                                    {% endfor %}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Attention :</strong> La suppression de ce prompt affectera tous les agents qui l'utilisent. Assurez-vous de mettre à jour ou de supprimer ces agents avant de procéder.
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">Agents utilisant ce prompt</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                {% for agent in prompt.agents.all %}
+                                <a href="{% url 'intelligence:agent_detail' agent.pk %}" class="list-group-item list-group-item-action">
+                                    {{ agent.name }}
+                                </a>
+                                {% empty %}
+                                <div class="text-center text-muted">Aucun agent n'utilise ce prompt</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'intelligence:prompt_detail' prompt.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Supprimer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

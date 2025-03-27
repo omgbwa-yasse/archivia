@@ -1,0 +1,166 @@
+{% extends "records/base.html" %}
+
+{% block page_title %}Dossiers{% endblock %}
+
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <button type="button" class="btn btn-primary" onclick="createFolder()">
+        <i class="fas fa-folder-plus"></i> Nouveau dossier
+    </button>
+</div>
+{% endblock %}
+
+{% block records_content %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Documents</th>
+                <th>Créé par</th>
+                <th>Date de création</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for folder in folders %}
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-folder text-warning me-2"></i>
+                        {{ folder.name }}
+                    </div>
+                </td>
+                <td>{{ folder.description|truncatewords:20 }}</td>
+                <td>
+                    <span class="badge bg-info">{{ folder.documents.count }}</span>
+                </td>
+                <td>{{ folder.created_by.get_full_name }}</td>
+                <td>{{ folder.created_at|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'records:folder_detail' folder.id %}" class="btn btn-sm btn-outline-primary" title="Voir">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editFolder('{{ folder.id }}')" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteFolder('{{ folder.id }}')" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-5">
+                    <i class="fas fa-folder fa-3x text-muted mb-3"></i>
+                    <h5>Aucun dossier</h5>
+                    <p class="text-muted">Commencez par créer un nouveau dossier</p>
+                    <button class="btn btn-primary" onclick="createFolder()">
+                        <i class="fas fa-folder-plus"></i> Nouveau dossier
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if folders.has_other_pages %}
+<nav aria-label="Navigation des dossiers" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if folders.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ folders.previous_page_number }}">Précédent</a>
+        </li>
+        {% endif %}
+
+        {% for num in folders.paginator.page_range %}
+        <li class="page-item {% if folders.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+
+        {% if folders.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ folders.next_page_number }}">Suivant</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentFolderId = null;
+
+function editFolder(folderId) {
+    currentFolderId = folderId;
+    fetch(`/folders/api/folders/${folderId}/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('folderName').value = data.name;
+            document.getElementById('folderDescription').value = data.description;
+            document.getElementById('folderModalTitle').textContent = 'Modifier le dossier';
+            new bootstrap.Modal(document.getElementById('folderModal')).show();
+        });
+}
+
+function saveFolder() {
+    const formData = new FormData(document.getElementById('folderForm'));
+    const method = currentFolderId ? 'PUT' : 'POST';
+    const url = currentFolderId ? `/folders/api/folders/${currentFolderId}/` : '/folders/api/folders/';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            window.location.reload();
+        } else {
+            alert('Une erreur est survenue');
+        }
+    })
+    .catch(error => {
+        alert('Une erreur est survenue');
+    });
+}
+
+function deleteFolder(folderId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce dossier ?')) {
+        fetch(`/folders/api/folders/${folderId}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Une erreur est survenue');
+            }
+        })
+        .catch(error => {
+            alert('Une erreur est survenue');
+        });
+    }
+}
+
+// Réinitialiser le formulaire quand le modal est fermé
+document.getElementById('folderModal').addEventListener('hidden.bs.modal', function () {
+    currentFolderId = null;
+    document.getElementById('folderForm').reset();
+    document.getElementById('folderModalTitle').textContent = 'Nouveau dossier';
+});
+</script>
+{% endblock %} 

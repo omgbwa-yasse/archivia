@@ -1,0 +1,35 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}Supprimer le prompt{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Supprimer le prompt</h3>
+                </div>
+                <div class="card-body">
+                    <p>Êtes-vous sûr de vouloir supprimer le prompt "{{ prompt.name }}" ?</p>
+                    <p>Cette action supprimera également :</p>
+                    <ul>
+                        <li>Tout l'historique d'utilisation associé</li>
+                        <li>Toutes les configurations qui utilisent ce prompt</li>
+                    </ul>
+                    <p class="text-danger">Cette action est irréversible.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                        <a href="{% url 'intelligence:prompt_detail' prompt.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Annuler
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

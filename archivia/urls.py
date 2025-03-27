@@ -19,11 +19,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect, render
 
-def redirect_to_login(request):
-    return redirect('users:login')
+def redirect_to_documents(request):
+    return redirect('records:document_list')
 
 urlpatterns = [
-    path('', redirect_to_login, name='home'),
+    path('', redirect_to_documents, name='home'),
     path('admin/', admin.site.urls),
     path('accounts/', include('users.urls')),  # Toutes les URLs (pages web et API) avec le préfixe accounts/
     path('records/', include('records.urls')),  # URLs pour le module records (folders et documents)

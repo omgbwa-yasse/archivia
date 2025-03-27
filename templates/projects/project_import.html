@@ -1,0 +1,71 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}Importer des projets{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Importer des projets</h1>
+        <a href="{% url 'projects:project_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Importer depuis un fichier CSV</h5>
+                    <p class="card-text">
+                        Sélectionnez un fichier CSV contenant les projets à importer.
+                        Le fichier doit contenir les colonnes suivantes :
+                    </p>
+                    <ul>
+                        <li><strong>name</strong> (obligatoire) : Nom du projet</li>
+                        <li><strong>description</strong> (optionnel) : Description du projet</li>
+                        <li><strong>status</strong> (optionnel) : Statut du projet (ACTIVE, COMPLETED, ON_HOLD)</li>
+                    </ul>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="csv_file" class="form-label">Fichier CSV</label>
+                            <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-file-import"></i> Importer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Exemple de format CSV</h5>
+                    <p class="card-text">
+                        Voici un exemple de format CSV valide :
+                    </p>
+                    <pre class="bg-light p-3 rounded">
+name,description,status
+Projet A,Description du projet A,ACTIVE
+Projet B,Description du projet B,ON_HOLD
+Projet C,Description du projet C,COMPLETED</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

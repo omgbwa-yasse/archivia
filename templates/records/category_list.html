@@ -1,0 +1,52 @@
+{% extends "records/base.html" %}
+
+{% block page_title %}Catégories{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'records:category_create' %}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Nouvelle catégorie
+</a>
+{% endblock %}
+
+{% block records_content %}
+{% if categories %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>{{ category.name }}</td>
+                        <td>{{ category.description|truncatewords:30 }}</td>
+                        <td>
+                            <a href="{% url 'records:category_detail' category.pk %}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'records:category_update' category.pk %}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'records:category_delete' category.pk %}" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    Aucune catégorie n'a été créée pour le moment.
+</div>
+{% endif %}
+{% endblock %} 

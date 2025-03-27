@@ -1,0 +1,109 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}Boîte de réception{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Boîte de réception</h3>
+                    <div class="card-tools">
+                        <a href="{% url 'mails:compose' %}" class="btn btn-primary">
+                            <i class="fas fa-pen"></i> Nouveau message
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px">
+                                        <input type="checkbox" id="select-all">
+                                    </th>
+                                    <th style="width: 40px"></th>
+                                    <th>Expéditeur</th>
+                                    <th>Objet</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for message in messages %}
+                                <tr {% if not message.is_read %}class="fw-bold"{% endif %}>
+                                    <td>
+                                        <input type="checkbox" class="message-checkbox" value="{{ message.id }}">
+                                    </td>
+                                    <td>
+                                        {% if message.has_attachments %}
+                                            <i class="fas fa-paperclip text-muted"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ message.sender.get_full_name }}</td>
+                                    <td>
+                                        <a href="{% url 'mails:message_detail' message.pk %}" class="text-decoration-none">
+                                            {{ message.subject }}
+                                        </a>
+                                    </td>
+                                    <td>{{ message.created_at|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{% url 'mails:message_detail' message.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'mails:message_reply' message.pk %}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-reply"></i>
+                                            </a>
+                                            <a href="{% url 'mails:message_delete' message.pk %}" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">Aucun message dans la boîte de réception.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if messages.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-3">
+                        <ul class="pagination justify-content-center">
+                            {% if messages.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ messages.previous_page_number }}">Précédent</a>
+                            </li>
+                            {% endif %}
+                            {% for num in messages.paginator.page_range %}
+                            <li class="page-item {% if messages.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                            {% endfor %}
+                            {% if messages.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ messages.next_page_number }}">Suivant</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#select-all').change(function() {
+            $('.message-checkbox').prop('checked', $(this).prop('checked'));
+        });
+    });
+</script>
+{% endblock %} 

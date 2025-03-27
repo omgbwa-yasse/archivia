@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Archivia{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        .module-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0.5rem 1rem;
+        }
+
+        .module-nav .nav-link {
+            color: #495057;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .module-nav .nav-link:hover {
+            background-color: #e9ecef;
+            color: #212529;
+        }
+
+        .module-nav .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .module-nav .nav-link i {
+            margin-right: 0.5rem;
+        }
+
+        .main-content {
+            margin-top: 4rem;
+            padding: 0.5rem;
+        }
+
+        .module-content {
+            margin-top: 0.5rem;
+        }
+
+        /* Styles pour les sidebars */
+        .sidebar {
+            position: fixed;
+            top: 4rem;
+            left: 0;
+            bottom: 0;
+            width: 250px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 0.5rem;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar .nav-link {
+            color: #495057;
+            padding: 0.35rem 0.75rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #e9ecef;
+            color: #212529;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        /* Ajustement du contenu principal quand la sidebar est visible */
+        .content-with-sidebar {
+            margin-left: 250px;
+            padding-left: 0.5rem;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation entre les modules -->
+    <nav class="module-nav">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center">
+                <ul class="nav nav-pills">
+                    <!-- Gestion documentaire -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'records' %}active{% endif %}" href="{% url 'records:folder_list' %}">
+                            <i class="fas fa-file-alt"></i> Gestion documentaire
+                        </a>
+                    </li>
+
+                    <!-- Messagerie -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'mails' %}active{% endif %}" href="{% url 'mails:inbox' %}">
+                            <i class="fas fa-envelope"></i> Messagerie
+                        </a>
+                    </li>
+
+                    <!-- Correspondance -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'correspondence' %}active{% endif %}" href="{% url 'correspondence:list' %}">
+                            <i class="fas fa-mail-bulk"></i> Correspondance
+                        </a>
+                    </li>
+
+                    <!-- Projets -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'projects' %}active{% endif %}" href="{% url 'projects:project_list' %}">
+                            <i class="fas fa-project-diagram"></i> Projets
+                        </a>
+                    </li>
+
+                    <!-- Tâches -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'tasks' %}active{% endif %}" href="{% url 'tasks:task_list' %}">
+                            <i class="fas fa-tasks"></i> Tâches
+                        </a>
+                    </li>
+
+                    <!-- Espaces de travail -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'workspace' %}active{% endif %}" href="{% url 'workspace:workspace_list' %}">
+                            <i class="fas fa-desktop"></i> Espace de travail
+                        </a>
+                    </li>
+
+                    <!-- Outils -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'tools' %}active{% endif %}" href="{% url 'tools:communicability_list' %}">
+                            <i class="fas fa-tools"></i> Outils
+                        </a>
+                    </li>
+
+                    <!-- Intelligence -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.namespace == 'intelligence' %}active{% endif %}" href="{% url 'intelligence:dashboard' %}">
+                            <i class="fas fa-brain"></i> Intelligence
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{ request.user.get_full_name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'users:profile' %}">Profil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'users:settings' %}">Paramètres</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'users:logout' %}">Déconnexion</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebars conditionnelles -->
+    {% if request.resolver_match.namespace == 'records' %}
+        {% include 'partials/sidebars/records_sidebar.html' %}
+    {% elif request.resolver_match.namespace == 'mails' %}
+        {% include 'partials/sidebars/mails_sidebar.html' %}
+    {% elif request.resolver_match.namespace in 'projects,tasks' %}
+        {% include 'partials/sidebars/projects_sidebar.html' %}
+    {% elif request.resolver_match.namespace in 'tools,intelligence' %}
+        {% include 'partials/sidebars/tools_sidebar.html' %}
+    {% elif request.resolver_match.namespace == 'correspondence' %}
+        {% include 'partials/sidebars/correspondence_sidebar.html' %}
+    {% elif request.resolver_match.namespace == 'workspace' %}
+        {% include 'partials/sidebars/workspace_sidebar.html' %}
+    {% endif %}
+
+    <!-- Contenu principal -->
+    <div class="main-content {% if request.resolver_match.namespace in 'records,mails,projects,tasks,tools,intelligence,correspondence,workspace' %}content-with-sidebar{% endif %}">
+        <div class="container-fluid">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

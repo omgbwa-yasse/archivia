@@ -1,0 +1,33 @@
+<!-- Sidebar pour la messagerie -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h5 class="mb-0">Messagerie</h5>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'inbox' %}active{% endif %}" href="{% url 'mails:inbox' %}">
+                <i class="fas fa-inbox"></i> Boîte de réception
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'sent' %}active{% endif %}" href="{% url 'mails:sent' %}">
+                <i class="fas fa-paper-plane"></i> Envoyés
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'drafts' %}active{% endif %}" href="{% url 'mails:drafts' %}">
+                <i class="fas fa-file-alt"></i> Brouillons
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'important' %}active{% endif %}" href="{% url 'mails:important' %}">
+                <i class="fas fa-exclamation-circle"></i> Importants
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'compose' %}active{% endif %}" href="{% url 'mails:compose' %}">
+                <i class="fas fa-pen"></i> Nouveau message
+            </a>
+        </li>
+    </ul>
+</div> 

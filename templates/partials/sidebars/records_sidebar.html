@@ -1,0 +1,33 @@
+<!-- Sidebar pour la gestion documentaire -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h5 class="mb-0">Gestion documentaire</h5>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'folder_list' %}active{% endif %}" href="{% url 'records:folder_list' %}">
+                <i class="fas fa-folder"></i> Records
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'document_list' %}active{% endif %}" href="{% url 'records:document_list' %}">
+                <i class="fas fa-file"></i> Documents
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'recent_documents' %}active{% endif %}" href="{% url 'records:recent_documents' %}">
+                <i class="fas fa-clock"></i> Documents récents
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'favorite_documents' %}active{% endif %}" href="{% url 'records:favorite_documents' %}">
+                <i class="fas fa-star"></i> Favoris
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'trash' %}active{% endif %}" href="{% url 'records:trash' %}">
+                <i class="fas fa-trash"></i> Corbeille
+            </a>
+        </li>
+    </ul>
+</div> 

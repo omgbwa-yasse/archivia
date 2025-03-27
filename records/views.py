@@ -28,7 +28,7 @@ import csv
 # Vues pour les templates
 class FolderListView(LoginRequiredMixin, ListView):
     model = Folder
-    template_name = 'records/folder_list.html'
+    template_name = 'records/folders/folder_list.html'
     context_object_name = 'folders'
     
     def get_queryset(self):
@@ -36,12 +36,12 @@ class FolderListView(LoginRequiredMixin, ListView):
 
 class FolderDetailView(LoginRequiredMixin, DetailView):
     model = Folder
-    template_name = 'records/folder_detail.html'
+    template_name = 'records/folders/folder_detail.html'
     context_object_name = 'folder'
 
 class FolderCreateView(LoginRequiredMixin, CreateView):
     model = Folder
-    template_name = 'records/folder_form.html'
+    template_name = 'records/folders/folder_form.html'
     fields = ['name', 'description', 'parent']
     success_url = reverse_lazy('records:folder_list')
 
@@ -51,7 +51,7 @@ class FolderCreateView(LoginRequiredMixin, CreateView):
 
 class FolderUpdateView(LoginRequiredMixin, UpdateView):
     model = Folder
-    template_name = 'records/folder_form.html'
+    template_name = 'records/folders/folder_form.html'
     fields = ['name', 'description', 'parent']
     success_url = reverse_lazy('records:folder_list')
 
@@ -61,7 +61,7 @@ class FolderUpdateView(LoginRequiredMixin, UpdateView):
 
 class FolderDeleteView(LoginRequiredMixin, DeleteView):
     model = Folder
-    template_name = 'records/folder_confirm_delete.html'
+    template_name = 'records/folders/folder_confirm_delete.html'
     success_url = reverse_lazy('records:folder_list')
 
     def delete(self, request, *args, **kwargs):
@@ -77,11 +77,11 @@ class FolderRestoreView(LoginRequiredMixin, View):
 
 class DocumentListView(LoginRequiredMixin, ListView):
     model = Document
-    template_name = 'records/document_list.html'
+    template_name = 'records/documents/document_list.html'
     context_object_name = 'documents'
 
 class DocumentImportView(LoginRequiredMixin, View):
-    template_name = 'records/document_import.html'
+    template_name = 'records/documents/document_import.html'
 
     def get(self, request):
         folders = Folder.objects.filter(deleted_at__isnull=True)
@@ -110,7 +110,7 @@ class DocumentImportView(LoginRequiredMixin, View):
 
 class DocumentDetailView(LoginRequiredMixin, DetailView):
     model = Document
-    template_name = 'records/document_detail.html'
+    template_name = 'records/documents/document_detail.html'
     context_object_name = 'document'
 
     def get(self, request, *args, **kwargs):
@@ -126,7 +126,7 @@ class DocumentDetailView(LoginRequiredMixin, DetailView):
 
 class DocumentCreateView(LoginRequiredMixin, CreateView):
     model = Document
-    template_name = 'records/document_form.html'
+    template_name = 'records/documents/document_form.html'
     fields = ['name', 'description', 'file', 'folder']
     success_url = reverse_lazy('records:document_list')
 
@@ -136,7 +136,7 @@ class DocumentCreateView(LoginRequiredMixin, CreateView):
 
 class DocumentUpdateView(LoginRequiredMixin, UpdateView):
     model = Document
-    template_name = 'records/document_form.html'
+    template_name = 'records/documents/document_form.html'
     fields = ['name', 'description', 'file', 'folder']
     success_url = reverse_lazy('records:document_list')
 
@@ -146,7 +146,7 @@ class DocumentUpdateView(LoginRequiredMixin, UpdateView):
 
 class DocumentDeleteView(LoginRequiredMixin, DeleteView):
     model = Document
-    template_name = 'records/document_confirm_delete.html'
+    template_name = 'records/documents/document_confirm_delete.html'
     success_url = reverse_lazy('records:document_list')
 
 class DocumentDownloadView(LoginRequiredMixin, View):
@@ -158,12 +158,12 @@ class DocumentDownloadView(LoginRequiredMixin, View):
 
 class MetadataDefinitionListView(LoginRequiredMixin, ListView):
     model = MetadataDefinition
-    template_name = 'records/metadata_definition_list.html'
+    template_name = 'records/metadata/metadata_definition_list.html'
     context_object_name = 'metadata_definitions'
 
 class MetadataDefinitionCreateView(LoginRequiredMixin, CreateView):
     model = MetadataDefinition
-    template_name = 'records/metadata_definition_form.html'
+    template_name = 'records/metadata/metadata_definition_form.html'
     fields = ['name', 'description', 'field_type', 'is_required', 'reference_list']
     success_url = reverse_lazy('records:metadata_definition_list')
 
@@ -173,12 +173,12 @@ class MetadataDefinitionCreateView(LoginRequiredMixin, CreateView):
 
 class MetadataDefinitionDetailView(LoginRequiredMixin, DetailView):
     model = MetadataDefinition
-    template_name = 'records/metadata_definition_detail.html'
+    template_name = 'records/metadata/metadata_definition_detail.html'
     context_object_name = 'metadata_definition'
 
 class MetadataDefinitionUpdateView(LoginRequiredMixin, UpdateView):
     model = MetadataDefinition
-    template_name = 'records/metadata_definition_form.html'
+    template_name = 'records/metadata/metadata_definition_form.html'
     fields = ['name', 'description', 'field_type', 'is_required', 'reference_list']
     success_url = reverse_lazy('records:metadata_definition_list')
 
@@ -188,7 +188,7 @@ class MetadataDefinitionUpdateView(LoginRequiredMixin, UpdateView):
 
 class MetadataDefinitionDeleteView(LoginRequiredMixin, DeleteView):
     model = MetadataDefinition
-    template_name = 'records/metadata_definition_confirm_delete.html'
+    template_name = 'records/metadata/metadata_definition_confirm_delete.html'
     success_url = reverse_lazy('records:metadata_definition_list')
 
     def delete(self, request, *args, **kwargs):
@@ -198,12 +198,12 @@ class MetadataDefinitionDeleteView(LoginRequiredMixin, DeleteView):
 
 class ReferenceListListView(LoginRequiredMixin, ListView):
     model = ReferenceList
-    template_name = 'records/reference_list_list.html'
+    template_name = 'records/references/reference_list_list.html'
     context_object_name = 'reference_lists'
 
 class ReferenceListCreateView(LoginRequiredMixin, CreateView):
     model = ReferenceList
-    template_name = 'records/reference_list_form.html'
+    template_name = 'records/references/reference_list_form.html'
     fields = ['name', 'description']
     success_url = reverse_lazy('records:reference_list_list')
 
@@ -213,12 +213,12 @@ class ReferenceListCreateView(LoginRequiredMixin, CreateView):
 
 class ReferenceListDetailView(LoginRequiredMixin, DetailView):
     model = ReferenceList
-    template_name = 'records/reference_list_detail.html'
+    template_name = 'records/references/reference_list_detail.html'
     context_object_name = 'reference_list'
 
 class ReferenceListUpdateView(LoginRequiredMixin, UpdateView):
     model = ReferenceList
-    template_name = 'records/reference_list_form.html'
+    template_name = 'records/references/reference_list_form.html'
     fields = ['name', 'description']
     success_url = reverse_lazy('records:reference_list_list')
 
@@ -228,7 +228,7 @@ class ReferenceListUpdateView(LoginRequiredMixin, UpdateView):
 
 class ReferenceListDeleteView(LoginRequiredMixin, DeleteView):
     model = ReferenceList
-    template_name = 'records/reference_list_confirm_delete.html'
+    template_name = 'records/references/reference_list_confirm_delete.html'
     success_url = reverse_lazy('records:reference_list_list')
 
     def delete(self, request, *args, **kwargs):
@@ -238,7 +238,7 @@ class ReferenceListDeleteView(LoginRequiredMixin, DeleteView):
 
 class ReferenceValueCreateView(LoginRequiredMixin, CreateView):
     model = ReferenceValue
-    template_name = 'records/reference_value_form.html'
+    template_name = 'records/references/reference_value_form.html'
     fields = ['value', 'description']
     success_url = reverse_lazy('records:reference_list_list')
 
@@ -249,7 +249,7 @@ class ReferenceValueCreateView(LoginRequiredMixin, CreateView):
 
 class ReferenceValueUpdateView(LoginRequiredMixin, UpdateView):
     model = ReferenceValue
-    template_name = 'records/reference_value_form.html'
+    template_name = 'records/references/reference_value_form.html'
     fields = ['value', 'description']
     success_url = reverse_lazy('records:reference_list_list')
 
@@ -259,7 +259,7 @@ class ReferenceValueUpdateView(LoginRequiredMixin, UpdateView):
 
 class ReferenceValueDeleteView(LoginRequiredMixin, DeleteView):
     model = ReferenceValue
-    template_name = 'records/reference_value_confirm_delete.html'
+    template_name = 'records/references/reference_value_confirm_delete.html'
     success_url = reverse_lazy('records:reference_list_list')
 
     def delete(self, request, *args, **kwargs):
@@ -379,19 +379,21 @@ class FolderTreeView(generics.RetrieveAPIView):
         return data
 
 class TrashView(LoginRequiredMixin, View):
-    template_name = 'records/trash.html'
+    template_name = 'records/trash/trash.html'
 
     def get(self, request):
         deleted_folders = Folder.objects.filter(deleted_at__isnull=False)
         deleted_documents = Document.objects.filter(deleted_at__isnull=False)
+        deleted_categories = Category.objects.filter(deleted_at__isnull=False)
         deleted_metadata = MetadataDefinition.objects.filter(deleted_at__isnull=False)
-        deleted_reference_lists = ReferenceList.objects.filter(deleted_at__isnull=False)
+        deleted_references = ReferenceList.objects.filter(deleted_at__isnull=False)
         
         context = {
             'deleted_folders': deleted_folders,
             'deleted_documents': deleted_documents,
+            'deleted_categories': deleted_categories,
             'deleted_metadata': deleted_metadata,
-            'deleted_reference_lists': deleted_reference_lists,
+            'deleted_references': deleted_references
         }
         return render(request, self.template_name, context)
 
@@ -407,33 +409,39 @@ class TrashView(LoginRequiredMixin, View):
             elif item_type == 'document':
                 item = get_object_or_404(Document, id=item_id)
                 item.restore()
+            elif item_type == 'category':
+                item = get_object_or_404(Category, id=item_id)
+                item.restore()
             elif item_type == 'metadata':
                 item = get_object_or_404(MetadataDefinition, id=item_id)
                 item.restore()
-            elif item_type == 'reference_list':
+            elif item_type == 'reference':
                 item = get_object_or_404(ReferenceList, id=item_id)
                 item.restore()
-            messages.success(request, f'{item_type.title()} restauré avec succès')
+            messages.success(request, f'{item_type} restauré avec succès')
         elif action == 'delete':
             if item_type == 'folder':
                 item = get_object_or_404(Folder, id=item_id)
-                item.hard_delete()
+                item.delete()
             elif item_type == 'document':
                 item = get_object_or_404(Document, id=item_id)
-                item.hard_delete()
+                item.delete()
+            elif item_type == 'category':
+                item = get_object_or_404(Category, id=item_id)
+                item.delete()
             elif item_type == 'metadata':
                 item = get_object_or_404(MetadataDefinition, id=item_id)
-                item.hard_delete()
-            elif item_type == 'reference_list':
+                item.delete()
+            elif item_type == 'reference':
                 item = get_object_or_404(ReferenceList, id=item_id)
-                item.hard_delete()
-            messages.success(request, f'{item_type.title()} supprimé définitivement')
+                item.delete()
+            messages.success(request, f'{item_type} supprimé définitivement')
 
         return redirect('records:trash')
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
     model = Category
-    template_name = 'records/category_form.html'
+    template_name = 'records/categories/category_form.html'
     fields = ['name', 'description', 'parent']
     success_url = reverse_lazy('records:category_list')
 
@@ -443,20 +451,20 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
 
 class CategoryListView(LoginRequiredMixin, ListView):
     model = Category
-    template_name = 'records/category_list.html'
+    template_name = 'records/categories/category_list.html'
     context_object_name = 'categories'
-    
+
     def get_queryset(self):
         return Category.objects.filter(parent=None)
 
 class CategoryDetailView(LoginRequiredMixin, DetailView):
     model = Category
-    template_name = 'records/category_detail.html'
+    template_name = 'records/categories/category_detail.html'
     context_object_name = 'category'
 
 class CategoryUpdateView(LoginRequiredMixin, UpdateView):
     model = Category
-    template_name = 'records/category_form.html'
+    template_name = 'records/categories/category_form.html'
     fields = ['name', 'description', 'parent']
     success_url = reverse_lazy('records:category_list')
 
@@ -466,7 +474,7 @@ class CategoryUpdateView(LoginRequiredMixin, UpdateView):
 
 class CategoryDeleteView(LoginRequiredMixin, DeleteView):
     model = Category
-    template_name = 'records/category_confirm_delete.html'
+    template_name = 'records/categories/category_confirm_delete.html'
     success_url = reverse_lazy('records:category_list')
 
     def delete(self, request, *args, **kwargs):
@@ -475,34 +483,51 @@ class CategoryDeleteView(LoginRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 class CategoryImportView(LoginRequiredMixin, View):
-    template_name = 'records/category_import.html'
+    template_name = 'records/categories/category_import.html'
 
     def get(self, request):
         return render(request, self.template_name)
 
     def post(self, request):
         try:
-            file = request.FILES.get('file')
-            if not file:
-                messages.error(request, 'Aucun fichier n\'a été sélectionné')
-                return render(request, self.template_name)
-
-            # Here you would implement the actual import logic
-            # For example, reading a CSV file and creating categories
+            file = request.FILES['file']
+            # TODO: Implement category import logic
             messages.success(request, 'Catégories importées avec succès')
             return redirect('records:category_list')
         except Exception as e:
             messages.error(request, f'Erreur lors de l\'import: {str(e)}')
             return render(request, self.template_name)
 
+class CategoryTreeView(LoginRequiredMixin, View):
+    template_name = 'records/categories/category_tree.html'
+
+    def get(self, request):
+        categories = Category.objects.filter(parent=None)
+        return render(request, self.template_name, {'categories': categories})
+
+class CategoryStatsView(LoginRequiredMixin, View):
+    template_name = 'records/categories/category_stats.html'
+
+    def get(self, request):
+        # Get all categories
+        categories = Category.objects.all()
+        stats = []
+        for category in categories:
+            stats.append({
+                'category': category,
+                'document_count': category.documents.count(),
+                'subcategory_count': category.children.count()
+            })
+        return render(request, self.template_name, {'stats': stats})
+
 class ArchiveListView(LoginRequiredMixin, ListView):
     model = Archive
-    template_name = 'records/archive_list.html'
+    template_name = 'records/archives/archive_list.html'
     context_object_name = 'archives'
 
 class ArchiveCreateView(LoginRequiredMixin, CreateView):
     model = Archive
-    template_name = 'records/archive_form.html'
+    template_name = 'records/archives/archive_form.html'
     fields = ['name', 'description', 'location', 'capacity']
     success_url = reverse_lazy('records:archive_list')
 
@@ -512,12 +537,12 @@ class ArchiveCreateView(LoginRequiredMixin, CreateView):
 
 class ArchiveDetailView(LoginRequiredMixin, DetailView):
     model = Archive
-    template_name = 'records/archive_detail.html'
+    template_name = 'records/archives/archive_detail.html'
     context_object_name = 'archive'
 
 class ArchiveUpdateView(LoginRequiredMixin, UpdateView):
     model = Archive
-    template_name = 'records/archive_form.html'
+    template_name = 'records/archives/archive_form.html'
     fields = ['name', 'description', 'location', 'capacity']
     success_url = reverse_lazy('records:archive_list')
 
@@ -527,7 +552,7 @@ class ArchiveUpdateView(LoginRequiredMixin, UpdateView):
 
 class ArchiveDeleteView(LoginRequiredMixin, DeleteView):
     model = Archive
-    template_name = 'records/archive_confirm_delete.html'
+    template_name = 'records/archives/archive_confirm_delete.html'
     success_url = reverse_lazy('records:archive_list')
 
     def delete(self, request, *args, **kwargs):
@@ -537,12 +562,12 @@ class ArchiveDeleteView(LoginRequiredMixin, DeleteView):
 
 class RetentionListView(LoginRequiredMixin, ListView):
     model = Retention
-    template_name = 'records/retention_list.html'
+    template_name = 'records/retention/retention_list.html'
     context_object_name = 'retentions'
 
 class RetentionCreateView(LoginRequiredMixin, CreateView):
     model = Retention
-    template_name = 'records/retention_form.html'
+    template_name = 'records/retention/retention_form.html'
     fields = ['name', 'description', 'retention_period', 'retention_type']
     success_url = reverse_lazy('records:retention_list')
 
@@ -552,12 +577,12 @@ class RetentionCreateView(LoginRequiredMixin, CreateView):
 
 class RetentionDetailView(LoginRequiredMixin, DetailView):
     model = Retention
-    template_name = 'records/retention_detail.html'
+    template_name = 'records/retention/retention_detail.html'
     context_object_name = 'retention'
 
 class RetentionUpdateView(LoginRequiredMixin, UpdateView):
     model = Retention
-    template_name = 'records/retention_form.html'
+    template_name = 'records/retention/retention_form.html'
     fields = ['name', 'description', 'retention_period', 'retention_type']
     success_url = reverse_lazy('records:retention_list')
 
@@ -567,7 +592,7 @@ class RetentionUpdateView(LoginRequiredMixin, UpdateView):
 
 class RetentionDeleteView(LoginRequiredMixin, DeleteView):
     model = Retention
-    template_name = 'records/retention_confirm_delete.html'
+    template_name = 'records/retention/retention_confirm_delete.html'
     success_url = reverse_lazy('records:retention_list')
 
     def delete(self, request, *args, **kwargs):
@@ -601,7 +626,7 @@ def recent_documents(request):
 def favorite_documents(request):
     """View for displaying favorite documents."""
     favorite_docs = Document.objects.filter(
-        favorites__user=request.user
+        favorite_entries__user=request.user
     ).distinct()
     
     context = {
@@ -609,50 +634,6 @@ def favorite_documents(request):
         'title': 'Documents favoris'
     }
     return render(request, 'records/document_list.html', context)
-
-class CategoryTreeView(LoginRequiredMixin, View):
-    template_name = 'records/category_tree.html'
-
-    def get(self, request):
-        root_categories = Category.objects.filter(parent=None, deleted_at__isnull=True)
-        context = {
-            'root_categories': root_categories,
-            'title': 'Arborescence des catégories'
-        }
-        return render(request, self.template_name, context)
-
-class CategoryStatsView(LoginRequiredMixin, View):
-    template_name = 'records/category_stats.html'
-
-    def get(self, request):
-        # Get all categories
-        categories = Category.objects.filter(deleted_at__isnull=True)
-        total_categories = categories.count()
-        total_documents = Document.objects.filter(deleted_at__isnull=True).count()
-        
-        # Calculate average documents per category
-        avg_documents = round(total_documents / total_categories, 1) if total_categories > 0 else 0.0
-        
-        # Count documents per category
-        category_stats = []
-        for category in categories:
-            doc_count = Document.objects.filter(category=category, deleted_at__isnull=True).count()
-            subcategory_count = Category.objects.filter(parent=category, deleted_at__isnull=True).count()
-            
-            category_stats.append({
-                'category': category,
-                'document_count': doc_count,
-                'subcategory_count': subcategory_count
-            })
-        
-        context = {
-            'category_stats': category_stats,
-            'total_categories': total_categories,
-            'total_documents': total_documents,
-            'avg_documents': avg_documents,
-            'title': 'Statistiques des catégories'
-        }
-        return render(request, self.template_name, context)
 
 class DisposalListView(LoginRequiredMixin, ListView):
     template_name = 'records/disposal_list.html'
@@ -672,57 +653,57 @@ class DisposalListView(LoginRequiredMixin, ListView):
         return context
 
 class SearchView(LoginRequiredMixin, View):
-    template_name = 'records/search.html'
+    template_name = 'records/search/search.html'
 
     def get(self, request):
         # Get search parameters from query string
         query = request.GET.get('q', '')
+        folder_id = request.GET.get('folder')
         category_id = request.GET.get('category')
         date_from = request.GET.get('date_from')
         date_to = request.GET.get('date_to')
-        retention_id = request.GET.get('retention')
-        
-        # Start with all non-deleted documents
+        metadata = request.GET.getlist('metadata')
+
+        # Build the query
         documents = Document.objects.filter(deleted_at__isnull=True)
-        
-        # Apply filters if provided
         if query:
             documents = documents.filter(
                 Q(name__icontains=query) |
                 Q(description__icontains=query)
             )
-        
+        if folder_id:
+            documents = documents.filter(folder_id=folder_id)
         if category_id:
             documents = documents.filter(category_id=category_id)
-            
         if date_from:
             documents = documents.filter(created_at__gte=date_from)
-            
         if date_to:
             documents = documents.filter(created_at__lte=date_to)
-            
-        if retention_id:
-            documents = documents.filter(retention_id=retention_id)
-        
-        # Get filter options
+        if metadata:
+            for meta in metadata:
+                documents = documents.filter(metadata__key=meta)
+
+        # Get context data
+        folders = Folder.objects.filter(deleted_at__isnull=True)
         categories = Category.objects.filter(deleted_at__isnull=True)
-        retentions = Retention.objects.filter(deleted_at__isnull=True)
-        
+        metadata_definitions = MetadataDefinition.objects.filter(deleted_at__isnull=True)
+
         context = {
             'documents': documents,
+            'folders': folders,
+            'categories': categories,
+            'metadata_definitions': metadata_definitions,
             'query': query,
+            'folder_id': folder_id,
             'category_id': category_id,
             'date_from': date_from,
             'date_to': date_to,
-            'retention_id': retention_id,
-            'categories': categories,
-            'retentions': retentions,
-            'title': 'Recherche avancée'
+            'metadata': metadata
         }
         return render(request, self.template_name, context)
 
 class AuditLogView(LoginRequiredMixin, ListView):
-    template_name = 'records/audit_log.html'
+    template_name = 'records/audit/audit_log.html'
     context_object_name = 'audit_logs'
     paginate_by = 20
 
@@ -732,7 +713,7 @@ class AuditLogView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Journal d\'audit'
+        context['total_actions'] = AuditLog.objects.count()
         return context
 
 @login_required
@@ -770,10 +751,4 @@ def export_data(request):
 
 @login_required
 def settings(request):
-    """View for managing records app settings."""
-    if request.method == 'POST':
-        # Handle settings update
-        messages.success(request, 'Paramètres mis à jour avec succès')
-        return redirect('records:settings')
-    
-    return render(request, 'records/settings.html')
+    return render(request, 'records/settings/settings.html')

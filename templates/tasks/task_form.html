@@ -1,0 +1,137 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}{% if task.pk %}Modifier la tâche{% else %}Nouvelle tâche{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">{% if task.pk %}Modifier la tâche{% else %}Nouvelle tâche{% endif %}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.name.id_for_label }}">Nom de la tâche</label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.name.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.assigned_to.id_for_label }}">Assigné à</label>
+                                    {{ form.assigned_to }}
+                                    {% if form.assigned_to.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.assigned_to.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.status.id_for_label }}">Statut</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.status.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.priority.id_for_label }}">Priorité</label>
+                                    {{ form.priority }}
+                                    {% if form.priority.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.priority.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.due_date.id_for_label }}">Date d'échéance</label>
+                                    {{ form.due_date }}
+                                    {% if form.due_date.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.due_date.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.progress.id_for_label }}">Progression</label>
+                                    {{ form.progress }}
+                                    {% if form.progress.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.progress.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ form.description.id_for_label }}">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.description.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                            <a href="{% url 'tasks:task_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialiser Select2 pour les champs select
+        $('#{{ form.assigned_to.id_for_label }}').select2();
+        $('#{{ form.status.id_for_label }}').select2();
+        $('#{{ form.priority.id_for_label }}').select2();
+        
+        // Initialiser le datepicker pour le champ date
+        $('#{{ form.due_date.id_for_label }}').datepicker({
+            format: 'dd/mm/yyyy',
+            autoclose: true
+        });
+        
+        // Initialiser le slider pour le champ progression
+        $('#{{ form.progress.id_for_label }}').slider({
+            min: 0,
+            max: 100,
+            step: 5,
+            value: {{ task.progress|default:0 }},
+            tooltip: 'show'
+        });
+    });
+</script>
+{% endblock %} 

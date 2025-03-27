@@ -1,0 +1,164 @@
+{% extends "records/base.html" %}
+
+{% block page_title %}{{ folder.name }}{% endblock %}
+
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <div class="btn-group me-2">
+        <button type="button" class="btn btn-primary" onclick="uploadDocument()">
+            <i class="fas fa-upload"></i> Ajouter un document
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="editFolder('{{ folder.id }}')">
+            <i class="fas fa-edit"></i> Modifier
+        </button>
+        <button type="button" class="btn btn-danger" onclick="deleteFolder('{{ folder.id }}')">
+            <i class="fas fa-trash"></i> Supprimer
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block records_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Description</h5>
+                <p class="card-text">{{ folder.description|default:"Aucune description" }}</p>
+                
+                <h5 class="card-title mt-4">Informations</h5>
+                <ul class="list-unstyled">
+                    <li><strong>Créé par :</strong> {{ folder.created_by.get_full_name }}</li>
+                    <li><strong>Date de création :</strong> {{ folder.created_at|date:"d/m/Y H:i" }}</li>
+                    {% if folder.updated_by %}
+                    <li><strong>Dernière modification :</strong> {{ folder.updated_at|date:"d/m/Y H:i" }} par {{ folder.updated_by.get_full_name }}</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Documents</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Type</th>
+                                <th>Date de création</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for document in folder.documents.all %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-file-alt text-muted me-2"></i>
+                                        {{ document.name }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ document.file_type }}</span>
+                                </td>
+                                <td>{{ document.created_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ document.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank" title="Télécharger">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editDocument('{{ document.id }}')" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDocument('{{ document.id }}')" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-3">
+                                    <p class="text-muted mb-0">Aucun document dans ce dossier</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Statistiques</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="fas fa-file-alt text-primary me-2"></i>
+                        {{ folder.documents.count }} document(s)
+                    </li>
+                    <li class="mb-2">
+                        <i class="fas fa-folder text-warning me-2"></i>
+                        {{ folder.subfolders.count }} sous-dossier(s)
+                    </li>
+                    <li>
+                        <i class="fas fa-clock text-info me-2"></i>
+                        Dernière activité : {{ folder.updated_at|date:"d/m/Y H:i" }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        {% if folder.metadata.all %}
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Métadonnées</h5>
+                <ul class="list-unstyled">
+                    {% for metadata in folder.metadata.all %}
+                    <li class="mb-2">
+                        <strong>{{ metadata.definition.name }} :</strong>
+                        {{ metadata.value }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // Fonctions spécifiques à la vue détaillée
+    function addMetadata(folderId) {
+        // Implémenter l'ajout de métadonnées
+    }
+
+    function uploadDocument(folderId) {
+        // Implémenter l'upload de documents
+    }
+
+    function createSubfolder(parentId) {
+        // Implémenter la création d'un sous-dossier
+    }
+
+    function editDocument(documentId) {
+        // Implémenter l'édition d'un document
+    }
+
+    function deleteDocument(documentId) {
+        // Implémenter la suppression d'un document
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        // Charger les définitions de métadonnées pour le select
+        loadMetadataDefinitions();
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,97 @@
+{% extends 'partials/base.html' %}
+
+{% block title %}Nouveau message{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Nouveau message</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="{{ form.recipients.id_for_label }}">À</label>
+                                    {{ form.recipients }}
+                                    {% if form.recipients.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.recipients.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="{{ form.subject.id_for_label }}">Objet</label>
+                                    {{ form.subject }}
+                                    {% if form.subject.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.subject.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="{{ form.content.id_for_label }}">Message</label>
+                                    {{ form.content }}
+                                    {% if form.content.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.content.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="{{ form.attachments.id_for_label }}">Pièces jointes</label>
+                                    {{ form.attachments }}
+                                    {% if form.attachments.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.attachments.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Envoyer
+                                </button>
+                                <a href="{% url 'mails:inbox' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Annuler
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialisation de Select2 pour les champs de sélection multiple
+        $('#{{ form.recipients.id_for_label }}').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionnez les destinataires',
+            allowClear: true
+        });
+    });
+</script>
+{% endblock %} 

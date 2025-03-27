@@ -1,0 +1,146 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ object.title }}</h5>
+                    <div>
+                        <a href="{% url 'intelligence:chat_update' object.pk %}" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <a href="{% url 'intelligence:chat_list' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chat-messages" style="height: 600px; overflow-y: auto;">
+                        {% for message in object.messages.all %}
+                        <div class="message mb-3 {% if message.role == 'USER' %}text-end{% endif %}">
+                            <div class="message-content p-3 rounded {% if message.role == 'USER' %}bg-primary text-white{% else %}bg-light{% endif %}" style="max-width: 80%; {% if message.role == 'USER' %}margin-left: auto;{% endif %}">
+                                {{ message.content|linebreaks }}
+                                {% if message.attachments.exists %}
+                                <div class="mt-2">
+                                    <small>Pièces jointes:</small>
+                                    <div class="list-group">
+                                        {% for attachment in message.attachments.all %}
+                                        <a href="{{ attachment.file_path }}" class="list-group-item list-group-item-action" target="_blank">
+                                            <i class="fas fa-paperclip"></i> {{ attachment.file_name }}
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">
+                                {{ message.created_at|date:"d/m/Y H:i" }}
+                                {% if message.model %}
+                                - {{ message.model.name }}
+                                {% endif %}
+                            </small>
+                        </div>
+                        {% empty %}
+                        <div class="text-center text-muted">Aucun message</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <form method="post" action="{% url 'intelligence:chat_message_create' object.pk %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <textarea name="content" class="form-control" placeholder="Votre message..." rows="2"></textarea>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Informations du chat</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Agent IA:</th>
+                            <td>{{ object.ai_agent.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Statut:</th>
+                            <td>
+                                <span class="badge {% if object.status == 'ACTIVE' %}bg-success{% elif object.status == 'ARCHIVED' %}bg-secondary{% else %}bg-danger{% endif %}">
+                                    {{ object.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Dernier message:</th>
+                            <td>
+                                {% if object.last_message_at %}
+                                {{ object.last_message_at|date:"d/m/Y H:i" }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Description:</th>
+                            <td>{{ object.description|linebreaks }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            {% if object.document or object.folder %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Contexte</h5>
+                    {% if object.document %}
+                    <div class="mb-3">
+                        <h6>Document associé:</h6>
+                        <a href="{% url 'documents:document_detail' object.document.pk %}" class="text-decoration-none">
+                            <i class="fas fa-file-alt"></i> {{ object.document.title }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if object.folder %}
+                    <div>
+                        <h6>Dossier associé:</h6>
+                        <a href="{% url 'folders:folder_detail' object.folder.pk %}" class="text-decoration-none">
+                            <i class="fas fa-folder"></i> {{ object.folder.name }}
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Métadonnées</h5>
+                    <table class="table table-sm">
+                        <tr>
+                            <th>Créé par:</th>
+                            <td>{{ object.created_by }}</td>
+                        </tr>
+                        <tr>
+                            <th>Créé le:</th>
+                            <td>{{ object.created_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Dernière mise à jour:</th>
+                            <td>{{ object.updated_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,97 @@
+{% extends "records/base.html" %}
+
+{% block page_title %}Documents{% endblock %}
+
+{% block page_actions %}
+<div class="btn-toolbar mb-2 mb-md-0">
+    <button type="button" class="btn btn-primary" onclick="uploadDocument()">
+        <i class="fas fa-upload"></i> Ajouter un document
+    </button>
+</div>
+{% endblock %}
+
+{% block records_content %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Créé par</th>
+                <th>Date de création</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for document in documents %}
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-alt text-muted me-2"></i>
+                        {{ document.name }}
+                    </div>
+                </td>
+                <td>{{ document.description|truncatewords:20 }}</td>
+                <td>
+                    <span class="badge bg-primary">{{ document.file_type }}</span>
+                </td>
+                <td>{{ document.created_by.get_full_name }}</td>
+                <td>{{ document.created_at|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{{ document.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank" title="Télécharger">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editDocument('{{ document.id }}')" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info" onclick="shareDocument('{{ document.id }}')" title="Partager">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteDocument('{{ document.id }}')" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-5">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h5>Aucun document</h5>
+                    <p class="text-muted">Commencez par ajouter un nouveau document</p>
+                    <button class="btn btn-primary" onclick="uploadDocument()">
+                        <i class="fas fa-upload"></i> Ajouter un document
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if documents.has_other_pages %}
+<nav aria-label="Navigation des documents" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if documents.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ documents.previous_page_number }}">Précédent</a>
+        </li>
+        {% endif %}
+
+        {% for num in documents.paginator.page_range %}
+        <li class="page-item {% if documents.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+
+        {% if documents.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ documents.next_page_number }}">Suivant</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %} 

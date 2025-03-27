@@ -1,0 +1,59 @@
+<!-- Sidebar pour l'espace de travail -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h5 class="mb-0">Espace de travail</h5>
+    </div>
+    <ul class="nav flex-column">
+        <!-- Vue d'ensemble -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'workspace_list' %}active{% endif %}" href="{% url 'workspace:workspace_list' %}">
+                <i class="fas fa-desktop"></i> Espaces
+            </a>
+        </li>
+
+        <!-- Fichiers -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'files' %}active{% endif %}" href="{% url 'workspace:files' %}">
+                <i class="fas fa-files"></i> Fichiers
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'files_recent' %}active{% endif %}" href="{% url 'workspace:files_recent' %}">
+                <i class="fas fa-clock"></i> Fichiers récents
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'files_shared' %}active{% endif %}" href="{% url 'workspace:files_shared' %}">
+                <i class="fas fa-share-alt"></i> Fichiers partagés
+            </a>
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- Gestion des membres -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'member_list' %}active{% endif %}" href="{% url 'workspace:member_list' %}">
+                <i class="fas fa-users"></i> Membres
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'roles' %}active{% endif %}" href="{% url 'workspace:roles' %}">
+                <i class="fas fa-user-tag"></i> Rôles
+            </a>
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- Activité -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'activity_log' %}active{% endif %}" href="{% url 'workspace:activity_log' %}">
+                <i class="fas fa-history"></i> Journal d'activité
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}" href="{% url 'workspace:notifications' %}">
+                <i class="fas fa-bell"></i> Notifications
+            </a>
+        </li>
+    </ul>
+</div> 
