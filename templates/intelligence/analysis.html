@@ -1,8 +1,270 @@
 {% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}Analyse IA{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>AI Analysis</h1>
-    <p>This feature is coming soon.</p>
+<div class="container-fluid mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="fas fa-chart-bar"></i> Analyse IA</h2>
+        <div>
+            <button class="btn btn-outline-primary" id="refresh-data">
+                <i class="fas fa-sync-alt"></i> Actualiser
+            </button>
+            <button class="btn btn-outline-secondary" id="export-data">
+                <i class="fas fa-file-export"></i> Exporter
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-filter"></i> Filtres</h5>
+        </div>
+        <div class="card-body">
+            <form id="analysis-filter-form" class="row g-3">
+                <div class="col-md-3">
+                    <label for="date-range" class="form-label">Période</label>
+                    <select class="form-select" id="date-range">
+                        <option value="today">Aujourd'hui</option>
+                        <option value="week">Cette semaine</option>
+                        <option value="month" selected>Ce mois</option>
+                        <option value="quarter">Ce trimestre</option>
+                        <option value="year">Cette année</option>
+                        <option value="custom">Personnalisé</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="model-type" class="form-label">Modèle</label>
+                    <select class="form-select" id="model-type">
+                        <option value="all" selected>Tous les modèles</option>
+                        <option value="gpt-4">GPT-4</option>
+                        <option value="gpt-3.5">GPT-3.5</option>
+                        <option value="claude">Claude</option>
+                        <option value="gemini">Gemini</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="task-type" class="form-label">Type de tâche</label>
+                    <select class="form-select" id="task-type">
+                        <option value="all" selected>Toutes les tâches</option>
+                        <option value="chat">Conversations</option>
+                        <option value="analysis">Analyses</option>
+                        <option value="prediction">Prédictions</option>
+                        <option value="generation">Générations</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i> Appliquer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Métriques principales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card h-100 border-primary">
+                <div class="card-body text-center">
+                    <h6 class="card-subtitle mb-2 text-muted">Total Requêtes</h6>
+                    <h2 class="card-title">1,247</h2>
+                    <p class="card-text text-success">
+                        <i class="fas fa-arrow-up"></i> 12% vs mois précédent
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-info">
+                <div class="card-body text-center">
+                    <h6 class="card-subtitle mb-2 text-muted">Jetons Utilisés</h6>
+                    <h2 class="card-title">452,981</h2>
+                    <p class="card-text text-danger">
+                        <i class="fas fa-arrow-up"></i> 8% vs mois précédent
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <h6 class="card-subtitle mb-2 text-muted">Coût Estimé</h6>
+                    <h2 class="card-title">€38.24</h2>
+                    <p class="card-text text-danger">
+                        <i class="fas fa-arrow-up"></i> 5% vs mois précédent
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 border-warning">
+                <div class="card-body text-center">
+                    <h6 class="card-subtitle mb-2 text-muted">Taux de Réussite</h6>
+                    <h2 class="card-title">98.7%</h2>
+                    <p class="card-text text-success">
+                        <i class="fas fa-arrow-up"></i> 0.5% vs mois précédent
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Utilisation dans le temps</h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <p class="text-muted">Graphique d'utilisation (démonstration)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Répartition par modèle</h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <p class="text-muted">Graphique circulaire (démonstration)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Détails des requêtes récentes -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Requêtes récentes</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Modèle</th>
+                            <th>Jetons</th>
+                            <th>Coût</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#12489</td>
+                            <td>2023-03-27 14:35</td>
+                            <td>Chat</td>
+                            <td>GPT-4</td>
+                            <td>1,254</td>
+                            <td>€0.12</td>
+                            <td><span class="badge bg-success">Réussi</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#12488</td>
+                            <td>2023-03-27 14:30</td>
+                            <td>Analyse</td>
+                            <td>Claude</td>
+                            <td>3,621</td>
+                            <td>€0.24</td>
+                            <td><span class="badge bg-success">Réussi</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#12487</td>
+                            <td>2023-03-27 14:22</td>
+                            <td>Prédiction</td>
+                            <td>GPT-3.5</td>
+                            <td>975</td>
+                            <td>€0.05</td>
+                            <td><span class="badge bg-danger">Échoué</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#12486</td>
+                            <td>2023-03-27 14:15</td>
+                            <td>Génération</td>
+                            <td>Gemini</td>
+                            <td>2,187</td>
+                            <td>€0.18</td>
+                            <td><span class="badge bg-success">Réussi</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <div>Affichage des entrées 1 à 4 sur 234</div>
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="#">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Suivant</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Ajouter quelques scripts JavaScript pour la démo -->
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Pour démontrer les boutons d'actualisation et d'export
+        document.getElementById('refresh-data').addEventListener('click', function() {
+            alert('Actualisation des données...');
+        });
+        
+        document.getElementById('export-data').addEventListener('click', function() {
+            alert('Export des données...');
+        });
+        
+        // Pour démontrer le formulaire de filtre
+        document.getElementById('analysis-filter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Filtres appliqués !');
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %} 

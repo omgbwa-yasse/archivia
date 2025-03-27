@@ -20,6 +20,11 @@
                 <i class="fas fa-chart-line"></i> Tableau de bord
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'home' %}">
+                <i class="fas fa-arrow-left"></i> Retour au portail
+            </a>
+        </li>
     </ul>
     
     <!-- Analyse et prédictions -->
@@ -40,32 +45,79 @@
                 <i class="fas fa-comments"></i> Conversations
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'task_list' %}active{% endif %}" href="{% url 'intelligence:task_list' %}">
+                <i class="fas fa-tasks"></i> Tâches
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'usage_stats' %}active{% endif %}" href="{% url 'intelligence:usage_stats' %}">
+                <i class="fas fa-chart-pie"></i> Statistiques
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'usage_stats_export' %}active{% endif %}" href="{% url 'intelligence:usage_stats_export' %}">
+                <i class="fas fa-file-export"></i> Exporter statistiques
+            </a>
+        </li>
     </ul>
     
     <!-- Configuration IA -->
     <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#iaConfigCollapse" aria-expanded="false">
          Configuration IA 
     </h6>
-    <ul class="nav flex-column mb-3">
+    <ul class="nav flex-column mb-3" id="iaConfigCollapse">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'agent_list' %}active{% endif %}" href="{% url 'intelligence:agent_list' %}">
                 <i class="fas fa-robot"></i> Agents IA
             </a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-plus-circle"></i> Gérer Agents
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'intelligence:agent_create' %}">Créer Agent</a></li>
+            </ul>
         </li>
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'model_list' %}active{% endif %}" href="{% url 'intelligence:model_list' %}">
                 <i class="fas fa-microchip"></i> Modèles IA
             </a>
         </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-plus-circle"></i> Gérer Modèles
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'intelligence:model_create' %}">Créer Modèle</a></li>
+            </ul>
+        </li>
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'prompt_list' %}active{% endif %}" href="{% url 'intelligence:prompt_list' %}">
                 <i class="fas fa-terminal"></i> Prompts
             </a>
         </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-plus-circle"></i> Gérer Prompts
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'intelligence:prompt_create' %}">Créer Prompt</a></li>
+            </ul>
+        </li>
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'tool_list' %}active{% endif %}" href="{% url 'intelligence:tool_list' %}">
                 <i class="fas fa-tools"></i> Outils IA
             </a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-plus-circle"></i> Gérer Outils
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'intelligence:tool_create' %}">Créer Outil</a></li>
+            </ul>
         </li>
     </ul>
     
@@ -73,7 +125,7 @@
     <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#learningCollapse" aria-expanded="false">
          Apprentissage
     </h6>
-    <ul class="nav flex-column mb-3">
+    <ul class="nav flex-column mb-3" id="learningCollapse">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'training' %}active{% endif %}" href="{% url 'intelligence:training' %}">
                 <i class="fas fa-dumbbell"></i> Formation
@@ -87,6 +139,39 @@
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'reference_list' %}active{% endif %}" href="{% url 'intelligence:reference_list' %}">
                 <i class="fas fa-database"></i> Données de référence
+            </a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-plus-circle"></i> Gérer Références
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'intelligence:reference_create' %}">Ajouter Référence</a></li>
+            </ul>
+        </li>
+    </ul>
+    
+    <!-- Navigation externe -->
+    <h6 class="sidebar-subtitle">Autres Modules</h6>
+    <ul class="nav flex-column mb-3">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'examples' %}">
+                <i class="fas fa-lightbulb"></i> Exemples
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'projects:index' %}">
+                <i class="fas fa-project-diagram"></i> Projets
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'tasks:index' %}">
+                <i class="fas fa-clipboard-list"></i> Tâches
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'correspondence:index' %}">
+                <i class="fas fa-envelope"></i> Correspondance
             </a>
         </li>
     </ul>

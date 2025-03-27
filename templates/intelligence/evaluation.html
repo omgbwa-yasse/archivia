@@ -1,8 +1,407 @@
 {% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}Évaluation IA{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>AI Evaluation</h1>
-    <p>This feature is coming soon.</p>
+<div class="container-fluid mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="fas fa-clipboard-check"></i> Évaluation des modèles IA</h2>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newEvaluationModal">
+                <i class="fas fa-plus"></i> Nouvelle évaluation
+            </button>
+        </div>
+    </div>
+
+    <!-- Tableau récapitulatif des évaluations -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-list-alt"></i> Évaluations récentes</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Modèle</th>
+                            <th>Date</th>
+                            <th>Jeu de test</th>
+                            <th>Précision</th>
+                            <th>Rappel</th>
+                            <th>Score F1</th>
+                            <th>BLEU</th>
+                            <th>Temps</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GPT-4 Fine-tuned</td>
+                            <td>27/03/2023</td>
+                            <td>Données client</td>
+                            <td class="text-success">94.8%</td>
+                            <td class="text-success">93.2%</td>
+                            <td class="text-success">94.0</td>
+                            <td class="text-success">0.82</td>
+                            <td>45s</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Claude Assistant</td>
+                            <td>25/03/2023</td>
+                            <td>Conversations</td>
+                            <td class="text-success">92.5%</td>
+                            <td class="text-success">91.0%</td>
+                            <td class="text-success">91.7</td>
+                            <td class="text-success">0.79</td>
+                            <td>38s</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>GPT-3.5 Document</td>
+                            <td>24/03/2023</td>
+                            <td>Docs techniques</td>
+                            <td class="text-warning">88.3%</td>
+                            <td class="text-warning">85.1%</td>
+                            <td class="text-warning">86.7</td>
+                            <td class="text-warning">0.73</td>
+                            <td>30s</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques d'évaluation -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Performance par modèle</h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <p class="text-muted">Graphique de performance (démonstration)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Évolution dans le temps</h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <p class="text-muted">Graphique d'évolution (démonstration)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analyse détaillée -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-microscope"></i> Analyse détaillée - GPT-4 Fine-tuned</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Matrice de confusion</h6>
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 200px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                <p class="text-muted">Matrice (démonstration)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Courbe ROC</h6>
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 200px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                <p class="text-muted">Courbe (démonstration)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Distribution des scores</h6>
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 200px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                <p class="text-muted">Distribution (démonstration)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Métriques par classe</h6>
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 200px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                <p class="text-muted">Métriques (démonstration)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exemples d'échantillons -->
+            <h6 class="mb-3"><i class="fas fa-vial"></i> Échantillons d'évaluation</h6>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Entrée</th>
+                            <th>Prédiction</th>
+                            <th>Référence</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Comment puis-je modifier mon abonnement ?</td>
+                            <td>Pour modifier votre abonnement, veuillez vous rendre dans "Mon compte" > "Abonnements" et cliquer sur "Modifier".</td>
+                            <td>Vous pouvez modifier votre abonnement dans la section "Mon compte", sous-section "Abonnements" puis "Modifier".</td>
+                            <td><span class="badge bg-success">0.92</span></td>
+                        </tr>
+                        <tr>
+                            <td>Quel est le délai de livraison ?</td>
+                            <td>Les délais de livraison sont généralement de 3-5 jours ouvrables pour les commandes nationales.</td>
+                            <td>Les délais de livraison standard sont de 3 à 5 jours ouvrables pour la France métropolitaine.</td>
+                            <td><span class="badge bg-success">0.88</span></td>
+                        </tr>
+                        <tr>
+                            <td>Comment demander un remboursement ?</td>
+                            <td>Pour un remboursement, contactez notre service client avec votre numéro de commande.</td>
+                            <td>Pour obtenir un remboursement, veuillez contacter notre service client par e-mail ou téléphone en indiquant votre numéro de commande.</td>
+                            <td><span class="badge bg-warning">0.75</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jeux de test disponibles -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-database"></i> Jeux de test disponibles</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Données client</h5>
+                            <p class="card-text text-muted">500 interactions client avec annotations</p>
+                            <div class="d-flex justify-content-between">
+                                <span><i class="fas fa-calendar-alt"></i> Mis à jour: 15/03/2023</span>
+                                <span><i class="fas fa-tasks"></i> 500 exemples</span>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-primary">Utiliser</button>
+                                <button class="btn btn-sm btn-outline-secondary">Aperçu</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Conversations</h5>
+                            <p class="card-text text-muted">200 dialogues multi-tours complets</p>
+                            <div class="d-flex justify-content-between">
+                                <span><i class="fas fa-calendar-alt"></i> Mis à jour: 10/03/2023</span>
+                                <span><i class="fas fa-tasks"></i> 200 exemples</span>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-primary">Utiliser</button>
+                                <button class="btn btn-sm btn-outline-secondary">Aperçu</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Docs techniques</h5>
+                            <p class="card-text text-muted">300 extraits de documentation technique</p>
+                            <div class="d-flex justify-content-between">
+                                <span><i class="fas fa-calendar-alt"></i> Mis à jour: 05/03/2023</span>
+                                <span><i class="fas fa-tasks"></i> 300 exemples</span>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-primary">Utiliser</button>
+                                <button class="btn btn-sm btn-outline-secondary">Aperçu</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-outline-success">
+                    <i class="fas fa-upload"></i> Importer un nouveau jeu de test
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Modal pour nouvelle évaluation -->
+<div class="modal fade" id="newEvaluationModal" tabindex="-1" aria-labelledby="newEvaluationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newEvaluationModalLabel">Nouvelle évaluation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newEvaluationForm">
+                    <div class="mb-3">
+                        <label for="modelToEvaluate" class="form-label">Modèle à évaluer</label>
+                        <select class="form-select" id="modelToEvaluate">
+                            <option selected>Sélectionnez un modèle...</option>
+                            <option value="gpt4">GPT-4 Fine-tuned</option>
+                            <option value="gpt3">GPT-3.5 Document</option>
+                            <option value="claude">Claude Assistant</option>
+                            <option value="gemini">Gemini Pro</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="testDataset" class="form-label">Jeu de test</label>
+                        <select class="form-select" id="testDataset">
+                            <option selected>Sélectionnez un jeu de test...</option>
+                            <option value="customer">Données client (500 exemples)</option>
+                            <option value="conversations">Conversations (200 dialogues)</option>
+                            <option value="technical">Docs techniques (300 extraits)</option>
+                            <option value="custom">Import personnalisé</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="evaluationMetrics" class="form-label">Métriques d'évaluation</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="accuracyCheck" checked>
+                            <label class="form-check-label" for="accuracyCheck">
+                                Précision
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="recallCheck" checked>
+                            <label class="form-check-label" for="recallCheck">
+                                Rappel
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="f1Check" checked>
+                            <label class="form-check-label" for="f1Check">
+                                Score F1
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="bleuCheck" checked>
+                            <label class="form-check-label" for="bleuCheck">
+                                BLEU Score
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="rougeCheck">
+                            <label class="form-check-label" for="rougeCheck">
+                                ROUGE Score
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="bertCheck">
+                            <label class="form-check-label" for="bertCheck">
+                                BERT Score
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="outputFormat" class="form-label">Format de sortie</label>
+                        <select class="form-select" id="outputFormat">
+                            <option value="dashboard" selected>Tableau de bord interactif</option>
+                            <option value="pdf">Rapport PDF</option>
+                            <option value="csv">Données CSV</option>
+                            <option value="json">Données JSON</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Options</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="saveCheck" checked>
+                            <label class="form-check-label" for="saveCheck">
+                                Enregistrer les résultats
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="compareCheck">
+                            <label class="form-check-label" for="compareCheck">
+                                Comparer avec évaluations précédentes
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="detailedCheck">
+                            <label class="form-check-label" for="detailedCheck">
+                                Analyse détaillée par échantillon
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="startEvaluation">Lancer l'évaluation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestion du formulaire de nouvelle évaluation
+        document.getElementById('startEvaluation').addEventListener('click', function() {
+            alert('Lancement de l\'évaluation (démo)...');
+            // Ici on simulerait l'envoi du formulaire et le traitement
+            $('#newEvaluationModal').modal('hide');
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %} 

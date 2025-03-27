@@ -1,8 +1,287 @@
 {% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}Prédictions IA{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>AI Predictions</h1>
-    <p>This feature is coming soon.</p>
+<div class="container-fluid mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="fas fa-magic"></i> Prédictions IA</h2>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newPredictionModal">
+                <i class="fas fa-plus"></i> Nouvelle prédiction
+            </button>
+        </div>
+    </div>
+
+    <!-- Section des prédictions actives -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-bolt"></i> Prédictions actives</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Type</th>
+                            <th>Créée le</th>
+                            <th>Modèle</th>
+                            <th>Dernière mise à jour</th>
+                            <th>Précision</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Prévision de ventes Q2</td>
+                            <td>Série temporelle</td>
+                            <td>15/03/2023</td>
+                            <td>GPT-4</td>
+                            <td>27/03/2023</td>
+                            <td>92%</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Analyse sentiment clients</td>
+                            <td>Classification</td>
+                            <td>20/03/2023</td>
+                            <td>Claude</td>
+                            <td>26/03/2023</td>
+                            <td>88%</td>
+                            <td><span class="badge bg-success">Active</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visualisation des prédictions -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Prévision de ventes Q2</h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <p class="text-muted">Graphique de prévision (démonstration)</p>
+                    </div>
+                    <div class="mt-3">
+                        <h6>Confiance: <span class="text-success">Élevée (92%)</span></h6>
+                        <p>Basé sur 24 mois de données historiques et l'analyse des tendances saisonnières.</p>
+                        <div class="d-flex mt-3">
+                            <button class="btn btn-sm btn-outline-primary me-2">
+                                <i class="fas fa-download"></i> Télécharger
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary me-2">
+                                <i class="fas fa-share"></i> Partager
+                            </button>
+                            <button class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-sync-alt"></i> Actualiser
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Analyse sentiment clients</h5>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <p class="text-muted">Graphique de sentiment (démonstration)</p>
+                    </div>
+                    <div class="mt-3">
+                        <h6>Confiance: <span class="text-success">Moyenne (88%)</span></h6>
+                        <p>Analyse basée sur 1500 commentaires clients des 3 derniers mois.</p>
+                        <div class="d-flex mt-3">
+                            <button class="btn btn-sm btn-outline-primary me-2">
+                                <i class="fas fa-download"></i> Télécharger
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary me-2">
+                                <i class="fas fa-share"></i> Partager
+                            </button>
+                            <button class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-sync-alt"></i> Actualiser
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historique des prédictions -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-history"></i> Historique des prédictions</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Type</th>
+                            <th>Créée le</th>
+                            <th>Modèle</th>
+                            <th>Précision</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Prévision budget 2023</td>
+                            <td>Régression</td>
+                            <td>05/01/2023</td>
+                            <td>GPT-4</td>
+                            <td>95%</td>
+                            <td><span class="badge bg-secondary">Archivée</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Prédiction comportement utilisateurs</td>
+                            <td>Classification</td>
+                            <td>12/02/2023</td>
+                            <td>Claude</td>
+                            <td>87%</td>
+                            <td><span class="badge bg-secondary">Archivée</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Modal pour nouvelle prédiction -->
+<div class="modal fade" id="newPredictionModal" tabindex="-1" aria-labelledby="newPredictionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newPredictionModalLabel">Nouvelle prédiction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newPredictionForm">
+                    <div class="mb-3">
+                        <label for="predictionName" class="form-label">Nom de la prédiction</label>
+                        <input type="text" class="form-control" id="predictionName" placeholder="Ex: Prévision des ventes Q3">
+                    </div>
+                    <div class="mb-3">
+                        <label for="predictionType" class="form-label">Type de prédiction</label>
+                        <select class="form-select" id="predictionType">
+                            <option selected>Sélectionnez un type...</option>
+                            <option value="timeseries">Série temporelle</option>
+                            <option value="classification">Classification</option>
+                            <option value="regression">Régression</option>
+                            <option value="clustering">Clustering</option>
+                            <option value="anomaly">Détection d'anomalies</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="dataSource" class="form-label">Source des données</label>
+                        <select class="form-select" id="dataSource">
+                            <option selected>Sélectionnez une source...</option>
+                            <option value="database">Base de données interne</option>
+                            <option value="csv">Fichier CSV</option>
+                            <option value="api">API externe</option>
+                            <option value="manual">Saisie manuelle</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="aiModel" class="form-label">Modèle IA</label>
+                        <select class="form-select" id="aiModel">
+                            <option selected>Sélectionnez un modèle...</option>
+                            <option value="gpt4">GPT-4</option>
+                            <option value="claude">Claude</option>
+                            <option value="gemini">Gemini</option>
+                            <option value="custom">Modèle personnalisé</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="predictionDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="predictionDescription" rows="3" placeholder="Décrivez l'objectif de cette prédiction..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Options avancées</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="schedulePrediction">
+                            <label class="form-check-label" for="schedulePrediction">
+                                Programmer des mises à jour régulières
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="alertThreshold">
+                            <label class="form-check-label" for="alertThreshold">
+                                Définir des seuils d'alerte
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="createPrediction">Créer prédiction</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestion du formulaire de nouvelle prédiction
+        document.getElementById('createPrediction').addEventListener('click', function() {
+            alert('Création de la prédiction (démo)...');
+            // Ici on simulerait l'envoi du formulaire et le traitement
+            $('#newPredictionModal').modal('hide');
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %} 

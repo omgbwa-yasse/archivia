@@ -1,8 +1,360 @@
 {% extends "partials/base.html" %}
+{% load static %}
+
+{% block title %}Formation IA{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>AI Training</h1>
-    <p>This feature is coming soon.</p>
+<div class="container-fluid mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="fas fa-dumbbell"></i> Formation des modèles IA</h2>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTrainingModal">
+                <i class="fas fa-plus"></i> Nouvelle formation
+            </button>
+        </div>
+    </div>
+
+    <!-- Formation en cours -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-spinner fa-spin"></i> Formations en cours</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Modèle</th>
+                            <th>Démarré le</th>
+                            <th>Données</th>
+                            <th>Progrès</th>
+                            <th>Temps estimé</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fine-tuning IA support client</td>
+                            <td>GPT-3.5</td>
+                            <td>27/03/2023 10:30</td>
+                            <td>1200 dialogues</td>
+                            <td>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
+                                </div>
+                            </td>
+                            <td>~ 1h20m restante</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-pause"></i> Pause
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-stop"></i> Arrêter
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modèles entraînés -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-check-circle"></i> Formations complétées</h5>
+        </div>
+        <div class="card-body">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Classificateur de documents</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <span class="badge bg-success">Complété</span>
+                                <span class="ms-2 text-muted">25/03/2023</span>
+                            </div>
+                            <p><strong>Base:</strong> GPT-4</p>
+                            <p><strong>Précision:</strong> 94.2%</p>
+                            <p><strong>Jeu de données:</strong> 5,000 documents</p>
+                            <p><strong>Durée:</strong> 3h45m</p>
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-play"></i> Utiliser ce modèle
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-chart-line"></i> Métriques
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Assistant conversationnel</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <span class="badge bg-success">Complété</span>
+                                <span class="ms-2 text-muted">20/03/2023</span>
+                            </div>
+                            <p><strong>Base:</strong> Claude</p>
+                            <p><strong>Score utilisateur:</strong> 4.8/5</p>
+                            <p><strong>Jeu de données:</strong> 10,000 conversations</p>
+                            <p><strong>Durée:</strong> 8h12m</p>
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-play"></i> Utiliser ce modèle
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-chart-line"></i> Métriques
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Analyse sémantique</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <span class="badge bg-success">Complété</span>
+                                <span class="ms-2 text-muted">15/03/2023</span>
+                            </div>
+                            <p><strong>Base:</strong> GPT-3.5</p>
+                            <p><strong>F1-Score:</strong> 0.89</p>
+                            <p><strong>Jeu de données:</strong> 3,200 articles</p>
+                            <p><strong>Durée:</strong> 2h30m</p>
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-play"></i> Utiliser ce modèle
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-chart-line"></i> Métriques
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Métriques de formation -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-chart-line"></i> Métriques de formation</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <p class="text-muted">Graphique d'apprentissage (démonstration)</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div style="height: 300px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <p class="text-muted">Distribution des erreurs (démonstration)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ressources disponibles -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-database"></i> Ressources pour l'entraînement</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Modèles de base</h6>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                GPT-4
+                                <span class="badge bg-primary rounded-pill">Premium</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                GPT-3.5
+                                <span class="badge bg-success rounded-pill">Standard</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Claude
+                                <span class="badge bg-primary rounded-pill">Premium</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Gemini
+                                <span class="badge bg-success rounded-pill">Standard</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Jeux de données</h6>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Conversations support
+                                <span class="badge bg-info rounded-pill">10,000</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Documents classifiés
+                                <span class="badge bg-info rounded-pill">5,000</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Analyses client
+                                <span class="badge bg-info rounded-pill">3,200</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Rapports techniques
+                                <span class="badge bg-info rounded-pill">1,800</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Capacité de calcul</h6>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                GPUs disponibles
+                                <span class="badge bg-success rounded-pill">2/3</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Crédits d'API
+                                <span class="badge bg-warning rounded-pill">75%</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Limite tokens mensuelle
+                                <span class="badge bg-success rounded-pill">2.1M/5M</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Stockage modèles
+                                <span class="badge bg-success rounded-pill">12/50 GB</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Modal pour nouvelle formation -->
+<div class="modal fade" id="newTrainingModal" tabindex="-1" aria-labelledby="newTrainingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newTrainingModalLabel">Nouvelle formation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newTrainingForm">
+                    <div class="mb-3">
+                        <label for="trainingName" class="form-label">Nom du modèle</label>
+                        <input type="text" class="form-control" id="trainingName" placeholder="Ex: Assistant support client v2">
+                    </div>
+                    <div class="mb-3">
+                        <label for="baseModel" class="form-label">Modèle de base</label>
+                        <select class="form-select" id="baseModel">
+                            <option selected>Sélectionnez un modèle...</option>
+                            <option value="gpt4">GPT-4</option>
+                            <option value="gpt35">GPT-3.5</option>
+                            <option value="claude">Claude</option>
+                            <option value="gemini">Gemini</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="trainingType" class="form-label">Type d'entraînement</label>
+                        <select class="form-select" id="trainingType">
+                            <option selected>Sélectionnez un type...</option>
+                            <option value="finetuning">Fine-tuning</option>
+                            <option value="transfer">Transfer learning</option>
+                            <option value="rlhf">RLHF (Reinforcement Learning with Human Feedback)</option>
+                            <option value="distillation">Distillation de modèle</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="datasetSelect" class="form-label">Jeu de données</label>
+                        <select class="form-select" id="datasetSelect">
+                            <option selected>Sélectionnez un jeu de données...</option>
+                            <option value="support">Conversations support (10,000)</option>
+                            <option value="documents">Documents classifiés (5,000)</option>
+                            <option value="analysis">Analyses client (3,200)</option>
+                            <option value="technical">Rapports techniques (1,800)</option>
+                            <option value="custom">Import personnalisé</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="computeResources" class="form-label">Ressources de calcul</label>
+                        <select class="form-select" id="computeResources">
+                            <option value="low">Faible (1 GPU, plus lent)</option>
+                            <option value="medium" selected>Moyen (2 GPUs, recommandé)</option>
+                            <option value="high">Élevé (3 GPUs, rapide)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hyperparameters" class="form-label">Hyperparamètres</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="advancedParams">
+                            <label class="form-check-label" for="advancedParams">Paramètres avancés</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Options supplémentaires</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="earlyStoppingCheck">
+                            <label class="form-check-label" for="earlyStoppingCheck">
+                                Arrêt anticipé
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="monitorMetricsCheck">
+                            <label class="form-check-label" for="monitorMetricsCheck">
+                                Surveillance des métriques en temps réel
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="notificationsCheck">
+                            <label class="form-check-label" for="notificationsCheck">
+                                Notifications à la fin
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="startTraining">Démarrer la formation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestion du formulaire de nouvelle formation
+        document.getElementById('startTraining').addEventListener('click', function() {
+            alert('Démarrage de la formation (démo)...');
+            // Ici on simulerait l'envoi du formulaire et le traitement
+            $('#newTrainingModal').modal('hide');
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %} 
