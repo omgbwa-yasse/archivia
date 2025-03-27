@@ -1,29 +1,24 @@
 <div class="sidebar">
     <div class="sidebar-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Correspondance</h5>
-        <button class="btn btn-sm btn-outline-primary" onclick="location.href='{% url 'correspondence:create' %}'">
-            <i class="fas fa-plus"></i>
-        </button>
     </div>
     
     <!-- Accès rapide -->
+    <h6 class="sidebar-subtitle"> Nouveau</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'incoming' %}active{% endif %}" href="{% url 'correspondence:incoming_list' %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'correspondence:create' %}active{% endif %}" href="{% url 'correspondence:create' %}">
                 <i class="fas fa-inbox"></i> Nouveau
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'outgoing' %}active{% endif %}" href="{% url 'correspondence:outgoing_list' %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'correspondence:scan' %}active{% endif %}" href="{% url 'correspondence:scan' %}">
                 <i class="fas fa-paper-plane"></i> Scanner
             </a>
         </li>
     </ul>
 
-
-    
     <!-- Vue d'ensemble -->
-    <h6 class="sidebar-subtitle"><i class="fas fa-home"></i> Principal</h6>
+    <h6 class="sidebar-subtitle"> Principal</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'list' %}active{% endif %}" href="{% url 'correspondence:list' %}">
@@ -33,7 +28,7 @@
     </ul>
     
     <!-- Types de correspondance -->
-    <h6 class="sidebar-subtitle"><i class="fas fa-mail-bulk"></i> Par type</h6>
+    <h6 class="sidebar-subtitle"> Par type</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'incoming' %}active{% endif %}" href="{% url 'correspondence:incoming_list' %}">
@@ -53,7 +48,7 @@
     </ul>
     
     <!-- Vues spéciales -->
-    <h6 class="sidebar-subtitle"><i class="fas fa-filter"></i> Filtres</h6>
+    <h6 class="sidebar-subtitle"> Filtres</h6>
     <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'recent' %}active{% endif %}" href="{% url 'correspondence:recent_list' %}">
@@ -69,9 +64,9 @@
     
     <!-- Gestion -->
     <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#gestionCollapse" aria-expanded="false">
-        <i class="fas fa-cogs"></i> Gestion <i class="fas fa-chevron-down float-end"></i>
+         Gestion 
     </h6>
-    <ul class="nav flex-column collapse" id="gestionCollapse">
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'folder_list' %}active{% endif %}" href="{% url 'correspondence:folder_list' %}">
                 <i class="fas fa-folder"></i> Dossiers
