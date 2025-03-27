@@ -221,7 +221,7 @@ def scan(request):
     context = {
         'priorities': CorrespondencePriority.objects.all(),
     }
-    return render(request, 'correspondence/scan.html', context)
+    return render(request, 'templates/scan.html', context)
 
 # Folder Views
 class CorrespondenceFolderListView(LoginRequiredMixin, ListView):

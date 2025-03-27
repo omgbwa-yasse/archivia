@@ -1,40 +1,58 @@
-<!-- Sidebar pour les outils -->
 <div class="sidebar">
-    <div class="sidebar-header">
+    <div class="sidebar-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Outils</h5>
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="createToolDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-plus"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="createToolDropdown">
+                <li><a class="dropdown-item" href="{% url 'tools:communicability_create' %}">Communicabilité</a></li>
+                <li><a class="dropdown-item" href="{% url 'tools:activity_create' %}">Activité</a></li>
+                <li><a class="dropdown-item" href="{% url 'tools:sort_create' %}">Tri</a></li>
+            </ul>
+        </div>
     </div>
-    <ul class="nav flex-column">
-        <!-- Communicabilité -->
+    
+    <!-- Outils principaux -->
+    <h6 class="sidebar-subtitle"><i class="fas fa-tools"></i> Outils principaux</h6>
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'communicability_list' %}active{% endif %}" href="{% url 'tools:communicability_list' %}">
                 <i class="fas fa-comments"></i> Communicabilité
             </a>
         </li>
-
-        <!-- Activité -->
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'activity_list' %}active{% endif %}" href="{% url 'tools:activity_list' %}">
                 <i class="fas fa-tasks"></i> Activité
             </a>
         </li>
-
-        <!-- Tri -->
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'sort_list' %}active{% endif %}" href="{% url 'tools:sort_list' %}">
                 <i class="fas fa-sort"></i> Tri
             </a>
         </li>
-
-        <!-- Conservation -->
+    </ul>
+    
+    <!-- Gestion de la conservation -->
+    <h6 class="sidebar-subtitle"><i class="fas fa-archive"></i> Conservation</h6>
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'retention_list' %}active{% endif %}" href="{% url 'tools:retention_list' %}">
-                <i class="fas fa-archive"></i> Conservation
+                <i class="fas fa-archive"></i> Règles de conservation
             </a>
         </li>
-
-        <li><hr class="dropdown-divider"></li>
-
-        <!-- Lois et réglementations -->
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'retention_law_article_list' %}active{% endif %}" href="{% url 'tools:retention_law_article_list' %}">
+                <i class="fas fa-gavel"></i> Articles applicables
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Cadre juridique -->
+    <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#legalCollapse" aria-expanded="false">
+        <i class="fas fa-balance-scale"></i> Cadre juridique <i class="fas fa-chevron-down float-end"></i>
+    </h6>
+    <ul class="nav flex-column collapse" id="legalCollapse">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'law_list' %}active{% endif %}" href="{% url 'tools:law_list' %}">
                 <i class="fas fa-gavel"></i> Lois
@@ -51,4 +69,34 @@
             </a>
         </li>
     </ul>
-</div> 
+    
+    <!-- Organisation -->
+    <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#orgCollapse" aria-expanded="false">
+        <i class="fas fa-sitemap"></i> Organisation <i class="fas fa-chevron-down float-end"></i>
+    </h6>
+    <ul class="nav flex-column collapse" id="orgCollapse">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'organisation_list' %}active{% endif %}" href="{% url 'tools:organisation_list' %}">
+                <i class="fas fa-building"></i> Organisations
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'organisation_activity_list' %}active{% endif %}" href="{% url 'tools:organisation_activity_list' %}">
+                <i class="fas fa-chart-line"></i> Activités
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Boutons d'action rapide -->
+    <div class="mt-4">
+        <h6 class="sidebar-subtitle"><i class="fas fa-bolt"></i> Actions rapides</h6>
+        <div class="d-grid gap-2">
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'tools:law_create' %}">
+                <i class="fas fa-plus"></i> Nouvelle loi
+            </a>
+            <a class="btn btn-outline-primary btn-sm" href="{% url 'tools:retention_create' %}">
+                <i class="fas fa-plus"></i> Nouvelle règle
+            </a>
+        </div>
+    </div>
+</div>

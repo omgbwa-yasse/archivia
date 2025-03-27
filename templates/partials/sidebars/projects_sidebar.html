@@ -1,18 +1,114 @@
-<!-- Sidebar pour la gestion des projets -->
 <div class="sidebar">
-    <div class="sidebar-header">
+    <div class="sidebar-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Gestion des projets</h5>
+        <button class="btn btn-sm btn-outline-primary" onclick="location.href='{% url 'projects:project_create' %}'">
+            <i class="fas fa-plus"></i>
+        </button>
     </div>
-    <ul class="nav flex-column">
+    
+    <!-- Accès rapide -->
+    <div class="mb-3 mt-2">
+        <div class="btn-group w-100">
+            <a class="btn btn-primary" href="{% url 'projects:project_create' %}">
+                <i class="fas fa-plus"></i> Nouveau projet
+            </a>
+            <a class="btn btn-outline-primary" href="{% url 'tasks:task_create' %}">
+                <i class="fas fa-tasks"></i> Nouvelle tâche
+            </a>
+        </div>
+    </div>
+    
+    <!-- Projets -->
+    <h6 class="sidebar-subtitle"><i class="fas fa-project-diagram"></i> Projets</h6>
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.namespace == 'projects' %}active{% endif %}" href="{% url 'projects:project_list' %}">
-                <i class="fas fa-project-diagram"></i> Projets
+            <a class="nav-link {% if request.resolver_match.url_name == 'project_list' and request.resolver_match.namespace == 'projects' %}active{% endif %}" href="{% url 'projects:project_list' %}">
+                <i class="fas fa-list"></i> Tous les projets
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.namespace == 'tasks' %}active{% endif %}" href="{% url 'tasks:task_list' %}">
-                <i class="fas fa-tasks"></i> Tâches
+            <a class="nav-link {% if request.resolver_match.url_name == 'my_projects' %}active{% endif %}" href="{% url 'projects:my_projects' %}">
+                <i class="fas fa-user-check"></i> Mes projets
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'milestone_list' %}active{% endif %}" href="{% url 'projects:milestone_list' %}">
+                <i class="fas fa-flag-checkered"></i> Jalons
             </a>
         </li>
     </ul>
-</div> 
+    
+    <!-- Tâches -->
+    <h6 class="sidebar-subtitle"><i class="fas fa-tasks"></i> Tâches</h6>
+    <ul class="nav flex-column mb-3">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'task_list' and request.resolver_match.namespace == 'tasks' %}active{% endif %}" href="{% url 'tasks:task_list' %}">
+                <i class="fas fa-list"></i> Toutes les tâches
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'my_tasks' %}active{% endif %}" href="{% url 'tasks:my_tasks' %}">
+                <i class="fas fa-user-check"></i> Mes tâches
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'task_calendar' %}active{% endif %}" href="{% url 'tasks:task_calendar' %}">
+                <i class="fas fa-calendar-alt"></i> Calendrier
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Filtres de tâches -->
+    <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#taskFiltersCollapse" aria-expanded="false">
+        <i class="fas fa-filter"></i> Filtres de tâches <i class="fas fa-chevron-down float-end"></i>
+    </h6>
+    <ul class="nav flex-column collapse" id="taskFiltersCollapse">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'urgent_tasks' %}active{% endif %}" href="{% url 'tasks:urgent_tasks' %}">
+                <i class="fas fa-exclamation-circle text-danger"></i> Urgentes
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'high_priority' %}active{% endif %}" href="{% url 'tasks:high_priority' %}">
+                <i class="fas fa-arrow-up text-warning"></i> Haute priorité
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'pending_tasks' %}active{% endif %}" href="{% url 'tasks:pending_tasks' %}">
+                <i class="fas fa-pause text-info"></i> En attente
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'in_progress' %}active{% endif %}" href="{% url 'tasks:in_progress' %}">
+                <i class="fas fa-spinner text-primary"></i> En cours
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'completed_tasks' %}active{% endif %}" href="{% url 'tasks:completed_tasks' %}">
+                <i class="fas fa-check text-success"></i> Terminées
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Rapports -->
+    <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#reportsCollapse" aria-expanded="false">
+        <i class="fas fa-chart-bar"></i> Rapports <i class="fas fa-chevron-down float-end"></i>
+    </h6>
+    <ul class="nav flex-column collapse" id="reportsCollapse">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'task_report' %}active{% endif %}" href="{% url 'tasks:task_report' %}">
+                <i class="fas fa-file-alt"></i> Rapport de tâches
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'performance_report' %}active{% endif %}" href="{% url 'tasks:performance_report' %}">
+                <i class="fas fa-tachometer-alt"></i> Performance
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'workload_report' %}active{% endif %}" href="{% url 'tasks:workload_report' %}">
+                <i class="fas fa-balance-scale"></i> Charge de travail
+            </a>
+        </li>
+    </ul>
+</div>

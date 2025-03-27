@@ -1,12 +1,22 @@
-<!-- Sidebar pour la messagerie -->
 <div class="sidebar">
-    <div class="sidebar-header">
+    <div class="sidebar-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Messagerie</h5>
     </div>
-    <ul class="nav flex-column">
+    
+    <!-- Accès rapide -->
+    <div class="mb-3 mt-2">
+        <a class="btn btn-primary w-100" href="{% url 'mails:compose' %}">
+            <i class="fas fa-pen"></i> Nouveau message
+        </a>
+    </div>
+    
+    <!-- Boîtes principales -->
+    <h6 class="sidebar-subtitle">Messages</h6>
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'inbox' %}active{% endif %}" href="{% url 'mails:inbox' %}">
                 <i class="fas fa-inbox"></i> Boîte de réception
+                <span class="badge bg-primary float-end">12</span>
             </a>
         </li>
         <li class="nav-item">
@@ -19,15 +29,42 @@
                 <i class="fas fa-file-alt"></i> Brouillons
             </a>
         </li>
+    </ul>
+    
+    <!-- Vues spéciales -->
+    <h6 class="sidebar-subtitle">Filtres</h6>
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'important' %}active{% endif %}" href="{% url 'mails:important' %}">
                 <i class="fas fa-exclamation-circle"></i> Importants
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'compose' %}active{% endif %}" href="{% url 'mails:compose' %}">
-                <i class="fas fa-pen"></i> Nouveau message
+            <a class="nav-link {% if request.resolver_match.url_name == 'flagged' %}active{% endif %}" href="{% url 'mails:flagged' %}">
+                <i class="fas fa-flag"></i> Signalés
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'favorites' %}active{% endif %}" href="{% url 'mails:favorites' %}">
+                <i class="fas fa-star"></i> Favoris
             </a>
         </li>
     </ul>
-</div> 
+    
+    <!-- Contacts -->
+    <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#contactsCollapse" aria-expanded="false">
+        <i class="fas fa-address-book"></i> Contacts <i class="fas fa-chevron-down float-end"></i>
+    </h6>
+    <ul class="nav flex-column collapse" id="contactsCollapse">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'contact_list' %}active{% endif %}" href="{% url 'mails:contact_list' %}">
+                <i class="fas fa-user"></i> Tous les contacts
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'groups' %}active{% endif %}" href="{% url 'mails:groups' %}">
+                <i class="fas fa-users"></i> Groupes
+            </a>
+        </li>
+    </ul>
+</div>

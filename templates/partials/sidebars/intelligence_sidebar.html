@@ -1,17 +1,33 @@
-<!-- Sidebar pour l'intelligence artificielle -->
 <div class="sidebar">
-    <div class="sidebar-header">
+    <div class="sidebar-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Intelligence Artificielle</h5>
+        <button class="btn btn-sm btn-outline-primary" onclick="location.href='{% url 'intelligence:chat_create' %}'">
+            <i class="fas fa-plus"></i>
+        </button>
     </div>
-    <ul class="nav flex-column">
-        <!-- Vue d'ensemble -->
+    
+    <!-- Accès rapide -->
+    <div class="mb-3 mt-2">
+        <div class="d-grid">
+            <a class="btn btn-primary" href="{% url 'intelligence:chat_create' %}">
+                <i class="fas fa-comments"></i> Nouvelle conversation
+            </a>
+        </div>
+    </div>
+    
+    <!-- Vue d'ensemble -->
+    <h6 class="sidebar-subtitle"><i class="fas fa-home"></i> Principal</h6>
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'intelligence:dashboard' %}">
                 <i class="fas fa-chart-line"></i> Tableau de bord
             </a>
         </li>
-
-        <!-- Analyse et prédictions -->
+    </ul>
+    
+    <!-- Analyse et prédictions -->
+    <h6 class="sidebar-subtitle"><i class="fas fa-brain"></i> Analyse</h6>
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'analysis' %}active{% endif %}" href="{% url 'intelligence:analysis' %}">
                 <i class="fas fa-chart-bar"></i> Analyse
@@ -19,55 +35,51 @@
         </li>
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'predictions' %}active{% endif %}" href="{% url 'intelligence:predictions' %}">
-                <i class="fas fa-brain"></i> Prédictions
+                <i class="fas fa-magic"></i> Prédictions
             </a>
         </li>
-
-        <li><hr class="dropdown-divider"></li>
-
-        <!-- Agents IA -->
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'agent_list' %}active{% endif %}" href="{% url 'intelligence:agent_list' %}">
-                <i class="fas fa-robot"></i> Agents IA
-            </a>
-        </li>
-
-        <!-- Modèles IA -->
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'model_list' %}active{% endif %}" href="{% url 'intelligence:model_list' %}">
-                <i class="fas fa-microchip"></i> Modèles IA
-            </a>
-        </li>
-
-        <!-- Prompts -->
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'prompt_list' %}active{% endif %}" href="{% url 'intelligence:prompt_list' %}">
-                <i class="fas fa-terminal"></i> Prompts
-            </a>
-        </li>
-
-        <li><hr class="dropdown-divider"></li>
-
-        <!-- Chats IA -->
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'chat_list' %}active{% endif %}" href="{% url 'intelligence:chat_list' %}">
                 <i class="fas fa-comments"></i> Conversations
             </a>
         </li>
-
-        <!-- Outils IA -->
+    </ul>
+    
+    <!-- Configuration IA -->
+    <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#iaConfigCollapse" aria-expanded="false">
+        <i class="fas fa-cogs"></i> Configuration IA <i class="fas fa-chevron-down float-end"></i>
+    </h6>
+    <ul class="nav flex-column collapse" id="iaConfigCollapse">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'agent_list' %}active{% endif %}" href="{% url 'intelligence:agent_list' %}">
+                <i class="fas fa-robot"></i> Agents IA
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'model_list' %}active{% endif %}" href="{% url 'intelligence:model_list' %}">
+                <i class="fas fa-microchip"></i> Modèles IA
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'prompt_list' %}active{% endif %}" href="{% url 'intelligence:prompt_list' %}">
+                <i class="fas fa-terminal"></i> Prompts
+            </a>
+        </li>
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'tool_list' %}active{% endif %}" href="{% url 'intelligence:tool_list' %}">
                 <i class="fas fa-tools"></i> Outils IA
             </a>
         </li>
-
-        <li><hr class="dropdown-divider"></li>
-
-        <!-- Formation et évaluation -->
+    </ul>
+    
+    <!-- Apprentissage -->
+    <h6 class="sidebar-subtitle collapsed" data-bs-toggle="collapse" data-bs-target="#learningCollapse" aria-expanded="false">
+        <i class="fas fa-graduation-cap"></i> Apprentissage <i class="fas fa-chevron-down float-end"></i>
+    </h6>
+    <ul class="nav flex-column collapse" id="learningCollapse">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'training' %}active{% endif %}" href="{% url 'intelligence:training' %}">
-                <i class="fas fa-graduation-cap"></i> Formation
+                <i class="fas fa-dumbbell"></i> Formation
             </a>
         </li>
         <li class="nav-item">
@@ -75,5 +87,10 @@
                 <i class="fas fa-clipboard-check"></i> Évaluation
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'reference_list' %}active{% endif %}" href="{% url 'intelligence:reference_list' %}">
+                <i class="fas fa-database"></i> Données de référence
+            </a>
+        </li>
     </ul>
-</div> 
+</div>

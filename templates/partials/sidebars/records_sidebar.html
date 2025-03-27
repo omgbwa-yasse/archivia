@@ -1,12 +1,35 @@
-<!-- Sidebar pour la gestion documentaire -->
 <div class="sidebar">
-    <div class="sidebar-header">
-        <h5 class="mb-0">Gestion documentaire</h5>
+    <!-- Accès rapide -->
+    <div class="mb-3">
+    <h6 class="sidebar-subtitle">Accès rapide</h6>
+    
+    <ul class="nav flex-column mb-3">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'records:folder_create' %}">
+                <i class="fas fa-folder-plus"></i> Nouveau dossier
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'records:document_create' %}">
+                <i class="fas fa-file"></i> Nouveau document
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'records:document_import' %}">
+                <i class="fas fa-file-import"></i> Importer
+            </a>
+        </li>
+    </ul>
+        
+
     </div>
-    <ul class="nav flex-column">
+    
+    <!-- Vues principales -->
+    <h6 class="sidebar-subtitle">Navigation</h6>
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'folder_list' %}active{% endif %}" href="{% url 'records:folder_list' %}">
-                <i class="fas fa-folder"></i> Records
+                <i class="fas fa-folder"></i> Dossiers
             </a>
         </li>
         <li class="nav-item">
@@ -14,9 +37,14 @@
                 <i class="fas fa-file"></i> Documents
             </a>
         </li>
+    </ul>
+    
+    <!-- Vues spéciales -->
+    <h6 class="sidebar-subtitle">Vues spéciales</h6>
+    <ul class="nav flex-column mb-3">
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'recent_documents' %}active{% endif %}" href="{% url 'records:recent_documents' %}">
-                <i class="fas fa-clock"></i> Documents récents
+                <i class="fas fa-clock"></i> Récents
             </a>
         </li>
         <li class="nav-item">
@@ -30,4 +58,4 @@
             </a>
         </li>
     </ul>
-</div> 
+</div>
